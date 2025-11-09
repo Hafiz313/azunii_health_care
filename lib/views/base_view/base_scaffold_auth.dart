@@ -46,14 +46,25 @@ class _BaseScaffoldAuthState extends State<BaseScaffoldAuth> {
       },
       child: SafeArea(
         child: Scaffold(
-            backgroundColor: widget.backgroundColor ?? AppColors.primary,
+            backgroundColor: widget.backgroundColor ??
+                const Color.fromARGB(255, 255, 255, 255),
             resizeToAvoidBottomInset: true,
             body: InkWell(
               onTap: () {
                 FocusManager.instance.primaryFocus?.unfocus();
               },
               child: Container(
-                  color: widget.backgroundColor ?? AppColors.primary,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      stops: const [0.0, 0.35],
+                      colors: [
+                        widget.backgroundColor ?? AppColors.primary,
+                        Colors.white,
+                      ],
+                    ),
+                  ),
                   child: widget.body!),
             )),
       ),

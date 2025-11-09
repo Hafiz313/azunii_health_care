@@ -11,6 +11,7 @@ import '../../base_view/base_scaffold.dart';
 import '../../home/home_view.dart';
 import '../../widget/buttons.dart';
 import '../../widget/text_fields.dart';
+import '../../widget/social_button.dart';
 import 'controller/login_controller.dart';
 
 class LoginWidgets {
@@ -25,14 +26,15 @@ class LoginWidgets {
   static Widget buildEmailField(
       BuildContext context, LoginController controller) {
     return CustomTxtField(
-      hintTxt: Lang.email,
+      title: Lang.email,
+      hintTxt: Lang.enterYourEmail,
       // enabled: !mainLoading.value,
       textEditingController: controller.emailTxtField,
-      // suffixIcon: Icon(
-      //   FontAwesomeIcons.solidEnvelope,
-      //   color: AppColors.borderColor,
-      //   size: context.percentHeight * 2.0,
-      // ),
+      prefixIcon: Icon(
+        FontAwesomeIcons.envelope,
+        color: AppColors.borderColor,
+        size: context.percentHeight * 2.0,
+      ),
       validator: (String? val) {
         if (val!.isEmpty) return Lang.empty;
         if (!emailExp.hasMatch(val)) return Lang.empty;
@@ -44,11 +46,17 @@ class LoginWidgets {
   static Widget buildPasswordField(
       BuildContext context, LoginController controller) {
     return Obx(() => CustomTxtField(
-          hintTxt: Lang.password,
+          title: Lang.password,
+          hintTxt: Lang.enterYourPassword,
           // enabled: !mainLoading.value,
           textEditingController: controller.passwordTxtField,
           keyboardType: TextInputType.visiblePassword,
           isHiddenPassword: controller.isPasswordVisible.value,
+          prefixIcon: Icon(
+            Icons.lock_outline,
+            color: AppColors.borderColor,
+            size: context.percentHeight * 2.5,
+          ),
           suffixIcon: InkWell(
             onTap: () => controller.isPasswordVisible.value =
                 !controller.isPasswordVisible.value,
@@ -75,12 +83,48 @@ class LoginWidgets {
         children: [
           Row(
             children: [
-              Checkbox(
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                visualDensity: VisualDensity.compact,
-                value: controller.isChecked.value,
-                onChanged: controller.toggleRememberMe,
-                side: BorderSide(color: AppColors.borderColor, width: 1.5),
+              Container(
+                height: context.percentHeight * 3,
+                width: context.percentHeight * 3,
+                padding: const EdgeInsets.all(0),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: controller.isChecked.value
+                        ? AppColors.secondary
+                        : AppColors.borderColor,
+                    width: 0.5,
+                  ),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Transform.scale(
+                  scale: 0.8,
+                  child: Checkbox(
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                    value: controller.isChecked.value,
+                    onChanged: controller.toggleRememberMe,
+                    side: BorderSide(
+                        color: controller.isChecked.value
+                            ? AppColors.secondary
+                            : AppColors.borderColor,
+                        width: 0.8),
+                    fillColor: MaterialStateProperty.resolveWith<Color?>(
+                      (Set<MaterialState> states) {
+                        if (states.contains(MaterialState.selected)) {
+                          return AppColors.secondary;
+                        }
+                        return Colors.transparent;
+                      },
+                    ),
+                    checkColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: context.percentWidth * 2,
               ),
               Text(
                 Lang.rememberMe,
@@ -96,9 +140,8 @@ class LoginWidgets {
             child: const Text(
               Lang.forgotPassword,
               style: TextStyle(
-                color: AppColors.blackColor,
-                fontWeight: FontWeight.bold,
-                decoration: TextDecoration.underline,
+                color: AppColors.redColor,
+                fontWeight: FontWeight.w400,
               ),
             ),
           ),
@@ -131,9 +174,35 @@ class LoginWidgets {
   static Widget buildLoginButton(BuildContext context,
       {required Function() onPress}) {
     return AppElevatedButton(
-      backgroundColor: AppColors.blue,
+      backgroundColor: AppColors.secondary,
       onPressed: onPress,
-      title: Lang.logIn,
+      title: Lang.signIn,
+    );
+  }
+
+  static Widget buildSocialButtons(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: SocialButton(
+            text: Lang.google,
+            iconPath: AppAssets.googleIcon,
+            onPressed: () {
+              // Handle Google sign in
+            },
+          ),
+        ),
+        SizedBox(width: context.percentWidth * 4.0),
+        Expanded(
+          child: SocialButton(
+            text: Lang.apple,
+            iconPath: AppAssets.appleIcon,
+            onPressed: () {
+              // Handle Apple sign in
+            },
+          ),
+        ),
+      ],
     );
   }
 }

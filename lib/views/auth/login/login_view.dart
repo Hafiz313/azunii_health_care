@@ -104,27 +104,21 @@ class _LoginViewState extends State<LoginView> {
 
   Widget _buildFormContainer(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(context.percentHeight * 2.0),
+      padding: EdgeInsets.symmetric(
+          horizontal: context.percentWidth * 0.02,
+          vertical: context.percentHeight * 0.1),
       decoration: BoxDecoration(
-        color: AppColors.white,
         borderRadius: BorderRadius.circular(context.percentHeight * 0.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
       ),
       child: Form(
         key: controller.formKey,
         child: Column(children: [
           Text(
-            Lang.loginToContinue,
+            Lang.welcomeBack,
             style: TextStyle(
               fontSize: context.percentHeight * 2.5,
               fontWeight: FontWeight.bold,
-              color: AppColors.blue,
+              color: AppColors.blackColor,
             ),
           ),
           SizedBox(height: context.percentHeight * 2.0),
@@ -186,7 +180,9 @@ class _LoginViewState extends State<LoginView> {
                       ),
                     LoginWidgets.buildLoginButton(context,
                         onPress: () => controller.login(context)),
-                    SizedBox(height: context.percentHeight * 1),
+                    SizedBox(height: context.percentHeight * 2.0),
+
+                    SizedBox(height: context.percentHeight * 2.0),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
@@ -194,7 +190,7 @@ class _LoginViewState extends State<LoginView> {
                         subText4(
                           Lang.donntHaveAnAccount,
                           color: AppColors.blackColor,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w400,
                         ),
                         SizedBox(width: context.percentWidth * 1),
                         InkWell(
@@ -205,10 +201,14 @@ class _LoginViewState extends State<LoginView> {
                             child: subText4(
                               Lang.signUp,
                               color: AppColors.primary,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w400,
                             )),
                       ],
                     ),
+                    SizedBox(
+                      height: context.percentHeight * 5,
+                    ),
+                    LoginWidgets.buildSocialButtons(context),
                   ],
                 ))
         ]),

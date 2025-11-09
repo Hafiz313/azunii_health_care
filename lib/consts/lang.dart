@@ -10,6 +10,9 @@ class Lang {
   static const String splashText =
       'User friendly, simple, easy, few clicks to run payroll';
   static const String alreadyText = 'Already have an account?';
+
+  static const String enterYourEmail = 'Enter Your Email';
+  static const String enterYourPassword = 'Enter Your Passsword';
   static const String didntReceived = 'Didn’t Received OTP?';
   static const String donntHaveAnAccount = 'Don’t have an account?';
   static const String sendAgain = 'Send Again';
@@ -145,10 +148,10 @@ class Lang {
   static const String employeeRegisteredEmail = 'Employee Email';
   static const String createNewAccount = 'CREATE NEW ACCOUNT';
   static const String enterOtpCode = 'Enter OTP Code';
-  static const String loginToContinue = 'LOGIN TO CONTINUE';
+  static const String welcomeBack = 'WELCOME BACK';
   static const String forgetPassword = 'Forget Password';
   static const String restPassword = 'Rest Password';
-  static const String logIn = 'Log In';
+  static const String signIn = 'Sign In';
   static const String password = 'Password';
   static const String reasonForTheSubstituteRequest =
       'Reason for the Substitute Request';
@@ -174,4 +177,8 @@ class Lang {
   static const String no = 'No';
 
   static const String pleaseEnterValidEmail = 'Please enter a valid Email';
+  static const String verifyPassword = 'Verify Password';
+  static const String enterYourFullName = 'Enter Your Full Name';
+  static const String google = 'Google';
+  static const String apple = 'Apple';
 }

@@ -48,15 +48,7 @@ class ForgetView extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(context.percentHeight * 2.0),
       decoration: BoxDecoration(
-        color: AppColors.white,
         borderRadius: BorderRadius.circular(context.percentHeight * 0.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
       ),
       child: Form(
         key: controller.formKey,
@@ -67,7 +59,7 @@ class ForgetView extends StatelessWidget {
               style: TextStyle(
                 fontSize: context.percentHeight * 2.5,
                 fontWeight: FontWeight.bold,
-                color: AppColors.blue,
+                color: AppColors.borderColor,
               ),
             ),
             SizedBox(height: context.percentHeight * 2.0),
@@ -92,10 +84,12 @@ class ForgetView extends StatelessWidget {
   static Widget buildEmailField(
       BuildContext context, TextEditingController textEditingController) {
     return CustomTxtField(
-      hintTxt: Lang.email,
+      title: Lang.email,
+      hintTxt: Lang.enterYourEmail,
+      // enabled: !mainLoading.value,
       textEditingController: textEditingController,
-      suffixIcon: Icon(
-        FontAwesomeIcons.solidEnvelope,
+      prefixIcon: Icon(
+        FontAwesomeIcons.envelope,
         color: AppColors.borderColor,
         size: context.percentHeight * 2.0,
       ),
@@ -105,11 +99,26 @@ class ForgetView extends StatelessWidget {
         return null;
       },
     );
+
+    // CustomTxtField(
+    //   hintTxt: Lang.email,
+    //   textEditingController: textEditingController,
+    //   suffixIcon: Icon(
+    //     FontAwesomeIcons.solidEnvelope,
+    //     color: AppColors.borderColor,
+    //     size: context.percentHeight * 2.0,
+    //   ),
+    //   validator: (String? val) {
+    //     if (val!.isEmpty) return Lang.empty;
+    //     if (!emailExp.hasMatch(val)) return Lang.empty;
+    //     return null;
+    //   },
+    // );
   }
 
   static Widget btn(BuildContext context, {required Function() onPress}) {
     return AppElevatedButton(
-      backgroundColor: AppColors.blue,
+      backgroundColor: AppColors.secondary,
       onPressed: onPress,
       title: Lang.getCode,
     );

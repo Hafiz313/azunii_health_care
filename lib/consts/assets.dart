@@ -11,4 +11,6 @@ class AppAssets {
   static const String bell = 'assets/svg/bell.svg';
   static const String attendanceHistory = 'assets/svg/attendanceHistory.svg';
   static const String remender = 'assets/svg/remender.svg';
+  static const String googleIcon = 'assets/icons/google.svg';
+  static const String appleIcon = 'assets/icons/apple.svg';
 }
