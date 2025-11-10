@@ -15,8 +15,8 @@ import '../../../../utils/custom_dialog.dart';
 import '../../../../utils/helper.dart';
 import '../../../../utils/localStorage/storage_consts.dart';
 import '../../../../utils/localStorage/storage_service.dart';
-import '../../../home/controller/home_controller.dart';
-import '../../../home/home_view.dart';
+import '../../../care_taker/home/controller/home_controller.dart';
+import '../../../care_taker/home/home_view.dart';
 import '../../Otp/otp_view.dart';
 import '../../login/login_view.dart';
 

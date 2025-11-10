@@ -8,7 +8,7 @@ import '../../../consts/assets.dart';
 import '../../../consts/colors.dart';
 import '../../../consts/lang.dart';
 import '../../base_view/base_scaffold.dart';
-import '../../home/home_view.dart';
+import '../../care_taker/home/home_view.dart';
 import '../../widget/buttons.dart';
 import '../../widget/text_fields.dart';
 import '../../widget/social_button.dart';

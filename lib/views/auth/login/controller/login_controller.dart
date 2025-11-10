@@ -19,9 +19,9 @@ import '../../../../utils/custom_dialog.dart';
 import '../../../../utils/helper.dart';
 import '../../../../utils/localStorage/storage_consts.dart';
 import '../../../../utils/localStorage/storage_service.dart';
-import '../../../home/controller/home_controller.dart';
-import '../../../home/controller/switch_company_controller.dart';
-import '../../../home/home_view.dart';
+import '../../../care_taker/home/controller/home_controller.dart';
+import '../../../care_taker/home/controller/switch_company_controller.dart';
+import '../../../care_taker/home/home_view.dart';
 import '../login_view.dart';
 
 class LoginController extends GetxController {
@@ -219,10 +219,9 @@ class LoginController extends GetxController {
                 .saveData(StorageConsts.kAccessToken, accessToken.toString());
             savePassword();
             afterLoginInfoApi(context);
-            
+
             // Check company count for switch company feature
 
-            
             Navigator.of(context).pushNamedAndRemoveUntil(
               HomeView.routeName,
               (Route<dynamic> route) => false,

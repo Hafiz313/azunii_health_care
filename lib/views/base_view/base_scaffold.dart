@@ -5,8 +5,8 @@ import '../../consts/colors.dart';
 import '../../utils/inactivity_service.dart';
 import '../../utils/navigation_dailog.dart';
 import '../auth/login/controller/login_controller.dart';
-import '../home/home_view.dart';
-import '../home/controller/home_controller.dart';
+import '../care_taker/home/home_view.dart';
+import '../care_taker/home/controller/home_controller.dart';
 
 class BaseScaffold extends StatefulWidget {
   final Widget? body;
@@ -143,9 +143,11 @@ class _BaseScaffoldState extends State<BaseScaffold> {
                         children: [
                           Obx(() {
                             final homeController = Get.find<HomeController>();
-                            final selectedJob = homeController.selectedJob.value;
-                            final jobTitle = selectedJob.jobTitle?.toString() ?? 'Eworkforce Payroll';
-                            
+                            final selectedJob =
+                                homeController.selectedJob.value;
+                            final jobTitle = selectedJob.jobTitle?.toString() ??
+                                'Eworkforce Payroll';
+
                             return Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -157,7 +159,8 @@ class _BaseScaffoldState extends State<BaseScaffold> {
                                     color: Color(0xFF2F308C), // Navy blue color
                                   ),
                                 ),
-                                if (selectedJob.jobTitle != null && homeController.isMultiJob.value)
+                                if (selectedJob.jobTitle != null &&
+                                    homeController.isMultiJob.value)
                                   Text(
                                     jobTitle,
                                     style: TextStyle(

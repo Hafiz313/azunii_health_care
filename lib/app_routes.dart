@@ -1,4 +1,3 @@
-
 import 'package:azunii_health_care/views/auth/Otp/otp_forget_view.dart';
 import 'package:azunii_health_care/views/auth/Otp/otp_signup_view.dart';
 import 'package:azunii_health_care/views/auth/forget/froget_view.dart';
@@ -8,9 +7,7 @@ import 'package:azunii_health_care/views/auth/Otp/otp_view.dart';
 import 'package:azunii_health_care/views/auth/sing_up/signup_view.dart';
 import 'package:azunii_health_care/views/auth/splash_view.dart';
 
-import 'package:azunii_health_care/views/home/home_view.dart';
-
-
+import 'package:azunii_health_care/views/care_taker/home/home_view.dart';
 
 import 'package:get/get_navigation/src/routes/get_route.dart';
 
