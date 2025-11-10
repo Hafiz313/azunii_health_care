@@ -36,8 +36,8 @@ class LoginWidgets {
         size: context.percentHeight * 2.0,
       ),
       validator: (String? val) {
-        if (val!.isEmpty) return Lang.empty;
-        if (!emailExp.hasMatch(val)) return Lang.empty;
+        if (val!.isEmpty) return Lang.enterYourEmail;
+        if (!emailExp.hasMatch(val)) return Lang.enterYourEmail;
         return null;
       },
     );
@@ -69,7 +69,7 @@ class LoginWidgets {
             ),
           ),
           validator: (String? val) {
-            if (val!.isEmpty) return Lang.empty;
+            if (val!.isEmpty) return Lang.enterYourPassword;
             return null;
           },
         ));

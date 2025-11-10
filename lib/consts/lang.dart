@@ -17,6 +17,7 @@ class Lang {
   static const String donntHaveAnAccount = 'Don’t have an account?';
   static const String sendAgain = 'Send Again';
   static const String termsCondition = 'Accept Terms & Condition';
+  static const String enterEmail = 'Accept Terms & Condition';
   static const String acceptTerms = 'Accept Terms & Condition';
   static const String accept = 'Accept';
   static const String rememberMe = 'Remember me';
@@ -175,6 +176,14 @@ class Lang {
   static const String punctuality = 'Punctuality';
   static const String yes = 'Yes';
   static const String no = 'No';
+
+  // Patient Bottom Navigation
+  static const String home = 'Home';
+  static const String medicines = 'Medicines';
+  static const String visits = 'Visits';
+  static const String summary = 'Summary';
+  static const String timeline = 'Timeline';
+  static const String advocacy = 'Advocacy';
 
   static const String pleaseEnterValidEmail = 'Please enter a valid Email';
   static const String verifyPassword = 'Verify Password';

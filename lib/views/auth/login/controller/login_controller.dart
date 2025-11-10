@@ -80,7 +80,10 @@ class LoginController extends GetxController {
     if (formKey.currentState!.validate()) {
       String email = emailTxtField.text;
       String paswwod = passwordTxtField.text;
-      isTenantAvailable(context, email: email, password: paswwod);
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        '/patient-dashboard',
+        (Route<dynamic> route) => false,
+      );
     }
   }
 
@@ -223,7 +226,7 @@ class LoginController extends GetxController {
             // Check company count for switch company feature
 
             Navigator.of(context).pushNamedAndRemoveUntil(
-              HomeView.routeName,
+              '/patient-dashboard',
               (Route<dynamic> route) => false,
             );
           } else {

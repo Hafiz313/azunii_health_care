@@ -3,6 +3,17 @@ import 'package:flutter/material.dart';
 import '../../consts/colors.dart';
 import '../../consts/fonts.dart';
 
+///Fontsize 28 bold heading
+Text headingText1(String title, {Color color = AppColors.headingTextColor}) => Text(
+      title,
+      style: TextStyle(
+        fontSize: 28.0,
+        fontWeight: FontWeight.bold,
+        fontFamily: FontFamily.satoshi,
+        color: color,
+      ),
+    );
+
 ///Fontsize 24 bold
 Text headline1(String title, {Color color = AppColors.textColor}) => Text(
       title,
