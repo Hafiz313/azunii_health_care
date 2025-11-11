@@ -19,9 +19,8 @@ import '../../../../utils/custom_dialog.dart';
 import '../../../../utils/helper.dart';
 import '../../../../utils/localStorage/storage_consts.dart';
 import '../../../../utils/localStorage/storage_service.dart';
-import '../../../care_taker/home/controller/home_controller.dart';
-import '../../../care_taker/home/controller/switch_company_controller.dart';
-import '../../../care_taker/home/home_view.dart';
+
+import '../../../patient/home/home_view.dart';
 import '../login_view.dart';
 
 class LoginController extends GetxController {
@@ -286,35 +285,35 @@ class LoginController extends GetxController {
 
     // Clear home controller data
     try {
-      final homeController = Get.find<HomeController>();
+      // final homeController = Get.find<HomeController>();
 
-      // Reset dashboard model
-      homeController.dashboardModel.value = DashBoardModel(
-        result: DashBoardResult(
-          workHoursDetails: WorkHoursDetails(),
-          announcements: [],
-          todayActivities: [],
-          leaves: Leaves(),
-        ),
-      );
+      // // Reset dashboard model
+      // homeController.dashboardModel.value = DashBoardModel(
+      //   result: DashBoardResult(
+      //     workHoursDetails: WorkHoursDetails(),
+      //     announcements: [],
+      //     todayActivities: [],
+      //     leaves: Leaves(),
+      //   ),
+      // );
 
-      // Clear job lists
-      homeController.jobEmpList.clear();
-      homeController.selectedJob.value = GetJobResult();
+      // // Clear job lists
+      // homeController.jobEmpList.clear();
+      // homeController.selectedJob.value = GetJobResult();
 
-      // Reset timer variables
-      homeController.hours.value = 0;
-      homeController.minutes.value = 0;
-      homeController.seconds.value = 0;
+      // // Reset timer variables
+      // homeController.hours.value = 0;
+      // homeController.minutes.value = 0;
+      // homeController.seconds.value = 0;
 
-      // Reset boolean flags
-      homeController.isPunchIn.value = true;
-      homeController.isMultiJob.value = true;
+      // // Reset boolean flags
+      // homeController.isPunchIn.value = true;
+      // homeController.isMultiJob.value = true;
 
-      // Cancel timer if running
-      if (homeController.timer?.isActive == true) {
-        homeController.timer?.cancel();
-      }
+      // // Cancel timer if running
+      // if (homeController.timer?.isActive == true) {
+      //   homeController.timer?.cancel();
+      // }
     } catch (e) {
       // HomeController might not be initialized, ignore error
       print('HomeController not found during logout: $e');

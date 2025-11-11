@@ -1,10 +1,11 @@
+import 'package:azunii_health_care/views/patient/home/controller/patient_home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import '../../../../consts/colors.dart';
 import '../../../../consts/lang.dart';
 import '../../../../utils/percentage_size_ext.dart';
-import '../controller/patient_home_controller.dart';
+
 import 'bottom_nav_item.dart';
 
 class PatientBottomNav extends StatelessWidget {

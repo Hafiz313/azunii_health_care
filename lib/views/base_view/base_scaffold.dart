@@ -5,8 +5,7 @@ import '../../consts/colors.dart';
 import '../../utils/inactivity_service.dart';
 import '../../utils/navigation_dailog.dart';
 import '../auth/login/controller/login_controller.dart';
-import '../care_taker/home/home_view.dart';
-import '../care_taker/home/controller/home_controller.dart';
+import '../patient/home/home_view.dart';
 
 class BaseScaffold extends StatefulWidget {
   final Widget? body;
@@ -63,7 +62,7 @@ class _BaseScaffoldState extends State<BaseScaffold> {
     });
     if (index == 0) {
       Navigator.of(context).pushNamedAndRemoveUntil(
-        HomeView.routeName,
+        '/patient-dashboard',
         (Route<dynamic> route) => false,
       );
     }
@@ -137,44 +136,44 @@ class _BaseScaffoldState extends State<BaseScaffold> {
                             ),
 
                       // Title
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Obx(() {
-                            final homeController = Get.find<HomeController>();
-                            final selectedJob =
-                                homeController.selectedJob.value;
-                            final jobTitle = selectedJob.jobTitle?.toString() ??
-                                'Eworkforce Payroll';
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.center,
+                      //   crossAxisAlignment: CrossAxisAlignment.center,
+                      //   children: [
+                      //     Obx(() {
+                      //       final homeController = Get.find<HomeController>();
+                      //       final selectedJob =
+                      //           homeController.selectedJob.value;
+                      //       final jobTitle = selectedJob.jobTitle?.toString() ??
+                      //           'Eworkforce Payroll';
 
-                            return Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'Eworkforce Payroll',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF2F308C), // Navy blue color
-                                  ),
-                                ),
-                                if (selectedJob.jobTitle != null &&
-                                    homeController.isMultiJob.value)
-                                  Text(
-                                    jobTitle,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color(0xFF2F308C).withOpacity(0.8),
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                              ],
-                            );
-                          }),
-                        ],
-                      ),
+                      //       return Column(
+                      //         mainAxisSize: MainAxisSize.min,
+                      //         children: [
+                      //           Text(
+                      //             'Eworkforce Payroll',
+                      //             style: TextStyle(
+                      //               fontSize: 18,
+                      //               fontWeight: FontWeight.bold,
+                      //               color: Color(0xFF2F308C), // Navy blue color
+                      //             ),
+                      //           ),
+                      //           if (selectedJob.jobTitle != null &&
+                      //               homeController.isMultiJob.value)
+                      //             Text(
+                      //               jobTitle,
+                      //               style: TextStyle(
+                      //                 fontSize: 14,
+                      //                 fontWeight: FontWeight.w500,
+                      //                 color: Color(0xFF2F308C).withOpacity(0.8),
+                      //               ),
+                      //               textAlign: TextAlign.center,
+                      //             ),
+                      //         ],
+                      //       );
+                      //     }),
+                      //   ],
+                      // ),
                       Container(),
 
                       // Notification Icons

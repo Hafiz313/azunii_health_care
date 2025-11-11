@@ -7,7 +7,7 @@ import 'package:azunii_health_care/views/auth/Otp/otp_view.dart';
 import 'package:azunii_health_care/views/auth/sing_up/signup_view.dart';
 import 'package:azunii_health_care/views/auth/splash_view.dart';
 
-import 'package:azunii_health_care/views/care_taker/home/home_view.dart';
+import 'package:azunii_health_care/views/patient/home/home_view.dart';
 import 'package:azunii_health_care/views/patient/patient_dashboard.dart';
 import 'package:azunii_health_care/views/patient/visits/visits_view.dart';
 import 'package:azunii_health_care/views/patient/summary/feedback_view.dart';

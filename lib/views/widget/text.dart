@@ -4,7 +4,8 @@ import '../../consts/colors.dart';
 import '../../consts/fonts.dart';
 
 ///Fontsize 28 bold heading
-Text headingText1(String title, {Color color = AppColors.headingTextColor}) => Text(
+Text headingText1(String title, {Color color = AppColors.headingTextColor}) =>
+    Text(
       title,
       style: TextStyle(
         fontSize: 28.0,
@@ -89,7 +90,7 @@ Text headline5(String title,
       style: TextStyle(
           decoration: txtDecoration ?? TextDecoration.none,
           fontWeight: fontWeight ?? FontWeight.bold,
-          fontSize: 18.0,
+          fontSize: 16.0,
           fontFamily: FontFamily.satoshi,
           color: color),
     );
@@ -204,7 +205,7 @@ Text subText6(
       title,
       textAlign: align ?? TextAlign.center,
       style: TextStyle(
-        fontSize: 8.0,
+        fontSize: 10.0,
         fontFamily: FontFamily.satoshi,
         fontWeight: fontWeight ?? FontWeight.normal,
         color: color,
