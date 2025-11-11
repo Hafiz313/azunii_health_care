@@ -9,6 +9,9 @@ import 'package:azunii_health_care/views/auth/splash_view.dart';
 
 import 'package:azunii_health_care/views/care_taker/home/home_view.dart';
 import 'package:azunii_health_care/views/patient/patient_dashboard.dart';
+import 'package:azunii_health_care/views/patient/visits/visits_view.dart';
+import 'package:azunii_health_care/views/patient/summary/feedback_view.dart';
+import 'package:azunii_health_care/views/patient/advocacy/add_caregiver_view.dart';
 
 import 'package:get/get_navigation/src/routes/get_route.dart';
 
@@ -23,6 +26,9 @@ class AppRoutes {
   static const otpForget = OtpForgetView.routeName;
   static const restPas = RestPasswordView.routeName;
   static const patientDashboard = PatientDashboard.routeName;
+  static const addVisit = AddVisitView.routeName;
+  static const feedback = FeedbackView.routeName;
+  static const addCaregiver = AddCaregiverView.routeName;
 
   static final List<GetPage> pages = [
     GetPage(name: splash, page: () => SplashView()),
@@ -35,5 +41,8 @@ class AppRoutes {
     GetPage(name: otpForget, page: () => OtpForgetView()),
     GetPage(name: restPas, page: () => RestPasswordView()),
     GetPage(name: patientDashboard, page: () => PatientDashboard()),
+    GetPage(name: addVisit, page: () => const AddVisitView()),
+    GetPage(name: feedback, page: () => const FeedbackView()),
+    GetPage(name: addCaregiver, page: () => const AddCaregiverView()),
   ];
 }

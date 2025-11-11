@@ -8,6 +8,7 @@ plugins {
 android {
     namespace = "azunii.healthcare.azunii_health_care"
     compileSdk = flutter.compileSdkVersion
+    buildToolsVersion = "33.0.2"
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

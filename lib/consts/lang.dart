@@ -184,6 +184,97 @@ class Lang {
   static const String summary = 'Summary';
   static const String timeline = 'Timeline';
   static const String advocacy = 'Advocacy';
+  
+  // Home Screen
+  static const String viewVisit = 'View Visit';
+  static const String viewMedication = 'View Medication';
+  static const String viewTimeline = 'View Timeline';
+  static const String asOfToday = 'As of Today';
+  static const String upcomingVisits = 'Upcoming Visits';
+  static const String futureAppointments = 'Future Appointments';
+  static const String viewAll = 'View All';
+  static const String healthStatus = 'Health status:';
+  static const String stable = 'Stable';
+  static const String lastActivity = 'Last Activity:';
+  static const String hoursAgo = 'hours ago';
+  static const String takeEyeDrops = 'Take eye drops 2x/day';
+  static const String takenOnTime = 'Taken on time';
+  static const String nextAppointment = 'Next Appointment';
+  static const String daysAway = 'Days away';
+  static const String vitalSigns = 'Vital Signs';
+  static const String normal = 'Normal';
+  static const String allReadingsStable = 'All readings stable';
+  static const String doctor = 'Doctor';
+  static const String reasonToVisit = 'Reason to Visit';
+  static const String father = 'Father';
+  
+  // New Home Screen
+  static const String addVisit = 'Add Visit';
+  static const String addMedication = 'Add Medication';
+  static const String reviewMed = 'Review Med';
+  static const String medicationAlert = 'Medication Alert';
+  static const String medContraindication = 'Med 1 + Med 2 contraindication - Consult your doctor';
+  static const String takeMedDaily = 'Take 1 med X daily until Oct 2';
+  static const String doNotTakeMed = 'Do not take med Z until Oct 3';
+  static const String limitedExercise = 'Limited exercise until Sept 30';
+  
+  // Add Visit Screen
+  static const String prepareForNewVisit = 'Prepare for New Visit';
+  static const String providerName = 'Provider Name';
+  static const String enterProviderName = 'Enter Provider Name';
+  static const String specialty = 'Specialty';
+  static const String selectSpecialty = 'Select Specialty';
+  static const String selectDate = 'Select Date';
+  static const String notes = 'Notes';
+  static const String writeDescription = 'Write your Description';
+  static const String photoDocumentUpload = 'Photo/Document Upload';
+  static const String selectAndUploadPhoto = 'Select and upload the Photo of your choice';
+  static const String chooseFileOrDrag = 'Choose a file or drag & drop it here';
+  static const String fileFormats = 'JPEG, PNG, PDF, and MP4 formats, up to 50MB';
+  static const String save = 'Save';
+  
+  // Medicines Screen
+  static const String medication = 'Medication';
+  static const String afterMeals = 'After Meals';
+  static const String endDate = 'End Date:';
+  static const String drugInteractions = 'Drug Interactions';
+  static const String interactsWith = 'Interacts with:';
+  static const String mayReduceEffectiveness = 'May reduce effectiveness of blood pressure medication';
+  static const String viewDetails = 'View Details';
+  
+  // Add Medicine Screen
+  static const String addMedicine = 'Add Medicine';
+  static const String medName = 'Med name';
+  static const String enterMedName = 'Enter Your Med Name';
+  static const String dosage = 'Dosage';
+  static const String enterDosage = 'Enter Dosage';
+  static const String frequency = 'Frequency';
+  static const String enterMedFrequency = 'Enter med frequency';
+  static const String selectStatus = 'Select status';
+  static const String uploadFiles = 'Upload files';
+  static const String selectAndUploadFiles = 'Select and upload the files of your choice';
+  static const String medicationSafetyAlert = 'Medication Safety Alert';
+  static const String possibleInteractionDetected = 'Possible interaction detected. Statins paused for 5 days due to COVID diagnosis.';
+  static const String important = 'Important:';
+  static const String potentialInteractionMessage = 'A potential interaction has been identified between your current medications. Your healthcare provider should review this before you continue.';
+  static const String reviewMedications = 'Review Medications';
+  static const String speakWithPrescribers = 'Speak with prescribers';
+  static const String medicationList = 'Medication List';
+  static const String confirmAndSave = 'Confirm & Save';
+  static const String dose = 'Dose';
+  
+  // Timeline Screen
+  static const String visitTimeline = 'Visit Timeline';
+  static const String sortBy = 'Sort By';
+  static const String walkMinutes = 'Walk 15 minutes';
+  static const String pauseStatins = 'Pause statins for 5 days';
+  static const String findings = 'Findings:';
+  static const String plan = 'Plan:';
+  static const String active = 'Active';
+  static const String details = 'Details';
+  static const String cardiology = 'Cardiology';
+  static const String chestPain = 'Chest Pain';
+  static const String midIssue = 'Mid issue';
 
   static const String pleaseEnterValidEmail = 'Please enter a valid Email';
   static const String verifyPassword = 'Verify Password';
