@@ -8,6 +8,7 @@ class AppElevatedButton extends StatelessWidget {
   const AppElevatedButton({
     required this.onPressed,
     required this.title,
+    this.textColor,
     this.backgroundColor,
     Key? key,
     this.width,
@@ -18,6 +19,7 @@ class AppElevatedButton extends StatelessWidget {
   final String title;
   final Color? backgroundColor;
   final double? width;
+  final Color? textColor;
 
   final double? height;
 
@@ -40,7 +42,7 @@ class AppElevatedButton extends StatelessWidget {
           child: subText2(
             fontWeight: FontWeight.w400,
             title,
-            color: AppColors.white,
+            color: textColor ?? AppColors.white,
           ),
         ),
       ),

@@ -94,6 +94,21 @@ Text headline5(String title,
           fontFamily: FontFamily.satoshi,
           color: color),
     );
+Text headline6(String title,
+        {TextAlign? align,
+        Color? color = AppColors.headingTxtColor,
+        TextDecoration? txtDecoration,
+        FontWeight? fontWeight}) =>
+    Text(
+      title,
+      textAlign: align ?? TextAlign.center,
+      style: TextStyle(
+          decoration: txtDecoration ?? TextDecoration.none,
+          fontWeight: fontWeight ?? FontWeight.bold,
+          fontSize: 14.0,
+          fontFamily: FontFamily.satoshi,
+          color: color),
+    );
 
 ///Fontsize 18 grey
 Text subText1(

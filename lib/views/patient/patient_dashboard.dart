@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import '../../consts/colors.dart';
 import 'advocacy/advocacy_view.dart';
 
-import '../care_taker/home/widget/patient_bottom_nav.dart';
+import '../care_taker/caregiverHome/widget/patient_bottom_nav.dart';
 import 'medicines/medicines_view.dart';
 import 'summary/summary_view.dart';
 import 'timeline/timeline_view.dart';
@@ -23,7 +23,7 @@ class PatientDashboard extends StatelessWidget {
     final List<Widget> pages = [
       const HomeView(),
       const MedicinesView(),
-      const VisitsView(),
+      AddVisitView(),
       const SummaryView(),
       const TimelineView(),
       const AdvocacyView(),

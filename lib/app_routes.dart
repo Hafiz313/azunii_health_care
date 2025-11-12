@@ -41,7 +41,7 @@ class AppRoutes {
     GetPage(name: otpForget, page: () => OtpForgetView()),
     GetPage(name: restPas, page: () => RestPasswordView()),
     GetPage(name: patientDashboard, page: () => PatientDashboard()),
-    GetPage(name: addVisit, page: () => const AddVisitView()),
+    GetPage(name: addVisit, page: () => AddVisitView()),
     GetPage(name: feedback, page: () => const FeedbackView()),
     GetPage(name: addCaregiver, page: () => const AddCaregiverView()),
   ];

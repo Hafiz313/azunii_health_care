@@ -1,3 +1,4 @@
+import 'package:azunii_health_care/views/widget/Common_widgets/customAppBar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -8,7 +9,7 @@ import '../../widget/buttons.dart';
 
 class FeedbackView extends StatefulWidget {
   const FeedbackView({super.key});
-  
+
   static const String routeName = '/feedback';
 
   @override
@@ -32,62 +33,15 @@ class _FeedbackViewState extends State<FeedbackView> {
       body: SafeArea(
         child: Column(
           children: [
-            _buildAppBar(context),
+            CustomAppBar(
+              title: 'User Feedback',
+              onIconTap: () {},
+            ),
             Expanded(
               child: _buildFeedbackContent(),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  /// App Bar with back button, title, and notification bell
-  Widget _buildAppBar(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Row(
-        children: [
-          // Back button
-          IconButton(
-            icon: const Icon(
-              Icons.arrow_back,
-              color: AppColors.blackColor,
-              size: 24,
-            ),
-            onPressed: () => Get.back(),
-          ),
-          // Title
-          Expanded(
-            child: Center(
-              child: headline3(
-                'User Feedback',
-                color: AppColors.headingTextColor,
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-          // Notification bell
-          Container(
-            width: 44,
-            height: 44,
-            decoration: const BoxDecoration(
-              color: AppColors.bellBgColor,
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: SvgPicture.asset(
-                AppAssets.bell,
-                width: 20,
-                height: 20,
-                colorFilter: const ColorFilter.mode(
-                  AppColors.white,
-                  BlendMode.srcIn,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -100,7 +54,7 @@ class _FeedbackViewState extends State<FeedbackView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 60),
-          
+
           // Help Us to Improve Section
           Center(
             child: Column(
@@ -111,12 +65,12 @@ class _FeedbackViewState extends State<FeedbackView> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 40),
-                
+
                 // Star Rating
                 _buildStarRating(),
-                
+
                 const SizedBox(height: 50),
-                
+
                 // Your Note Section
                 Align(
                   alignment: Alignment.centerLeft,
@@ -128,12 +82,12 @@ class _FeedbackViewState extends State<FeedbackView> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                
+
                 // Note Input Field
                 _buildNoteInputField(),
-                
+
                 const SizedBox(height: 50),
-                
+
                 // Submit Button
                 AppElevatedButton(
                   onPressed: () {
@@ -146,7 +100,7 @@ class _FeedbackViewState extends State<FeedbackView> {
               ],
             ),
           ),
-          
+
           const SizedBox(height: 20),
         ],
       ),
@@ -168,7 +122,9 @@ class _FeedbackViewState extends State<FeedbackView> {
             child: Icon(
               index < _selectedRating ? Icons.star : Icons.star_border,
               size: 40,
-              color: index < _selectedRating ? AppColors.yellow : AppColors.textColor,
+              color: index < _selectedRating
+                  ? AppColors.yellow
+                  : AppColors.textColor,
             ),
           ),
         );
@@ -213,7 +169,7 @@ class _FeedbackViewState extends State<FeedbackView> {
     // Handle feedback submission
     print('Rating: $_selectedRating');
     print('Note: ${_noteController.text}');
-    
+
     // Show success message and go back
     Get.snackbar(
       'Success',
@@ -222,7 +178,7 @@ class _FeedbackViewState extends State<FeedbackView> {
       colorText: AppColors.white,
       snackPosition: SnackPosition.TOP,
     );
-    
+
     // Go back after a short delay
     Future.delayed(const Duration(seconds: 1), () {
       Get.back();

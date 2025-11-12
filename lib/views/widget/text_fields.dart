@@ -17,6 +17,7 @@ class CustomTxtField extends StatelessWidget {
   final TextStyle? hintStyle;
   final Color? fillColor;
   int? maxLength;
+  int? maxLines;
   List<TextInputFormatter>? inputFormatters;
   final String? Function(String?)? validator;
 
@@ -38,7 +39,8 @@ class CustomTxtField extends StatelessWidget {
       this.enabled = true,
       this.isRequired = false,
       this.hintStyle,
-      this.fillColor})
+      this.fillColor,
+      this.maxLines = 1})
       : super(key: key);
 
   @override
@@ -79,6 +81,7 @@ class CustomTxtField extends StatelessWidget {
             controller: textEditingController,
             obscureText: isHiddenPassword,
             validator: validator,
+            maxLines: maxLines,
             style: const TextStyle(
                 color: AppColors.blackColor,
                 fontFamily: FontFamily.satoshi,
@@ -113,8 +116,7 @@ class CustomTxtField extends StatelessWidget {
               ),
               suffixIcon: suffixIcon,
               hintText: hintTxt,
-              fillColor:
-                  const Color.fromARGB(255, 213, 247, 255).withOpacity(0.5),
+              fillColor: AppColors.cardsColor,
               filled: true,
               hintStyle: const TextStyle(
                   color: AppColors.blackColor,
