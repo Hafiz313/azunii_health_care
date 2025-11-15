@@ -114,6 +114,7 @@ class _SummaryViewState extends State<SummaryView> {
                     );
                   },
                   title: 'Save Summary',
+                  fontSize: 14,
                   backgroundColor: AppColors.primary,
                 ),
               ),

@@ -18,8 +18,13 @@ class CustomAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
+    // return Padding(
+    //   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
+    //child:
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      decoration: BoxDecoration(
+          border: Border.all(color: AppColors.textColor, width: 0.02)),
       child: Row(
         children: [
           // Back button
@@ -35,9 +40,11 @@ class CustomAppBar extends StatelessWidget {
           // Title in center
           Expanded(
             child: Center(
-              child: headline5(
+              child: subText5(
                 title,
-                fontWeight: FontWeight.w400,
+                fontSize: 15,
+                fontWeight: FontWeight.normal,
+                //fontWeight: FontWeight.w400,
                 color: AppColors.headingTextColor,
               ),
             ),
@@ -68,6 +75,7 @@ class CustomAppBar extends StatelessWidget {
           ),
         ],
       ),
+      //  ),
     );
   }
 }

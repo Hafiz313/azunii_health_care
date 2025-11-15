@@ -49,7 +49,8 @@ class AppointmentCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 4),
-                subText6(
+                subText5(
+                  fontSize: 12,
                   date,
                   color: AppColors.headingTextColor,
                   align: TextAlign.start,
@@ -79,15 +80,18 @@ class AppointmentCard extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: subText6(
+          child: subText5(
+            fontSize: 12,
+            fontWeight: FontWeight.normal,
             label,
             color: AppColors.textColor,
             align: TextAlign.start,
           ),
         ),
         Expanded(
-          child: subText6(
+          child: subText5(
             value,
+            fontSize: 12,
             color: const Color.fromARGB(255, 53, 53, 53),
             align: TextAlign.end,
             fontWeight: FontWeight.w500,

@@ -31,11 +31,11 @@ class HomeView extends StatelessWidget {
             children: [
               _buildHeader(context),
               _buildQuickActions(context),
-              const SizedBox(height: 8),
+              const SizedBox(height: 13),
               _buildMedicationAlert(context),
-              const SizedBox(height: 8),
+              const SizedBox(height: 13),
               _buildAsOfTodaySection(context),
-              const SizedBox(height: 8),
+              const SizedBox(height: 13),
               _buildFutureAppointmentsSection(context),
               const SizedBox(height: 20),
             ],
@@ -281,7 +281,8 @@ class HomeView extends StatelessWidget {
                   fontWeight: FontWeight.w500),
               InkWell(
                 onTap: controller.onViewAllTap,
-                child: subText6(
+                child: subText5(
+                  fontSize: 12,
                   Lang.viewAll,
                   color: AppColors.borderColor,
                   align: TextAlign.start,

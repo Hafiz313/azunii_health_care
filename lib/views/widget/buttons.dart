@@ -9,6 +9,7 @@ class AppElevatedButton extends StatelessWidget {
     required this.onPressed,
     required this.title,
     this.textColor,
+    this.fontSize,
     this.backgroundColor,
     Key? key,
     this.width,
@@ -17,6 +18,7 @@ class AppElevatedButton extends StatelessWidget {
 
   final Function()? onPressed;
   final String title;
+  final double? fontSize;
   final Color? backgroundColor;
   final double? width;
   final Color? textColor;
@@ -27,19 +29,20 @@ class AppElevatedButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: width ?? context.percentWidth * 85,
-      height: height ?? context.percentWidth * 11,
+      height: height ?? context.percentWidth * 12,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(
-                5), // Removes the border radius (square corners)
+                10), // Removes the border radius (square corners)
           ),
           backgroundColor: backgroundColor ?? AppColors.green,
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 4.0),
-          child: subText2(
+          child: subText5(
+            fontSize: fontSize ?? 13,
             fontWeight: FontWeight.w400,
             title,
             color: textColor ?? AppColors.white,

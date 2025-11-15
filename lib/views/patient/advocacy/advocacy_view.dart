@@ -1,3 +1,5 @@
+import 'package:azunii_health_care/utils/percentage_size_ext.dart';
+import 'package:azunii_health_care/views/widget/Common_widgets/customAppBar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -47,62 +49,15 @@ class _AdvocacyViewState extends State<AdvocacyView> {
       body: SafeArea(
         child: Column(
           children: [
-            _buildAppBar(context),
+            CustomAppBar(
+              title: 'Caregiver Access',
+              onIconTap: () {},
+            ),
             Expanded(
               child: _buildCaregiverContent(),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  /// App Bar with back button, title, and notification bell
-  Widget _buildAppBar(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Row(
-        children: [
-          // Back button
-          IconButton(
-            icon: const Icon(
-              Icons.arrow_back,
-              color: AppColors.blackColor,
-              size: 24,
-            ),
-            onPressed: () => Get.back(),
-          ),
-          // Title
-          Expanded(
-            child: Center(
-              child: headline3(
-                'Caregiver Access',
-                color: AppColors.headingTextColor,
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-          // Notification bell
-          Container(
-            width: 44,
-            height: 44,
-            decoration: const BoxDecoration(
-              color: AppColors.bellBgColor,
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: SvgPicture.asset(
-                AppAssets.bell,
-                width: 20,
-                height: 20,
-                colorFilter: const ColorFilter.mode(
-                  AppColors.white,
-                  BlendMode.srcIn,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -115,12 +70,12 @@ class _AdvocacyViewState extends State<AdvocacyView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
-          
+
           // Add Caregiver Button
           _buildAddCaregiverButton(),
-          
+
           const SizedBox(height: 24),
-          
+
           // Caregiver Access Header
           subText2(
             'Caregiver Access',
@@ -128,12 +83,12 @@ class _AdvocacyViewState extends State<AdvocacyView> {
             align: TextAlign.start,
             fontWeight: FontWeight.w600,
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Caregiver List
           ...caregivers.map((caregiver) => _buildCaregiverCard(caregiver)),
-          
+
           const SizedBox(height: 20),
         ],
       ),
@@ -142,7 +97,7 @@ class _AdvocacyViewState extends State<AdvocacyView> {
 
   Widget _buildAddCaregiverButton() {
     return Container(
-      width: double.infinity,
+      width: context.screenWidth * 0.5,
       child: ElevatedButton(
         onPressed: () {
           Navigator.push(
@@ -152,7 +107,7 @@ class _AdvocacyViewState extends State<AdvocacyView> {
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
@@ -160,16 +115,16 @@ class _AdvocacyViewState extends State<AdvocacyView> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.add,
-              color: AppColors.white,
-              size: 20,
-            ),
-            const SizedBox(width: 8),
-            subText2(
-              'Add Caregiver',
+            subText5(
+              fontSize: 13,
+              'Add Caregiver ',
               color: AppColors.white,
               fontWeight: FontWeight.w500,
+            ),
+            const Icon(
+              Icons.add_circle_outline,
+              color: AppColors.white,
+              size: 20,
             ),
           ],
         ),
@@ -193,25 +148,26 @@ class _AdvocacyViewState extends State<AdvocacyView> {
             children: [
               // Profile Image
               CircleAvatar(
-                radius: 24,
+                radius: 18,
                 backgroundColor: AppColors.dividerGray,
                 backgroundImage: AssetImage(caregiver.profileImage),
               ),
               const SizedBox(width: 12),
-              
+
               // Name and Role
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    subText2(
+                    subText4(
                       caregiver.name,
                       color: AppColors.headingTextColor,
                       align: TextAlign.start,
                       fontWeight: FontWeight.w600,
                     ),
                     const SizedBox(height: 2),
-                    subText3(
+                    subText5(
+                      fontWeight: FontWeight.normal,
                       caregiver.role,
                       color: AppColors.textColor,
                       align: TextAlign.start,
@@ -219,11 +175,11 @@ class _AdvocacyViewState extends State<AdvocacyView> {
                   ],
                 ),
               ),
-              
+
               // Delete Button
               Container(
-                width: 36,
-                height: 36,
+                width: context.screenWidth * 0.1,
+                height: context.screenWidth * 0.1,
                 decoration: BoxDecoration(
                   color: AppColors.lightRed,
                   borderRadius: BorderRadius.circular(8),
@@ -235,60 +191,59 @@ class _AdvocacyViewState extends State<AdvocacyView> {
                   icon: const Icon(
                     Icons.delete_outline,
                     color: AppColors.redColor,
-                    size: 18,
+                    size: 16,
                   ),
                 ),
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Email and Added Date
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    subText3(
-                      'Email: ${caregiver.email}',
-                      color: AppColors.textColor,
-                      align: TextAlign.start,
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        subText3(
-                          'Added on',
-                          color: AppColors.textColor,
-                          align: TextAlign.start,
-                        ),
-                        const SizedBox(width: 4),
-                        Icon(
-                          Icons.calendar_today,
-                          size: 12,
-                          color: AppColors.textColor,
-                        ),
-                        const SizedBox(width: 4),
-                        subText3(
-                          caregiver.addedDate,
-                          color: AppColors.textColor,
-                          align: TextAlign.start,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+              subText5(
+                'Email: ${caregiver.email}',
+                fontWeight: FontWeight.w500,
+                color: AppColors.textColor,
+                align: TextAlign.start,
+                fontSize: 11,
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  subText5(
+                    'Added on',
+                    color: AppColors.textColor,
+                    fontSize: 11,
+                    fontWeight: FontWeight.normal,
+                    align: TextAlign.start,
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.calendar_today,
+                    size: 12,
+                    color: AppColors.textColor,
+                  ),
+                  const SizedBox(width: 4),
+                  subText5(
+                    caregiver.addedDate,
+                    fontSize: 11,
+                    color: AppColors.textColor,
+                    align: TextAlign.start,
+                  ),
+                ],
               ),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Permissions
           Wrap(
-            spacing: 8,
+            spacing: 5,
             runSpacing: 8,
             children: [
               _buildPermissionChip('View Records'),
@@ -296,9 +251,9 @@ class _AdvocacyViewState extends State<AdvocacyView> {
               _buildPermissionChip('View Appointments'),
             ],
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Details Button
           SizedBox(
             width: 80,
@@ -334,7 +289,7 @@ class _AdvocacyViewState extends State<AdvocacyView> {
         borderRadius: BorderRadius.circular(4),
         border: Border.all(color: AppColors.dividerGray, width: 1),
       ),
-      child: subText3(
+      child: subText5(
         permission,
         color: AppColors.textColor,
         align: TextAlign.center,
@@ -348,7 +303,8 @@ class _AdvocacyViewState extends State<AdvocacyView> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Delete Caregiver'),
-          content: Text('Are you sure you want to remove ${caregiver.name} as a caregiver?'),
+          content: Text(
+              'Are you sure you want to remove ${caregiver.name} as a caregiver?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -361,7 +317,8 @@ class _AdvocacyViewState extends State<AdvocacyView> {
                 });
                 Navigator.of(context).pop();
               },
-              child: const Text('Delete', style: TextStyle(color: AppColors.redColor)),
+              child: const Text('Delete',
+                  style: TextStyle(color: AppColors.redColor)),
             ),
           ],
         );

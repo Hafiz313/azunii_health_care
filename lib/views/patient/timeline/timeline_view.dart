@@ -57,29 +57,36 @@ class TimelineView extends StatelessWidget {
             subText5(Lang.asOfToday,
                 color: AppColors.headingTextColor, fontSize: 14),
             const SizedBox(width: 12),
-            SvgPicture.asset(
-              AppAssets.calander,
-              width: 16,
-              height: 16,
-              colorFilter: const ColorFilter.mode(
-                AppColors.textColor,
-                BlendMode.srcIn,
+            SizedBox(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SvgPicture.asset(
+                    AppAssets.calander,
+                    width: 16,
+                    height: 16,
+                    colorFilter: const ColorFilter.mode(
+                      AppColors.textColor,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  subText5(
+                    '09-12-2025',
+                    fontSize: 13,
+                    fontWeight: FontWeight.normal,
+                    color: AppColors.headingTextColor,
+                    align: TextAlign.start,
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.star,
+                    color: Colors.amber,
+                    size: 20,
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(width: 8),
-            subText5(
-              '09-12-2025',
-              fontSize: 13,
-              fontWeight: FontWeight.normal,
-              color: AppColors.headingTextColor,
-              align: TextAlign.start,
-            ),
-            const SizedBox(width: 8),
-            const Icon(
-              Icons.pin,
-              color: Colors.amber,
-              size: 20,
-            ),
+            )
           ],
         ),
         const SizedBox(height: 16),
@@ -133,8 +140,8 @@ class TimelineView extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 48,
-            height: 48,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
               color: AppColors.white.withOpacity(0.7),
               shape: BoxShape.circle,
@@ -143,7 +150,7 @@ class TimelineView extends StatelessWidget {
               child: Icon(
                 icon,
                 color: iconColor,
-                size: 24,
+                size: 18,
               ),
             ),
           ),
@@ -152,8 +159,9 @@ class TimelineView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                subText2(
+                subText4(
                   title,
+                  fontWeight: FontWeight.w500,
                   color: AppColors.headingTextColor,
                   align: TextAlign.start,
                 ),
@@ -190,10 +198,10 @@ class TimelineView extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            headline3(
+            headline6(
               Lang.visitTimeline,
               color: AppColors.headingTextColor,
-              textAlign: TextAlign.start,
+              //  textAlign: TextAlign.start,
             ),
             InkWell(
               onTap: () {

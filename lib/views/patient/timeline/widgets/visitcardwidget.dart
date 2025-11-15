@@ -57,7 +57,7 @@ class VisitCard extends StatelessWidget {
           Row(
             children: [
               CircleAvatar(
-                radius: 24,
+                radius: 14,
                 backgroundColor: AppColors.cardGray,
                 backgroundImage: const AssetImage(AppAssets.profile),
               ),
@@ -66,7 +66,7 @@ class VisitCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    subText5(
+                    subText4(
                       '${visit.doctorName} (${visit.specialty})',
                       color: AppColors.headingTextColor,
                     ),
@@ -95,6 +95,7 @@ class VisitCard extends StatelessWidget {
                     const SizedBox(width: 6),
                     subText5(
                       visit.date,
+                      fontSize: 12,
                       color: AppColors.headingTextColor,
                     ),
                   ],
@@ -128,6 +129,7 @@ class VisitCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                     subText5(
+                      fontSize: 13,
                       'Active',
                       color: AppColors.green,
                     ),

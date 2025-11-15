@@ -90,20 +90,20 @@ class CustomTxtField extends StatelessWidget {
             decoration: InputDecoration(
               border: OutlineInputBorder(
                 borderSide:
-                    const BorderSide(width: 0.1, color: AppColors.primary),
+                    const BorderSide(width: 0.05, color: AppColors.primary),
                 borderRadius: BorderRadius.circular(10),
               ),
               enabledBorder: OutlineInputBorder(
                   borderSide:
-                      const BorderSide(width: 0.3, color: AppColors.primary),
+                      const BorderSide(width: 0.1, color: AppColors.primary),
                   borderRadius: BorderRadius.circular(10)),
               disabledBorder: OutlineInputBorder(
                   borderSide:
-                      const BorderSide(width: 0.1, color: AppColors.primary),
+                      const BorderSide(width: 0.05, color: AppColors.primary),
                   borderRadius: BorderRadius.circular(10)),
               focusedBorder: OutlineInputBorder(
                   borderSide:
-                      const BorderSide(width: 0.5, color: AppColors.secondary),
+                      const BorderSide(width: 0.3, color: AppColors.secondary),
                   borderRadius: BorderRadius.circular(10)),
               errorBorder: OutlineInputBorder(
                   borderSide:

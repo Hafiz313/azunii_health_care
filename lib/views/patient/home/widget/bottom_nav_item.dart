@@ -20,23 +20,27 @@ class BottomNavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: context.percentHeight * 1),
+        padding: const EdgeInsets.symmetric(
+          vertical: 8,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             FaIcon(
               icon,
               color: isSelected ? AppColors.primary : AppColors.textColor,
-              size: context.percentWidth * 5,
+              size: 20,
             ),
-            SizedBox(height: context.percentHeight * 0.5),
-            subText6(
+            const SizedBox(height: 4),
+            subText5(
               label,
+              fontSize: 12,
               color: isSelected ? AppColors.primary : AppColors.textColor,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
             ),
           ],
         ),

@@ -29,13 +29,14 @@ class TodayTaskCard extends StatelessWidget {
         children: [
           CircleAvatar(
             backgroundColor: backgroundColor,
-            radius: 16,
+            radius: 18,
             child: Center(child: icon),
           ),
           const SizedBox(width: 16),
           Expanded(
-            child: subText6(
-              fontWeight: FontWeight.normal,
+            child: subText5(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
               title,
               color: AppColors.headingTextColor,
               align: TextAlign.start,
@@ -51,9 +52,10 @@ class TodayTaskCard extends StatelessWidget {
                   size: 20,
                 ),
                 const SizedBox(width: 6),
-                subText6(
+                subText5(
                   fontWeight: FontWeight.w500,
                   Lang.completed,
+                  fontSize: 12,
                   color: AppColors.green,
                   align: TextAlign.start,
                 ),

@@ -178,11 +178,11 @@ class _LoginViewState extends State<LoginView> {
                           SizedBox(height: context.percentHeight * 2.0),
                         ],
                       ),
+                    SizedBox(height: context.percentHeight * 4),
                     LoginWidgets.buildLoginButton(context,
                         onPress: () => controller.login(context)),
-                    SizedBox(height: context.percentHeight * 2.0),
+                    SizedBox(height: context.percentHeight * 4.0),
 
-                    SizedBox(height: context.percentHeight * 2.0),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
@@ -192,7 +192,7 @@ class _LoginViewState extends State<LoginView> {
                           color: AppColors.blackColor,
                           fontWeight: FontWeight.w400,
                         ),
-                        SizedBox(width: context.percentWidth * 1),
+                        SizedBox(width: context.percentWidth * 5),
                         InkWell(
                             onTap: () {
                               Navigator.pushReplacementNamed(
@@ -204,6 +204,57 @@ class _LoginViewState extends State<LoginView> {
                               fontWeight: FontWeight.w400,
                             )),
                       ],
+                    ),
+                    SizedBox(
+                      height: context.percentHeight * 1,
+                    ),
+                    SizedBox(
+                      width: context.screenWidth * 0.6,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              height: 1,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.transparent,
+                                    Color(0xFF9CA3AF).withOpacity(0.5),
+                                    Colors.transparent,
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8,
+                            ),
+                            child: Text(
+                              'OR',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xFF9CA3AF),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              height: 1,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.transparent,
+                                    Color(0xFF9CA3AF).withOpacity(0.5),
+                                    Colors.transparent,
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     SizedBox(
                       height: context.percentHeight * 5,

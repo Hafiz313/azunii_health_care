@@ -1,5 +1,6 @@
 import 'package:azunii_health_care/views/patient/home/controller/patient_home_controller.dart';
 import 'package:azunii_health_care/views/patient/home/home_view.dart';
+import 'package:azunii_health_care/views/patient/home/widget/patient_bottom_nav.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../consts/colors.dart';
@@ -32,6 +33,7 @@ class PatientDashboard extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.homeBG,
       body: PageView(
+        physics: NeverScrollableScrollPhysics(),
         controller: controller.pageController,
         onPageChanged: controller.onPageChanged,
         children: pages,

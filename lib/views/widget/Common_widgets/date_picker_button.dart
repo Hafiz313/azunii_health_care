@@ -44,8 +44,9 @@ class DatePickerButton extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            subText6(
+            subText5(
               date,
+              fontSize: 12,
               fontWeight: FontWeight.normal,
               color: AppColors.headingTextColor,
               align: TextAlign.start,

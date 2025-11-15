@@ -105,7 +105,7 @@ Text headline6(String title,
       style: TextStyle(
           decoration: txtDecoration ?? TextDecoration.none,
           fontWeight: fontWeight ?? FontWeight.bold,
-          fontSize: 14.0,
+          fontSize: 15.0,
           fontFamily: FontFamily.satoshi,
           color: color),
     );
@@ -160,7 +160,7 @@ Text subText5(
       title,
       textAlign: align ?? TextAlign.center,
       style: TextStyle(
-        fontSize: fontSize ?? 10.0,
+        fontSize: fontSize ?? 12.0,
         fontFamily: FontFamily.satoshi,
         decoration: decoration ?? TextDecoration.none,
         color: color,

@@ -27,8 +27,8 @@ class SocialButton extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           border: Border.all(
-            color: AppColors.borderColor,
-            width: 1.0,
+            color: AppColors.textColor,
+            width: 0.1,
           ),
           borderRadius: BorderRadius.circular(25),
         ),

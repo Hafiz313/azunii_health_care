@@ -29,48 +29,46 @@ class PatientBottomNav extends StatelessWidget {
         child: Container(
           height: context.percentHeight * 8,
           padding: EdgeInsets.symmetric(horizontal: context.percentWidth * 2),
-          child: Obx(
-            () => Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                BottomNavItem(
-                  icon: FontAwesomeIcons.house,
-                  label: Lang.home,
-                  isSelected: controller.currentIndex.value == 0,
-                  onTap: () => controller.changePage(0),
-                ),
-                BottomNavItem(
-                  icon: FontAwesomeIcons.pills,
-                  label: Lang.medicines,
-                  isSelected: controller.currentIndex.value == 1,
-                  onTap: () => controller.changePage(1),
-                ),
-                BottomNavItem(
-                  icon: FontAwesomeIcons.userDoctor,
-                  label: Lang.visits,
-                  isSelected: controller.currentIndex.value == 2,
-                  onTap: () => controller.changePage(2),
-                ),
-                BottomNavItem(
-                  icon: FontAwesomeIcons.chartPie,
-                  label: Lang.summary,
-                  isSelected: controller.currentIndex.value == 3,
-                  onTap: () => controller.changePage(3),
-                ),
-                BottomNavItem(
-                  icon: FontAwesomeIcons.timeline,
-                  label: Lang.timeline,
-                  isSelected: controller.currentIndex.value == 4,
-                  onTap: () => controller.changePage(4),
-                ),
-                BottomNavItem(
-                  icon: FontAwesomeIcons.handshake,
-                  label: Lang.advocacy,
-                  isSelected: controller.currentIndex.value == 5,
-                  onTap: () => controller.changePage(5),
-                ),
-              ],
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Obx(() => BottomNavItem(
+                icon: FontAwesomeIcons.house,
+                label: Lang.home,
+                isSelected: controller.currentIndex.value == 0,
+                onTap: () => controller.changePage(0),
+              )),
+              Obx(() => BottomNavItem(
+                icon: FontAwesomeIcons.pills,
+                label: Lang.medicines,
+                isSelected: controller.currentIndex.value == 1,
+                onTap: () => controller.changePage(1),
+              )),
+              Obx(() => BottomNavItem(
+                icon: FontAwesomeIcons.userDoctor,
+                label: Lang.visits,
+                isSelected: controller.currentIndex.value == 2,
+                onTap: () => controller.changePage(2),
+              )),
+              Obx(() => BottomNavItem(
+                icon: FontAwesomeIcons.chartPie,
+                label: Lang.summary,
+                isSelected: controller.currentIndex.value == 3,
+                onTap: () => controller.changePage(3),
+              )),
+              Obx(() => BottomNavItem(
+                icon: FontAwesomeIcons.timeline,
+                label: Lang.timeline,
+                isSelected: controller.currentIndex.value == 4,
+                onTap: () => controller.changePage(4),
+              )),
+              Obx(() => BottomNavItem(
+                icon: FontAwesomeIcons.handshake,
+                label: Lang.advocacy,
+                isSelected: controller.currentIndex.value == 5,
+                onTap: () => controller.changePage(5),
+              )),
+            ],
           ),
         ),
       ),
