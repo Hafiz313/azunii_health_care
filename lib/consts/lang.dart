@@ -304,6 +304,14 @@ class Lang {
   static const String patientReportedFeeling = 'Patient reported feeling more energetic today. Completed morning walk without shortness of breath. Blood pressure reading was 128/62';
   static const String addedBySarahJohnson = 'Added by Sarah Johnson (Spouse)';
 
+  // Settings Screen
+  static const String settings = 'Settings';
+  static const String profile = 'Profile';
+  static const String accessibility = 'Accessibility';
+  static const String notifications = 'Notifications';
+  static const String privacySecurity = 'Privacy & Security';
+  static const String logOut = 'Log Out';
+
   // Timeline Screen
   static const String visitTimeline = 'Visit Timeline';
   static const String sortBy = 'Sort By';
