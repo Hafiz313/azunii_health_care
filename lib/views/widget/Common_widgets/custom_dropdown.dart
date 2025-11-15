@@ -79,10 +79,16 @@ class CustomDropdown extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       backgroundColor: AppColors.white,
+      isScrollControlled: true,
+      isDismissible: true,
+      enableDrag: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.6,
+        ),
         padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -96,19 +102,29 @@ class CustomDropdown extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            ...items.map((item) => ListTile(
-                  title: Text(
-                    item,
-                    style: const TextStyle(
-                      fontFamily: 'Satoshi',
-                      fontSize: 16,
+            Flexible(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: items.length,
+                itemBuilder: (context, index) {
+                  final item = items[index];
+                  return ListTile(
+                    title: Text(
+                      item,
+                      style: const TextStyle(
+                        fontFamily: 'Satoshi',
+                        fontSize: 16,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  onTap: () {
-                    onChanged(item);
-                    Navigator.pop(context);
-                  },
-                )),
+                    onTap: () {
+                      onChanged(item);
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),

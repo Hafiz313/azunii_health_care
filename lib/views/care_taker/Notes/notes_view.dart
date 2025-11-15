@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../../consts/colors.dart';
 import '../../../consts/lang.dart';
 import '../../../utils/percentage_size_ext.dart';
@@ -7,45 +8,16 @@ import '../../widget/buttons.dart';
 import '../../widget/Common_widgets/customAppBar.dart';
 import '../../widget/Common_widgets/custom_dropdown.dart';
 import '../../widget/text_fields.dart';
+import 'controller/notes_controller.dart';
 
-class Notesview extends StatefulWidget {
+class Notesview extends StatelessWidget {
   static const String routeName = '/notes-caregiver';
-  
+
   const Notesview({super.key});
 
   @override
-  State<Notesview> createState() => _NotesviewState();
-}
-
-class _NotesviewState extends State<Notesview> {
-  final TextEditingController noteController = TextEditingController();
-  String selectedCategory = '';
-  
-  final List<String> categories = [
-    Lang.generalHealth,
-    'Medication',
-    'Exercise',
-    'Diet',
-    'Mood',
-  ];
-
-  final List<Map<String, dynamic>> previousNotes = [
-    {
-      'category': Lang.generalHealth,
-      'date': '09-12-2025',
-      'note': Lang.patientReportedFeeling,
-      'addedBy': Lang.addedBySarahJohnson,
-    },
-    {
-      'category': Lang.generalHealth,
-      'date': '09-12-2025',
-      'note': Lang.patientReportedFeeling,
-      'addedBy': Lang.addedBySarahJohnson,
-    },
-  ];
-
-  @override
   Widget build(BuildContext context) {
+    final controller = Get.put(NotesController());
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
@@ -53,7 +25,6 @@ class _NotesviewState extends State<Notesview> {
           children: [
             CustomAppBar(
               title: Lang.caregiverNotes,
-              onIconTap: () {},
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -61,9 +32,9 @@ class _NotesviewState extends State<Notesview> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: context.screenWidth * 0.05),
-                    _buildAddNotesSection(),
+                    _buildAddNotesSection(context, controller),
                     SizedBox(height: context.screenWidth * 0.06),
-                    _buildPreviousNotesSection(),
+                    _buildPreviousNotesSection(context, controller),
                     SizedBox(height: context.screenWidth * 0.05),
                   ],
                 ),
@@ -75,7 +46,8 @@ class _NotesviewState extends State<Notesview> {
     );
   }
 
-  Widget _buildAddNotesSection() {
+  Widget _buildAddNotesSection(
+      BuildContext context, NotesController controller) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: context.screenWidth * 0.05),
       child: Column(
@@ -87,26 +59,24 @@ class _NotesviewState extends State<Notesview> {
             fontWeight: FontWeight.w500,
           ),
           SizedBox(height: context.screenWidth * 0.04),
-          CustomDropdown(
-            label: Lang.category,
-            hintText: Lang.selectCategory,
-            items: categories,
-            selectedValue: selectedCategory.isEmpty ? null : selectedCategory,
-            onChanged: (value) {
-              setState(() {
-                selectedCategory = value ?? '';
-              });
-            },
-            prefixIcon: const Icon(
-              Icons.category_outlined,
-              color: AppColors.textColor,
-              size: 20,
-            ),
-          ),
+          Obx(() => CustomDropdown(
+                label: Lang.category,
+                hintText: Lang.selectCategory,
+                items: controller.categories,
+                selectedValue: controller.selectedCategory.value.isEmpty
+                    ? null
+                    : controller.selectedCategory.value,
+                onChanged: controller.setCategory,
+                prefixIcon: const Icon(
+                  Icons.category_outlined,
+                  color: AppColors.textColor,
+                  size: 20,
+                ),
+              )),
           SizedBox(height: context.screenWidth * 0.04),
           CustomTxtField(
             title: Lang.yourNote,
-            textEditingController: noteController,
+            textEditingController: controller.noteController,
             hintTxt: Lang.writeYourNote,
             maxLines: 6,
             prefixIcon: const Icon(
@@ -120,7 +90,7 @@ class _NotesviewState extends State<Notesview> {
             width: double.infinity,
             height: context.screenWidth * 0.12,
             child: AppElevatedButton(
-              onPressed: () {},
+              onPressed: controller.saveNote,
               title: Lang.save,
               backgroundColor: AppColors.primary,
             ),
@@ -130,7 +100,8 @@ class _NotesviewState extends State<Notesview> {
     );
   }
 
-  Widget _buildPreviousNotesSection() {
+  Widget _buildPreviousNotesSection(
+      BuildContext context, NotesController controller) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: context.screenWidth * 0.05),
       child: Column(
@@ -145,7 +116,7 @@ class _NotesviewState extends State<Notesview> {
                 fontWeight: FontWeight.w500,
               ),
               InkWell(
-                onTap: () {},
+                onTap: controller.viewAllNotes,
                 child: subText5(
                   fontSize: 12,
                   Lang.viewAll,
@@ -156,22 +127,24 @@ class _NotesviewState extends State<Notesview> {
             ],
           ),
           SizedBox(height: context.screenWidth * 0.04),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: previousNotes.length,
-            separatorBuilder: (context, index) => SizedBox(height: context.screenWidth * 0.04),
-            itemBuilder: (context, index) {
-              final note = previousNotes[index];
-              return _buildNoteCard(note);
-            },
-          ),
+          Obx(() => ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: controller.previousNotes.length,
+                separatorBuilder: (context, index) =>
+                    SizedBox(height: context.screenWidth * 0.04),
+                itemBuilder: (context, index) {
+                  final note = controller.previousNotes[index];
+                  return _buildNoteCard(context, note, controller);
+                },
+              )),
         ],
       ),
     );
   }
 
-  Widget _buildNoteCard(Map<String, dynamic> note) {
+  Widget _buildNoteCard(BuildContext context, Map<String, dynamic> note,
+      NotesController controller) {
     return Container(
       padding: EdgeInsets.all(context.screenWidth * 0.04),
       decoration: BoxDecoration(
@@ -259,7 +232,7 @@ class _NotesviewState extends State<Notesview> {
                 width: context.screenWidth * 0.24,
                 height: context.screenWidth * 0.08,
                 child: AppElevatedButton(
-                  onPressed: () {},
+                  onPressed: () => controller.viewNoteDetails(note),
                   title: Lang.details,
                   backgroundColor: AppColors.primary,
                 ),

@@ -66,8 +66,6 @@ class AddVisitView extends StatelessWidget {
           children: [
             CustomAppBar(
               title: Lang.addVisit,
-
-              onIconTap: () {}, // optional
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -140,10 +138,7 @@ class AddVisitView extends StatelessWidget {
                     const SizedBox(height: 24),
                     // Save Button
                     AppElevatedButton(
-                      onPressed: () {
-                        // handle save logic or validation
-                        Get.back();
-                      },
+                      onPressed: controller.saveVisit,
                       title: Lang.save,
                       backgroundColor: AppColors.primary,
                       width: double.infinity,

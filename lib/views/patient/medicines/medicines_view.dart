@@ -25,8 +25,6 @@ class MedicinesView extends StatelessWidget {
           children: [
             CustomAppBar(
               title: Lang.medication,
-
-              onIconTap: () {}, // optional
             ),
             Expanded(
               child: Padding(
@@ -73,6 +71,27 @@ class AddMedicineView extends StatefulWidget {
 
 class _AddMedicineViewState extends State<AddMedicineView> {
   final MedicineController controller = Get.put(MedicineController());
+
+  void _showSaveDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Success'),
+          content: const Text('Medicine saved successfully!'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close dialog
+                Get.back(); // Go back to previous screen
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -165,8 +184,7 @@ class _AddMedicineViewState extends State<AddMedicineView> {
                     // Save Button
                     AppElevatedButton(
                       onPressed: () {
-                        // handle save logic or validation
-                        Get.back();
+                        _showSaveDialog(context);
                       },
                       title: Lang.save,
                       backgroundColor: AppColors.primary,

@@ -81,6 +81,42 @@ class VisitsController extends GetxController {
     selectedImage.value = null;
   }
 
+  void saveVisit() {
+    if (providerNameController.text.trim().isEmpty) {
+      Get.snackbar(
+        'Error',
+        'Please enter provider name',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+      );
+      return;
+    }
+
+    if (selectedSpecialty.value.isEmpty) {
+      Get.snackbar(
+        'Error',
+        'Please select a specialty',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.TOP,
+      );
+      return;
+    }
+
+    Get.snackbar(
+      'Success',
+      'Visit saved successfully!',
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
+      snackPosition: SnackPosition.TOP,
+    );
+
+    Future.delayed(const Duration(seconds: 1), () {
+      Get.back();
+    });
+  }
+
   @override
   void onClose() {
     providerNameController.dispose();

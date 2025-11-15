@@ -4,6 +4,7 @@ import 'package:azunii_health_care/views/widget/text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import '../../care_taker/settings/notification/notification_view.dart';
 
 class CustomAppBar extends StatelessWidget {
   final String title;
@@ -52,19 +53,22 @@ class CustomAppBar extends StatelessWidget {
 
           // Trailing icon (e.g. bell)
           GestureDetector(
-            onTap: onIconTap,
+            onTap: onIconTap ?? () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const NotificationView()),
+            ),
             child: Container(
-              width: MediaQuery.of(context).size.width * 0.09,
-              height: MediaQuery.of(context).size.width * 0.09,
+              width: MediaQuery.of(context).size.width * 0.11,
+              height: MediaQuery.of(context).size.width * 0.11,
               decoration: const BoxDecoration(
-                color: AppColors.bellBgColor,
+                color: AppColors.primary,
                 shape: BoxShape.circle,
               ),
               child: Center(
                 child: SvgPicture.asset(
-                  AppAssets.bell,
-                  width: 15,
-                  height: 15,
+                  AppAssets.notificationBing,
+                  width: 21,
+                  height: 21,
                   colorFilter: const ColorFilter.mode(
                     AppColors.white,
                     BlendMode.srcIn,

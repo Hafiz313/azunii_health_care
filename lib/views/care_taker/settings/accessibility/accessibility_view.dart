@@ -7,7 +7,7 @@ import '../../../widget/Common_widgets/customAppBar.dart';
 
 class AccessibilityView extends StatefulWidget {
   static const String routeName = '/accessibility-settings';
-  
+
   const AccessibilityView({super.key});
 
   @override
@@ -29,7 +29,6 @@ class _AccessibilityViewState extends State<AccessibilityView> {
           children: [
             CustomAppBar(
               title: Lang.accessibility,
-              onIconTap: () {},
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -142,8 +141,8 @@ class _AccessibilityViewState extends State<AccessibilityView> {
           DropdownButton<String>(
             value: selectedFontSize,
             underline: Container(),
-            items: ['Small', 'Medium', 'Large', 'Extra Large']
-                .map((String value) {
+            items:
+                ['Small', 'Medium', 'Large', 'Extra Large'].map((String value) {
               return DropdownMenuItem<String>(
                 value: value,
                 child: subText3(value, color: AppColors.textColor),

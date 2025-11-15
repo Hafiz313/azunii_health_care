@@ -22,7 +22,6 @@ class TimelineView extends StatelessWidget {
           children: [
             CustomAppBar(
               title: Lang.timeline,
-              onIconTap: () {},
             ),
             Expanded(
               child: SingleChildScrollView(

@@ -2,6 +2,7 @@ import 'package:azunii_health_care/consts/assets.dart';
 import 'package:azunii_health_care/utils/percentage_size_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../../consts/colors.dart';
 import '../../../consts/lang.dart';
@@ -14,16 +15,21 @@ import '../../widget/Common_widgets/appointment_card.dart';
 import '../visits/visits_view.dart';
 import '../medicines/medicines_view.dart';
 import 'controller/home_controller.dart';
+import '../../auth/login/login_view.dart';
 
 class HomeView extends StatelessWidget {
   static const String routeName = '/HomeView';
   const HomeView({super.key});
+  
+  static final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(HomeController());
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: AppColors.white,
+      drawer: _buildDrawer(context),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -56,6 +62,12 @@ class HomeView extends StatelessWidget {
                 bottom: BorderSide(color: AppColors.textColor, width: 0.1))),
         child: Row(
           children: [
+            // Menu Icon
+            GestureDetector(
+              onTap: () => _scaffoldKey.currentState?.openDrawer(),
+              child: Icon(Icons.menu),
+            ),
+            const SizedBox(width: 12),
             // Logo/Icon (R or ribbon icon)
             Container(
               width: context.screenWidth * 0.1,
@@ -163,6 +175,7 @@ class HomeView extends StatelessWidget {
                     size: 18,
                   ),
                   title: Lang.viewTimeline,
+                  onTap: () => Get.find<HomeController>().onViewTimelineTap(),
                 ),
               ),
               const SizedBox(width: 12),
@@ -187,6 +200,7 @@ class HomeView extends StatelessWidget {
                     ],
                   ),
                   title: Lang.reviewMed,
+                  onTap: () => Get.find<HomeController>().onReviewMedTap(),
                 ),
               ),
             ],
@@ -308,6 +322,142 @@ class HomeView extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildDrawer(BuildContext context) {
+    return Drawer(
+      child: Column(
+        children: [
+          // Logo at top
+          Container(
+            padding: const EdgeInsets.all(40),
+            child: SvgPicture.asset(
+              AppAssets.logoMain,
+              height: 80,
+            ),
+          ),
+          const SizedBox(height: 20),
+          // Menu options
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.person,
+                  title: 'Profile',
+                  onTap: () => Navigator.pop(context),
+                ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.settings,
+                  title: 'Settings',
+                  onTap: () => Navigator.pop(context),
+                ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.privacy_tip,
+                  title: 'Privacy Policy',
+                  onTap: () => Navigator.pop(context),
+                ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.help,
+                  title: 'Help & Support',
+                  onTap: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+          ),
+          // Logout button at bottom
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _showLogoutDialog(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: subText4(
+                  'Logout',
+                  color: AppColors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDrawerItem(BuildContext context, {
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Icon(
+        icon,
+        color: AppColors.primary,
+      ),
+      title: subText4(
+        title,
+        color: AppColors.headingTextColor,
+        align: TextAlign.start,
+      ),
+      onTap: onTap,
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: subText4(
+            'Logout',
+            color: AppColors.headingTextColor,
+            fontWeight: FontWeight.w500,
+          ),
+          content: subText5(
+            'Are you sure you want to logout?',
+            color: AppColors.textColor,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: subText5(
+                'Cancel',
+                color: AppColors.textColor,
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.popUntil(context, (route) => route.isFirst);
+                Navigator.pushReplacementNamed(context, LoginView.routeName);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+              ),
+              child: subText5(
+                'Logout',
+                color: AppColors.white,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

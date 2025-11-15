@@ -7,7 +7,7 @@ import '../../../widget/Common_widgets/customAppBar.dart';
 
 class NotificationView extends StatefulWidget {
   static const String routeName = '/notification-settings';
-  
+
   const NotificationView({super.key});
 
   @override
@@ -29,7 +29,6 @@ class _NotificationViewState extends State<NotificationView> {
           children: [
             CustomAppBar(
               title: Lang.notifications,
-              onIconTap: () {},
             ),
             Expanded(
               child: SingleChildScrollView(

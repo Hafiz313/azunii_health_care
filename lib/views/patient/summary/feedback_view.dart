@@ -35,7 +35,6 @@ class _FeedbackViewState extends State<FeedbackView> {
           children: [
             CustomAppBar(
               title: 'User Feedback',
-              onIconTap: () {},
             ),
             Expanded(
               child: _buildFeedbackContent(),

@@ -28,12 +28,6 @@ class _SummaryViewState extends State<SummaryView> {
           children: [
             CustomAppBar(
               title: Lang.plainLanguageSummary,
-              onIconTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const FeedbackView()),
-                );
-              },
             ),
             Expanded(
               child: _buildPlainLanguageSummary(),

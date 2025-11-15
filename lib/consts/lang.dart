@@ -238,7 +238,7 @@ class Lang {
       'Select and upload the Photo of your choice';
   static const String chooseFileOrDrag = 'Choose a file or drag & drop it here';
   static const String fileFormats =
-      'JPEG, PNG, PDF, and MP4 formats, up to 50MB';
+      'JPEG, PNG, PDF, and MP4 formats, up to 5MB';
   static const String save = 'Save';
 
   // Medicines Screen

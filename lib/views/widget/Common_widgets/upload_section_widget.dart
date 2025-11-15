@@ -82,7 +82,7 @@ class UploadSectionWidget extends StatelessWidget {
                 color: AppColors.white,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: selectedImage.value != null
+              child: Obx(() => selectedImage.value != null
                   ? Container(
                       padding: const EdgeInsets.all(16),
                       child: ClipRRect(
@@ -120,7 +120,7 @@ class UploadSectionWidget extends StatelessWidget {
                           ),
                         ],
                       ),
-                    ),
+                    )),
             ),
           )
         ],

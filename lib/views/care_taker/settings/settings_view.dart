@@ -5,6 +5,7 @@ import '../../../utils/percentage_size_ext.dart';
 import '../../widget/text.dart';
 import '../../widget/buttons.dart';
 import '../../widget/Common_widgets/customAppBar.dart';
+import '../../auth/login/login_view.dart';
 import 'profile/profile_view.dart';
 import 'accessibility/accessibility_view.dart';
 import 'notification/notification_view.dart';
@@ -12,7 +13,7 @@ import 'privacy/privacy_view.dart';
 
 class Settingsview extends StatelessWidget {
   static const String routeName = '/settings-caregiver';
-  
+
   const Settingsview({super.key});
 
   @override
@@ -24,7 +25,6 @@ class Settingsview extends StatelessWidget {
           children: [
             CustomAppBar(
               title: Lang.settings,
-              onIconTap: () {},
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -65,25 +65,29 @@ class Settingsview extends StatelessWidget {
         'title': Lang.profile,
         'icon': Icons.person_outline,
         'color': AppColors.primary,
-        'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileView())),
+        'onTap': () => Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const ProfileView())),
       },
       {
         'title': Lang.accessibility,
         'icon': Icons.accessibility_outlined,
         'color': AppColors.primary,
-        'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (context) => const AccessibilityView())),
+        'onTap': () => Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const AccessibilityView())),
       },
       {
         'title': Lang.notifications,
         'icon': Icons.notifications_outlined,
         'color': AppColors.primary,
-        'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationView())),
+        'onTap': () => Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const NotificationView())),
       },
       {
         'title': Lang.privacySecurity,
         'icon': Icons.security_outlined,
         'color': AppColors.primary,
-        'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (context) => const PrivacyView())),
+        'onTap': () => Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const PrivacyView())),
       },
     ];
 
@@ -93,7 +97,8 @@ class Settingsview extends StatelessWidget {
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: menuItems.length,
-        separatorBuilder: (context, index) => SizedBox(height: context.screenWidth * 0.03),
+        separatorBuilder: (context, index) =>
+            SizedBox(height: context.screenWidth * 0.03),
         itemBuilder: (context, index) {
           final item = menuItems[index];
           return _buildMenuItem(
@@ -179,7 +184,13 @@ class Settingsview extends StatelessWidget {
             child: SizedBox(
               height: context.screenWidth * 0.12,
               child: AppElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    LoginView.routeName,
+                    (route) => false,
+                  );
+                },
                 title: Lang.logOut,
                 backgroundColor: AppColors.cardGray,
                 textColor: AppColors.headingTextColor,

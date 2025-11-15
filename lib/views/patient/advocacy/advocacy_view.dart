@@ -51,7 +51,6 @@ class _AdvocacyViewState extends State<AdvocacyView> {
           children: [
             CustomAppBar(
               title: 'Caregiver Access',
-              onIconTap: () {},
             ),
             Expanded(
               child: _buildCaregiverContent(),

@@ -4,6 +4,7 @@ import 'package:azunii_health_care/views/care_taker/home/controller/care-giver-c
 import 'package:azunii_health_care/views/patient/medicines/medicines_view.dart';
 import 'package:azunii_health_care/views/patient/visits/visits_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import '../../../consts/colors.dart';
@@ -14,16 +15,21 @@ import '../../widget/Common_widgets/medication_alert_card.dart';
 import '../../widget/Common_widgets/today_task_card.dart';
 import '../../widget/Common_widgets/date_picker_button.dart';
 import '../../widget/Common_widgets/appointment_card.dart';
+import '../../auth/login/login_view.dart';
 
 class HomeView_caregiver extends StatelessWidget {
   static const String routeName = '/home-caregiver';
   const HomeView_caregiver({super.key});
+  
+  static final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(HomeController_caregiver());
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: AppColors.white,
+      drawer: _buildDrawer(context),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -56,24 +62,17 @@ class HomeView_caregiver extends StatelessWidget {
                 bottom: BorderSide(color: AppColors.textColor, width: 0.1))),
         child: Row(
           children: [
-            // Logo/Icon (R or ribbon icon)
-            Container(
-              width: context.screenWidth * 0.1,
-              height: context.screenWidth * 0.1,
-              decoration: BoxDecoration(
-                color: AppColors.valueTextColor,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Center(
-                child: Text(
-                  'R',
-                  style: TextStyle(
-                    color: AppColors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-              ),
+            // Menu Icon
+            GestureDetector(
+              onTap: () => _scaffoldKey.currentState?.openDrawer(),
+              child: Icon(Icons.menu),
+            ),
+            const SizedBox(width: 4),
+
+            CircleAvatar(
+              radius: 18,
+              backgroundColor: AppColors.cardGray,
+              backgroundImage: const AssetImage(AppAssets.profile),
             ),
             const SizedBox(width: 12),
             // Welcome text
@@ -97,10 +96,27 @@ class HomeView_caregiver extends StatelessWidget {
               ),
             ),
             // Profile picture
-            CircleAvatar(
-              radius: 18,
-              backgroundColor: AppColors.cardGray,
-              backgroundImage: const AssetImage(AppAssets.profile),
+            GestureDetector(
+              onTap: () {},
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.11,
+                height: MediaQuery.of(context).size.width * 0.11,
+                decoration: const BoxDecoration(
+                  color: AppColors.primary,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: SvgPicture.asset(
+                    AppAssets.notificationBing,
+                    width: 21,
+                    height: 21,
+                    colorFilter: const ColorFilter.mode(
+                      AppColors.white,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -285,6 +301,106 @@ class HomeView_caregiver extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildDrawer(BuildContext context) {
+    return Drawer(
+      width: context.screenWidth * 0.6,
+      child: Container(
+        color: Colors.white,
+        child: Column(
+          children: [
+            // Logo at top
+            Container(
+              padding: const EdgeInsets.all(40),
+              child: SvgPicture.asset(
+                AppAssets.logoMain,
+                height: 80,
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Menu options
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildDrawerItem(
+                    context,
+                    icon: Icons.settings,
+                    title: 'Settings',
+                    onTap: () => Navigator.pop(context),
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    icon: Icons.privacy_tip,
+                    title: 'Privacy Policy',
+                    onTap: () => Navigator.pop(context),
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    icon: Icons.help,
+                    title: 'Help & Support',
+                    onTap: () => Navigator.pop(context),
+                  ),
+                  _buildDrawerItem(
+                    context,
+                    icon: Icons.info,
+                    title: 'About',
+                    onTap: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+            // Logout button at bottom
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.popUntil(context, (route) => route.isFirst);
+                    Navigator.pushReplacementNamed(
+                        context, LoginView.routeName);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: subText4(
+                    'Logout',
+                    color: AppColors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDrawerItem(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Icon(
+        icon,
+        color: AppColors.primary,
+      ),
+      title: subText4(
+        title,
+        color: AppColors.headingTextColor,
+        align: TextAlign.start,
+      ),
+      onTap: onTap,
     );
   }
 }

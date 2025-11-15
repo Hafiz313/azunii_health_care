@@ -7,7 +7,7 @@ import '../../../widget/Common_widgets/customAppBar.dart';
 
 class PrivacyView extends StatefulWidget {
   static const String routeName = '/privacy-settings';
-  
+
   const PrivacyView({super.key});
 
   @override
@@ -29,7 +29,6 @@ class _PrivacyViewState extends State<PrivacyView> {
           children: [
             CustomAppBar(
               title: Lang.privacySecurity,
-              onIconTap: () {},
             ),
             Expanded(
               child: SingleChildScrollView(

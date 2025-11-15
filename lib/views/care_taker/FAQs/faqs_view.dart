@@ -17,34 +17,13 @@ class _FAQsViewState extends State<FAQsView> {
   int? expandedIndex;
 
   final List<Map<String, String>> faqData = [
-    {
-      'question': Lang.faqQuestion1,
-      'answer': Lang.faqAnswer1
-    },
-    {
-      'question': Lang.faqQuestion2,
-      'answer': Lang.faqAnswer2
-    },
-    {
-      'question': Lang.faqQuestion3,
-      'answer': Lang.faqAnswer3
-    },
-    {
-      'question': Lang.faqQuestion4,
-      'answer': Lang.faqAnswer4
-    },
-    {
-      'question': Lang.faqQuestion5,
-      'answer': Lang.faqAnswer5
-    },
-    {
-      'question': Lang.faqQuestion6,
-      'answer': Lang.faqAnswer6
-    },
-    {
-      'question': Lang.faqQuestion7,
-      'answer': Lang.faqAnswer7
-    },
+    {'question': Lang.faqQuestion1, 'answer': Lang.faqAnswer1},
+    {'question': Lang.faqQuestion2, 'answer': Lang.faqAnswer2},
+    {'question': Lang.faqQuestion3, 'answer': Lang.faqAnswer3},
+    {'question': Lang.faqQuestion4, 'answer': Lang.faqAnswer4},
+    {'question': Lang.faqQuestion5, 'answer': Lang.faqAnswer5},
+    {'question': Lang.faqQuestion6, 'answer': Lang.faqAnswer6},
+    {'question': Lang.faqQuestion7, 'answer': Lang.faqAnswer7},
   ];
 
   @override
@@ -56,7 +35,6 @@ class _FAQsViewState extends State<FAQsView> {
           children: [
             CustomAppBar(
               title: Lang.faq,
-              onIconTap: () {},
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -114,7 +92,7 @@ class _FAQsViewState extends State<FAQsView> {
         itemBuilder: (context, index) {
           final faq = faqData[index];
           final isExpanded = expandedIndex == index;
-          
+
           return _buildFAQCard(
             question: faq['question']!,
             answer: faq['answer']!,
@@ -164,20 +142,18 @@ class _FAQsViewState extends State<FAQsView> {
                   Expanded(
                     child: subText4(
                       question,
-                      color: isExpanded 
-                          ? AppColors.white 
+                      color: isExpanded
+                          ? AppColors.white
                           : AppColors.headingTextColor,
                       fontWeight: FontWeight.w500,
                       align: TextAlign.start,
                     ),
                   ),
                   Icon(
-                    isExpanded 
-                        ? Icons.keyboard_arrow_up 
+                    isExpanded
+                        ? Icons.keyboard_arrow_up
                         : Icons.keyboard_arrow_down,
-                    color: isExpanded 
-                        ? AppColors.white 
-                        : AppColors.textColor,
+                    color: isExpanded ? AppColors.white : AppColors.textColor,
                     size: 24,
                   ),
                 ],
@@ -190,8 +166,8 @@ class _FAQsViewState extends State<FAQsView> {
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: subText3(
                 answer,
-                color: isExpanded 
-                    ? AppColors.white.withOpacity(0.9) 
+                color: isExpanded
+                    ? AppColors.white.withOpacity(0.9)
                     : AppColors.textColor,
                 align: TextAlign.start,
                 fontWeight: FontWeight.normal,

@@ -7,7 +7,7 @@ import '../../../widget/Common_widgets/customAppBar.dart';
 
 class ProfileView extends StatelessWidget {
   static const String routeName = '/profile-settings';
-  
+
   const ProfileView({super.key});
 
   @override
@@ -19,7 +19,6 @@ class ProfileView extends StatelessWidget {
           children: [
             CustomAppBar(
               title: Lang.profile,
-              onIconTap: () {},
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -86,7 +85,8 @@ class ProfileView extends StatelessWidget {
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: menuItems.length,
-        separatorBuilder: (context, index) => SizedBox(height: context.screenWidth * 0.03),
+        separatorBuilder: (context, index) =>
+            SizedBox(height: context.screenWidth * 0.03),
         itemBuilder: (context, index) {
           final item = menuItems[index];
           return _buildMenuItem(

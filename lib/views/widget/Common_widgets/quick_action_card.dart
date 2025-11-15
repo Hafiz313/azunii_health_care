@@ -33,7 +33,7 @@ class QuickActionCard extends StatelessWidget {
             Expanded(
               child: subText5(
                 title,
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: FontWeight.normal,
                 color: AppColors.headingTextColor,
                 align: TextAlign.start,

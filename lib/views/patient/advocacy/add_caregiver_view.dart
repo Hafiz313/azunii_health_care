@@ -25,7 +25,6 @@ class AddCaregiverView extends StatelessWidget {
           children: [
             CustomAppBar(
               title: 'Add Caregiver',
-              onIconTap: () {},
             ),
             Expanded(
               child: _buildAddCaregiverContent(controller),
@@ -85,20 +84,24 @@ class AddCaregiverView extends StatelessWidget {
               const SizedBox(height: 24),
 
               // Relationship Dropdown
-              Obx(() => CustomDropdown(
-                    label: 'Relationship',
-                    hintText: 'Select Relationship',
-                    items: controller.relationships,
-                    selectedValue: controller.selectedRelationship.value.isEmpty
-                        ? null
-                        : controller.selectedRelationship.value,
-                    onChanged: (value) => controller.setRelationship(value!),
-                    prefixIcon: const Icon(
-                      Icons.settings_outlined,
-                      size: 18,
-                      color: AppColors.textColor,
-                    ),
-                  )),
+              SizedBox(
+                width: double.infinity,
+                child: Obx(() => CustomDropdown(
+                      label: 'Relationship',
+                      hintText: 'Select Relationship',
+                      items: controller.relationships,
+                      selectedValue:
+                          controller.selectedRelationship.value.isEmpty
+                              ? null
+                              : controller.selectedRelationship.value,
+                      onChanged: (value) => controller.setRelationship(value!),
+                      prefixIcon: const Icon(
+                        Icons.people_outline,
+                        size: 18,
+                        color: AppColors.textColor,
+                      ),
+                    )),
+              ),
 
               const SizedBox(height: 32),
 

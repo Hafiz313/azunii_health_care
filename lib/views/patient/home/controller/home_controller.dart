@@ -90,10 +90,52 @@ class HomeController extends GetxController {
   }
 
   void onDatePickerTap() {
-    // Handle date picker logic
+    Get.snackbar(
+      'Date Picker',
+      'Date picker functionality coming soon!',
+      backgroundColor: AppColors.primary,
+      colorText: AppColors.white,
+      snackPosition: SnackPosition.TOP,
+    );
   }
 
   void onViewAllTap() {
-    // Handle view all appointments
+    Get.snackbar(
+      'View All',
+      'Showing all appointments',
+      backgroundColor: AppColors.primary,
+      colorText: AppColors.white,
+      snackPosition: SnackPosition.TOP,
+    );
+  }
+
+  void onViewTimelineTap() {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Timeline'),
+        content: const Text('Timeline view will show your medical history chronologically.'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void onReviewMedTap() {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Review Medication'),
+        content: const Text('This will help you review your current medications and check for interactions.'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 }
