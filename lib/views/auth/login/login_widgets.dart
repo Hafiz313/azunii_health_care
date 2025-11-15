@@ -84,8 +84,8 @@ class LoginWidgets {
           Row(
             children: [
               Container(
-                height: context.percentHeight * 3,
-                width: context.percentHeight * 3,
+                height: context.percentHeight * 2.5,
+                width: context.percentHeight * 2.5,
                 padding: const EdgeInsets.all(0),
                 decoration: BoxDecoration(
                   border: Border.all(
@@ -97,7 +97,7 @@ class LoginWidgets {
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Transform.scale(
-                  scale: 0.8,
+                  scale: 0.7,
                   child: Checkbox(
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     visualDensity: VisualDensity.compact,

@@ -13,6 +13,7 @@ class Lang {
 
   static const String enterYourEmail = 'Enter Your Email';
   static const String enterYourPassword = 'Enter Your Passsword';
+  static const String ProviderName = 'Provider Name';
   static const String didntReceived = 'Didn’t Received OTP?';
   static const String donntHaveAnAccount = 'Don’t have an account?';
   static const String sendAgain = 'Send Again';
@@ -184,7 +185,7 @@ class Lang {
   static const String summary = 'Summary';
   static const String timeline = 'Timeline';
   static const String advocacy = 'Advocacy';
-  
+
   // Home Screen
   static const String viewVisit = 'View Visit';
   static const String viewMedication = 'View Medication';
@@ -207,17 +208,18 @@ class Lang {
   static const String doctor = 'Doctor';
   static const String reasonToVisit = 'Reason to Visit';
   static const String father = 'Father';
-  
+
   // New Home Screen
   static const String addVisit = 'Add Visit';
   static const String addMedication = 'Add Medication';
   static const String reviewMed = 'Review Med';
   static const String medicationAlert = 'Medication Alert';
-  static const String medContraindication = 'Med 1 + Med 2 contraindication - Consult your doctor';
+  static const String medContraindication =
+      'Med 1 + Med 2 contraindication - Consult your doctor';
   static const String takeMedDaily = 'Take 1 med X daily until Oct 2';
   static const String doNotTakeMed = 'Do not take med Z until Oct 3';
   static const String limitedExercise = 'Limited exercise until Sept 30';
-  
+
   // Add Visit Screen
   static const String prepareForNewVisit = 'Prepare for New Visit';
   static const String providerName = 'Provider Name';
@@ -228,20 +230,23 @@ class Lang {
   static const String notes = 'Notes';
   static const String writeDescription = 'Write your Description';
   static const String photoDocumentUpload = 'Photo/Document Upload';
-  static const String selectAndUploadPhoto = 'Select and upload the Photo of your choice';
+  static const String selectAndUploadPhoto =
+      'Select and upload the Photo of your choice';
   static const String chooseFileOrDrag = 'Choose a file or drag & drop it here';
-  static const String fileFormats = 'JPEG, PNG, PDF, and MP4 formats, up to 50MB';
+  static const String fileFormats =
+      'JPEG, PNG, PDF, and MP4 formats, up to 50MB';
   static const String save = 'Save';
-  
+
   // Medicines Screen
   static const String medication = 'Medication';
   static const String afterMeals = 'After Meals';
   static const String endDate = 'End Date:';
   static const String drugInteractions = 'Drug Interactions';
   static const String interactsWith = 'Interacts with:';
-  static const String mayReduceEffectiveness = 'May reduce effectiveness of blood pressure medication';
+  static const String mayReduceEffectiveness =
+      'May reduce effectiveness of blood pressure medication';
   static const String viewDetails = 'View Details';
-  
+
   // Add Medicine Screen
   static const String addMedicine = 'Add Medicine';
   static const String medName = 'Med name';
@@ -252,17 +257,53 @@ class Lang {
   static const String enterMedFrequency = 'Enter med frequency';
   static const String selectStatus = 'Select status';
   static const String uploadFiles = 'Upload files';
-  static const String selectAndUploadFiles = 'Select and upload the files of your choice';
+  static const String selectAndUploadFiles =
+      'Select and upload the files of your choice';
   static const String medicationSafetyAlert = 'Medication Safety Alert';
-  static const String possibleInteractionDetected = 'Possible interaction detected. Statins paused for 5 days due to COVID diagnosis.';
+  static const String possibleInteractionDetected =
+      'Possible interaction detected. Statins paused for 5 days due to COVID diagnosis.';
   static const String important = 'Important:';
-  static const String potentialInteractionMessage = 'A potential interaction has been identified between your current medications. Your healthcare provider should review this before you continue.';
+  static const String potentialInteractionMessage =
+      'A potential interaction has been identified between your current medications. Your healthcare provider should review this before you continue.';
   static const String reviewMedications = 'Review Medications';
   static const String speakWithPrescribers = 'Speak with prescribers';
   static const String medicationList = 'Medication List';
   static const String confirmAndSave = 'Confirm & Save';
   static const String dose = 'Dose';
-  
+
+  // FAQ Screen
+  static const String faq = 'FAQ';
+  static const String faqQuestion1 = 'How do I add a new medical visit?';
+  static const String faqAnswer1 = 'To add a new visit, go to your Dashboard and tap "Add Visit". Then enter your provider\'s name, specialty, date of visit, and any notes or documents. It\'s a good idea to add your visit when you\'re done. Tap "Save". Your visit will appear in your Timeline automatically!';
+  static const String faqQuestion2 = 'How do I create a new AzuNii Health account?';
+  static const String faqAnswer2 = 'You can create a new account by downloading the app and following the registration process. Enter your personal information and verify your email address.';
+  static const String faqQuestion3 = 'Is my health information safe in AzuNii Health?';
+  static const String faqAnswer3 = 'Yes, your health information is protected with industry-standard encryption and security measures. We comply with all healthcare privacy regulations.';
+  static const String faqQuestion4 = 'How is my data protected?';
+  static const String faqAnswer4 = 'Your data is encrypted both in transit and at rest. We use secure servers and follow strict privacy protocols to ensure your information remains confidential.';
+  static const String faqQuestion5 = 'Can I delete my account and data permanently?';
+  static const String faqAnswer5 = 'Yes, you can permanently delete your account and all associated data through the settings menu. This action cannot be undone.';
+  static const String faqQuestion6 = 'How can I see all my visits and medications in one place?';
+  static const String faqAnswer6 = 'Use the Timeline view to see all your visits and medications chronologically. You can also access the Summary section for a comprehensive overview.';
+  static const String faqQuestion7 = 'What is the "Timeline View"?';
+  static const String faqAnswer7 = 'The Timeline View shows all your health events in chronological order, including visits, medications, and important health milestones.';
+
+  // Medication Screen - Additional constants
+  static const String paracetamol = 'Paracetamol';
+  static const String ibuprofen = 'Ibuprofen';
+
+  // Caregiver Notes Screen
+  static const String caregiverNotes = 'Caregiver Notes';
+  static const String addNotes = 'Add Notes';
+  static const String category = 'Category';
+  static const String selectCategory = 'Select Category';
+  static const String yourNote = 'Your Note';
+  static const String writeYourNote = 'Write your Note';
+  static const String previousNotes = 'Previous Notes';
+  static const String generalHealth = 'General Health';
+  static const String patientReportedFeeling = 'Patient reported feeling more energetic today. Completed morning walk without shortness of breath. Blood pressure reading was 128/62';
+  static const String addedBySarahJohnson = 'Added by Sarah Johnson (Spouse)';
+
   // Timeline Screen
   static const String visitTimeline = 'Visit Timeline';
   static const String sortBy = 'Sort By';
@@ -275,6 +316,8 @@ class Lang {
   static const String cardiology = 'Cardiology';
   static const String chestPain = 'Chest Pain';
   static const String midIssue = 'Mid issue';
+//summary screeen
+  static const String plainLanguageSummary = 'Plain-Language Summary';
 
   static const String pleaseEnterValidEmail = 'Please enter a valid Email';
   static const String verifyPassword = 'Verify Password';

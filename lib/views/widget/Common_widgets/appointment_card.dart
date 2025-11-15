@@ -31,25 +31,26 @@ class AppointmentCard extends StatelessWidget {
         children: [
           // Date badge
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: AppColors.bgGrayColor,
-              borderRadius: BorderRadius.circular(20),
+              color: const Color.fromARGB(255, 232, 232, 232),
+              borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 SvgPicture.asset(
                   AppAssets.calander,
-                  width: 14,
-                  height: 14,
+                  width: 12,
+                  height: 12,
                   colorFilter: const ColorFilter.mode(
                     AppColors.textColor,
                     BlendMode.srcIn,
                   ),
                 ),
-                const SizedBox(width: 6),
-                subText3(
+                const SizedBox(width: 4),
+                subText5(
+                  fontSize: 12,
                   date,
                   color: AppColors.headingTextColor,
                   align: TextAlign.start,
@@ -79,18 +80,21 @@ class AppointmentCard extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: subText6(
+          child: subText5(
+            fontSize: 12,
+            fontWeight: FontWeight.normal,
             label,
             color: AppColors.textColor,
             align: TextAlign.start,
           ),
         ),
         Expanded(
-          child: subText6(
+          child: subText5(
             value,
-            color: AppColors.valueTextColor,
+            fontSize: 12,
+            color: const Color.fromARGB(255, 53, 53, 53),
             align: TextAlign.end,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ],

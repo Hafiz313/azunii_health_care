@@ -4,13 +4,13 @@ import '../../../../consts/colors.dart';
 import '../../../../utils/percentage_size_ext.dart';
 import '../../../widget/text.dart';
 
-class BottomNavItem extends StatelessWidget {
+class BottomNavItem1 extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
 
-  const BottomNavItem({
+  const BottomNavItem1({
     super.key,
     required this.icon,
     required this.label,
@@ -23,7 +23,9 @@ class BottomNavItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: context.percentHeight * 1),
+        padding: EdgeInsets.symmetric(
+            vertical: context.percentHeight * 1,
+            horizontal: context.percentWidth * 2),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

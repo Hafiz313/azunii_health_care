@@ -30,20 +30,20 @@ class SignUpView extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: context.percentWidth * 4.0,
-                  vertical: context.percentHeight * 2,
+                  vertical: context.percentHeight * 1,
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(
-                      width: context.percentWidth * 30.0,
+                      width: context.percentWidth * 50.0,
                       child: Image.asset(AppAssets.logo),
                     ),
                     SizedBox(
                       height: context.screenHeight * 0.02,
                     ),
-                    headline5(Lang.createNewAccount, color: AppColors.blue),
+                    headline5('WELCOME YOU', color: AppColors.blue),
                     SizedBox(
                       height: context.screenHeight * 0.015,
                     ),
@@ -63,11 +63,7 @@ class SignUpView extends StatelessWidget {
                         }
                       },
                     ),
-                    SizedBox(
-                      height: context.screenHeight * 0.01,
-                    ),
-
-                    // CustomTxtField(
+                    //CustomTxtField(
                     //   hintTxt: Lang.ssn,
                     //   textEditingController: controller.ssnTxtField,
                     //   inputFormatters: [
@@ -121,9 +117,7 @@ class SignUpView extends StatelessWidget {
                         return null;
                       },
                     ),
-                    SizedBox(
-                      height: context.screenHeight * 0.01,
-                    ),
+
                     CustomTxtField(
                       title: Lang.password,
                       hintTxt: Lang.enterYourPassword,
@@ -157,9 +151,7 @@ class SignUpView extends StatelessWidget {
                         return null;
                       },
                     ),
-                    SizedBox(
-                      height: context.screenHeight * 0.01,
-                    ),
+
                     CustomTxtField(
                       title: Lang.verifyPassword,
                       hintTxt: Lang.verifyPassword,

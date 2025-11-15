@@ -1,55 +1,34 @@
+import 'package:azunii_health_care/utils/percentage_size_ext.dart';
+import 'package:azunii_health_care/views/widget/Common_widgets/customAppBar.dart';
+import 'package:azunii_health_care/views/widget/Common_widgets/custom_dropdown.dart';
+import 'package:azunii_health_care/views/widget/text_fields.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../../consts/colors.dart';
-import '../../../consts/assets.dart';
 import '../../../consts/lang.dart';
 import '../../widget/text.dart';
 import '../../widget/buttons.dart';
+import 'controller/advocacyController.dart';
 
-class AddCaregiverView extends StatefulWidget {
+class AddCaregiverView extends StatelessWidget {
   const AddCaregiverView({super.key});
-  
+
   static const String routeName = '/add-caregiver';
 
   @override
-  State<AddCaregiverView> createState() => _AddCaregiverViewState();
-}
-
-class _AddCaregiverViewState extends State<AddCaregiverView> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _fullNameController = TextEditingController();
-  String? _selectedRelationship;
-  bool _viewPermission = true;
-  bool _addNotesPermission = true;
-
-  final List<String> relationships = [
-    'Spouse',
-    'Parent',
-    'Child',
-    'Sibling',
-    'Friend',
-    'Other Family Member',
-    'Healthcare Provider',
-  ];
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _fullNameController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final controller = Get.put(AdvocacyController());
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
         child: Column(
           children: [
-            _buildAppBar(context),
+            CustomAppBar(
+              title: 'Add Caregiver',
+              onIconTap: () {},
+            ),
             Expanded(
-              child: _buildAddCaregiverContent(),
+              child: _buildAddCaregiverContent(controller),
             ),
           ],
         ),
@@ -57,301 +36,118 @@ class _AddCaregiverViewState extends State<AddCaregiverView> {
     );
   }
 
-  /// App Bar with back button, title, and notification bell
-  Widget _buildAppBar(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Row(
-        children: [
-          // Back button
-          IconButton(
-            icon: const Icon(
-              Icons.arrow_back,
-              color: AppColors.blackColor,
-              size: 24,
-            ),
-            onPressed: () => Get.back(),
-          ),
-          // Title
-          Expanded(
-            child: Center(
-              child: headline3(
+  /// Add Caregiver Content
+  Widget _buildAddCaregiverContent(AdvocacyController controller) {
+    return Builder(
+      builder: (context) {
+        return SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              subText5(
+                fontSize: 14,
                 'Add Caregiver',
                 color: AppColors.headingTextColor,
-                textAlign: TextAlign.center,
+                align: TextAlign.start,
+                fontWeight: FontWeight.w600,
               ),
-            ),
-          ),
-          // Notification bell
-          Container(
-            width: 44,
-            height: 44,
-            decoration: const BoxDecoration(
-              color: AppColors.bellBgColor,
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: SvgPicture.asset(
-                AppAssets.bell,
-                width: 20,
-                height: 20,
-                colorFilter: const ColorFilter.mode(
-                  AppColors.white,
-                  BlendMode.srcIn,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  /// Add Caregiver Content
-  Widget _buildAddCaregiverContent() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 20),
-          
-          // Header
-          subText2(
-            'Add Caregiver',
-            color: AppColors.headingTextColor,
-            align: TextAlign.start,
-            fontWeight: FontWeight.w600,
-          ),
-          
-          const SizedBox(height: 32),
-          
-          // Email Field
-          _buildEmailField(),
-          
-          const SizedBox(height: 24),
-          
-          // Full Name Field
-          _buildFullNameField(),
-          
-          const SizedBox(height: 24),
-          
-          // Relationship Dropdown
-          _buildRelationshipDropdown(),
-          
-          const SizedBox(height: 32),
-          
-          // Permissions Section
-          _buildPermissionsSection(),
-          
-          const SizedBox(height: 40),
-          
-          // Action Buttons
-          _buildActionButtons(),
-          
-          const SizedBox(height: 20),
-        ],
-      ),
-    );
-  }
+              SizedBox(height: context.screenHeight * 0.04),
 
-  Widget _buildEmailField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        subText2(
-          'Email',
-          color: AppColors.headingTextColor,
-          align: TextAlign.start,
-          fontWeight: FontWeight.w500,
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: _emailController,
-          keyboardType: TextInputType.emailAddress,
-          textInputAction: TextInputAction.next,
-          style: const TextStyle(
-            color: AppColors.blackColor,
-            fontFamily: 'Satoshi',
-            fontSize: 16,
-          ),
-          decoration: InputDecoration(
-            hintText: 'Enter Your Email',
-            hintStyle: const TextStyle(
-              color: AppColors.textColor,
-              fontFamily: 'Satoshi',
-              fontSize: 16,
-            ),
-            prefixIcon: const Icon(
-              Icons.email_outlined,
-              color: AppColors.textColor,
-              size: 20,
-            ),
-            filled: true,
-            fillColor: AppColors.cardGray,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 16,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFullNameField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        subText2(
-          'Full Name',
-          color: AppColors.headingTextColor,
-          align: TextAlign.start,
-          fontWeight: FontWeight.w500,
-        ),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: _fullNameController,
-          textInputAction: TextInputAction.next,
-          style: const TextStyle(
-            color: AppColors.blackColor,
-            fontFamily: 'Satoshi',
-            fontSize: 16,
-          ),
-          decoration: InputDecoration(
-            hintText: 'Enter Your Full Name',
-            hintStyle: const TextStyle(
-              color: AppColors.textColor,
-              fontFamily: 'Satoshi',
-              fontSize: 16,
-            ),
-            prefixIcon: const Icon(
-              Icons.person_outline,
-              color: AppColors.textColor,
-              size: 20,
-            ),
-            filled: true,
-            fillColor: AppColors.cardGray,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 16,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRelationshipDropdown() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        subText2(
-          'Relationship',
-          color: AppColors.headingTextColor,
-          align: TextAlign.start,
-          fontWeight: FontWeight.w500,
-        ),
-        const SizedBox(height: 8),
-        InkWell(
-          onTap: () => _showRelationshipPicker(),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            decoration: BoxDecoration(
-              color: AppColors.cardGray,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.people_outline,
+              // Email Field
+              CustomTxtField(
+                title: 'Email',
+                textEditingController: controller.emailController,
+                hintTxt: 'Enter Your Email',
+                prefixIcon: const Icon(
+                  Icons.email_outlined,
                   color: AppColors.textColor,
-                  size: 20,
+                  size: 16,
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    _selectedRelationship ?? 'Select Relationship',
-                    style: TextStyle(
-                      color: _selectedRelationship != null
-                          ? AppColors.blackColor
-                          : AppColors.textColor,
-                      fontFamily: 'Satoshi',
-                      fontSize: 16,
+              ),
+
+              const SizedBox(height: 24),
+
+              // Full Name Field
+              CustomTxtField(
+                title: 'Full Name',
+                textEditingController: controller.fullNameController,
+                hintTxt: 'Enter Your Full Name',
+                prefixIcon: const Icon(
+                  Icons.person_outline,
+                  color: AppColors.textColor,
+                  size: 16,
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Relationship Dropdown
+              Obx(() => CustomDropdown(
+                    label: 'Relationship',
+                    hintText: 'Select Relationship',
+                    items: controller.relationships,
+                    selectedValue: controller.selectedRelationship.value.isEmpty
+                        ? null
+                        : controller.selectedRelationship.value,
+                    onChanged: (value) => controller.setRelationship(value!),
+                    prefixIcon: const Icon(
+                      Icons.settings_outlined,
+                      size: 18,
+                      color: AppColors.textColor,
                     ),
-                  ),
-                ),
-                const Icon(
-                  Icons.arrow_drop_down,
-                  color: AppColors.textColor,
-                  size: 24,
-                ),
-              ],
-            ),
+                  )),
+
+              const SizedBox(height: 32),
+
+              // Permissions Section
+              _buildPermissionsSection(context, controller),
+
+              SizedBox(height: context.screenHeight * 0.05),
+
+              // Action Buttons
+              _buildActionButtons(controller),
+
+              SizedBox(height: context.screenHeight * 0.025),
+            ],
           ),
-        ),
-      ],
+        );
+      },
     );
   }
 
-  Widget _buildPermissionsSection() {
+  Widget _buildPermissionsSection(
+      BuildContext context, AdvocacyController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // View Permission
-        _buildPermissionToggle(
-          icon: Icons.visibility_outlined,
-          title: 'View',
-          value: _viewPermission,
-          onChanged: (value) {
-            setState(() {
-              _viewPermission = value;
-            });
-          },
-        ),
-        
-        const SizedBox(height: 16),
-        
+        Obx(() => _buildPermissionToggle(
+              context: context,
+              icon: Icons.visibility_outlined,
+              title: 'View',
+              value: controller.viewPermission.value,
+              onChanged: controller.toggleViewPermission,
+            )),
+
+        SizedBox(height: context.screenHeight * 0.02),
+
         // Add Notes Permission
-        _buildPermissionToggle(
-          icon: Icons.note_add_outlined,
-          title: 'Add Notes',
-          value: _addNotesPermission,
-          onChanged: (value) {
-            setState(() {
-              _addNotesPermission = value;
-            });
-          },
-        ),
+        Obx(() => _buildPermissionToggle(
+              context: context,
+              icon: Icons.note_add_outlined,
+              title: 'Add Notes',
+              value: controller.addNotesPermission.value,
+              onChanged: controller.toggleAddNotesPermission,
+            )),
       ],
     );
   }
 
   Widget _buildPermissionToggle({
+    required BuildContext context,
     required IconData icon,
     required String title,
     required bool value,
@@ -367,7 +163,7 @@ class _AddCaregiverViewState extends State<AddCaregiverView> {
         children: [
           Container(
             width: 40,
-            height: 40,
+            height: context.screenHeight * 0.05,
             decoration: BoxDecoration(
               color: AppColors.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
@@ -380,8 +176,9 @@ class _AddCaregiverViewState extends State<AddCaregiverView> {
           ),
           const SizedBox(width: 16),
           Expanded(
-            child: subText2(
+            child: subText5(
               title,
+              fontSize: 14,
               color: AppColors.headingTextColor,
               align: TextAlign.start,
               fontWeight: FontWeight.w500,
@@ -400,7 +197,7 @@ class _AddCaregiverViewState extends State<AddCaregiverView> {
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActionButtons(AdvocacyController controller) {
     return Row(
       children: [
         Expanded(
@@ -409,91 +206,19 @@ class _AddCaregiverViewState extends State<AddCaregiverView> {
               Get.back();
             },
             title: 'Cancel',
+            textColor: AppColors.borderColor,
             backgroundColor: AppColors.cardGray,
           ),
         ),
         const SizedBox(width: 16),
         Expanded(
           child: AppElevatedButton(
-            onPressed: () {
-              _handleSendInvitation();
-            },
+            onPressed: controller.handleSendInvitation,
             title: 'Send Invitation',
             backgroundColor: AppColors.primary,
           ),
         ),
       ],
     );
-  }
-
-  void _showRelationshipPicker() {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              subText2(
-                'Select Relationship',
-                color: AppColors.headingTextColor,
-                fontWeight: FontWeight.w600,
-              ),
-              const SizedBox(height: 20),
-              ...relationships.map((relationship) {
-                return ListTile(
-                  title: Text(
-                    relationship,
-                    style: const TextStyle(
-                      fontFamily: 'Satoshi',
-                      fontSize: 16,
-                    ),
-                  ),
-                  onTap: () {
-                    setState(() {
-                      _selectedRelationship = relationship;
-                    });
-                    Navigator.pop(context);
-                  },
-                );
-              }).toList(),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _handleSendInvitation() {
-    if (_emailController.text.isEmpty || 
-        _fullNameController.text.isEmpty || 
-        _selectedRelationship == null) {
-      Get.snackbar(
-        'Error',
-        'Please fill in all required fields',
-        backgroundColor: AppColors.redColor,
-        colorText: AppColors.white,
-        snackPosition: SnackPosition.TOP,
-      );
-      return;
-    }
-
-    // Handle send invitation
-    Get.snackbar(
-      'Success',
-      'Invitation sent successfully!',
-      backgroundColor: AppColors.green,
-      colorText: AppColors.white,
-      snackPosition: SnackPosition.TOP,
-    );
-    
-    // Go back after a short delay
-    Future.delayed(const Duration(seconds: 1), () {
-      Get.back();
-    });
   }
 }

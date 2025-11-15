@@ -1,3 +1,4 @@
+import 'package:azunii_health_care/views/widget/Common_widgets/customAppBar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -7,6 +8,7 @@ import '../../../consts/assets.dart';
 import '../../../consts/lang.dart';
 import '../../widget/text.dart';
 import '../../widget/buttons.dart';
+import 'widgets/visitcardwidget.dart';
 
 class TimelineView extends StatelessWidget {
   const TimelineView({super.key});
@@ -18,7 +20,10 @@ class TimelineView extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            _buildAppBar(context),
+            CustomAppBar(
+              title: Lang.timeline,
+              onIconTap: () {},
+            ),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -40,56 +45,6 @@ class TimelineView extends StatelessWidget {
     );
   }
 
-  /// App Bar with back button, title, and notification bell
-  Widget _buildAppBar(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Row(
-        children: [
-          // Back button
-          IconButton(
-            icon: const Icon(
-              Icons.arrow_back,
-              color: AppColors.blackColor,
-              size: 24,
-            ),
-            onPressed: () => Get.back(),
-          ),
-          // Title
-          Expanded(
-            child: Center(
-              child: headline3(
-                Lang.timeline,
-                color: AppColors.headingTextColor,
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-          // Notification bell
-          Container(
-            width: 44,
-            height: 44,
-            decoration: const BoxDecoration(
-              color: AppColors.bellBgColor,
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: SvgPicture.asset(
-                AppAssets.bell,
-                width: 20,
-                height: 20,
-                colorFilter: const ColorFilter.mode(
-                  AppColors.white,
-                  BlendMode.srcIn,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   /// As of Today Section
   Widget _buildAsOfTodaySection(BuildContext context) {
     return Column(
@@ -97,34 +52,41 @@ class TimelineView extends StatelessWidget {
       children: [
         // Header with date and star icon
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            headline3(
-              Lang.asOfToday,
-              color: AppColors.headingTextColor,
-              textAlign: TextAlign.start,
-            ),
+            subText5(Lang.asOfToday,
+                color: AppColors.headingTextColor, fontSize: 14),
             const SizedBox(width: 12),
-            SvgPicture.asset(
-              AppAssets.calander,
-              width: 16,
-              height: 16,
-              colorFilter: const ColorFilter.mode(
-                AppColors.textColor,
-                BlendMode.srcIn,
+            SizedBox(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SvgPicture.asset(
+                    AppAssets.calander,
+                    width: 16,
+                    height: 16,
+                    colorFilter: const ColorFilter.mode(
+                      AppColors.textColor,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  subText5(
+                    '09-12-2025',
+                    fontSize: 13,
+                    fontWeight: FontWeight.normal,
+                    color: AppColors.headingTextColor,
+                    align: TextAlign.start,
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.star,
+                    color: Colors.amber,
+                    size: 20,
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(width: 8),
-            subText3(
-              '09-12-2025',
-              color: AppColors.headingTextColor,
-              align: TextAlign.start,
-            ),
-            const SizedBox(width: 8),
-            const Icon(
-              Icons.star,
-              color: Colors.amber,
-              size: 20,
-            ),
+            )
           ],
         ),
         const SizedBox(height: 16),
@@ -178,8 +140,8 @@ class TimelineView extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 48,
-            height: 48,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
               color: AppColors.white.withOpacity(0.7),
               shape: BoxShape.circle,
@@ -188,7 +150,7 @@ class TimelineView extends StatelessWidget {
               child: Icon(
                 icon,
                 color: iconColor,
-                size: 24,
+                size: 18,
               ),
             ),
           ),
@@ -197,8 +159,9 @@ class TimelineView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                subText2(
+                subText4(
                   title,
+                  fontWeight: FontWeight.w500,
                   color: AppColors.headingTextColor,
                   align: TextAlign.start,
                 ),
@@ -235,10 +198,10 @@ class TimelineView extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            headline3(
+            headline6(
               Lang.visitTimeline,
               color: AppColors.headingTextColor,
-              textAlign: TextAlign.start,
+              //  textAlign: TextAlign.start,
             ),
             InkWell(
               onTap: () {
@@ -275,176 +238,47 @@ class TimelineView extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         // Visit Cards
-        _buildVisitCard(
-          context,
-          doctorName: 'Dr. P',
-          specialty: Lang.cardiology,
-          date: '09-12-2025',
-          reason: Lang.chestPain,
-          findings: Lang.midIssue,
-          plan: Lang.midIssue,
-        ),
-        const SizedBox(height: 12),
-        _buildVisitCard(
-          context,
-          doctorName: 'Dr. P',
-          specialty: Lang.cardiology,
-          date: '09-12-2025',
-          reason: Lang.chestPain,
-          findings: Lang.midIssue,
-          plan: Lang.midIssue,
+        ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: _getVisits().length,
+          separatorBuilder: (context, index) => const SizedBox(height: 12),
+          itemBuilder: (context, index) {
+            return VisitCard(visit: _getVisits()[index]);
+          },
         ),
       ],
     );
   }
 
-  Widget _buildVisitCard(
-    BuildContext context, {
-    required String doctorName,
-    required String specialty,
-    required String date,
-    required String reason,
-    required String findings,
-    required String plan,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.dividerGray,
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Top row with doctor and date
-          Row(
-            children: [
-              // Doctor profile picture
-              CircleAvatar(
-                radius: 24,
-                backgroundColor: AppColors.cardGray,
-                backgroundImage: const AssetImage(AppAssets.profile),
-              ),
-              const SizedBox(width: 12),
-              // Doctor name and specialty
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    headline5(
-                      '$doctorName ($specialty)',
-                      color: AppColors.headingTextColor,
-                      align: TextAlign.start,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ],
-                ),
-              ),
-              // Date
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.cardGray,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SvgPicture.asset(
-                      AppAssets.calander,
-                      width: 14,
-                      height: 14,
-                      colorFilter: const ColorFilter.mode(
-                        AppColors.textColor,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    subText3(
-                      date,
-                      color: AppColors.headingTextColor,
-                      align: TextAlign.start,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          // Reason, Findings, Plan
-          _buildVisitDetailRow(Lang.reason, reason),
-          const SizedBox(height: 8),
-          _buildVisitDetailRow(Lang.findings, findings),
-          const SizedBox(height: 8),
-          _buildVisitDetailRow(Lang.plan, plan),
-          const SizedBox(height: 16),
-          // Bottom row with Active status and Details button
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Active status
-              Row(
-                children: [
-                  Container(
-                    width: 12,
-                    height: 12,
-                    decoration: const BoxDecoration(
-                      color: AppColors.green,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  subText3(
-                    Lang.active,
-                    color: AppColors.green,
-                    align: TextAlign.start,
-                  ),
-                ],
-              ),
-              // Details button
-              SizedBox(
-                height: 36,
-                child: AppElevatedButton(
-                  onPressed: () {
-                    // Handle details
-                  },
-                  title: Lang.details,
-                  backgroundColor: AppColors.primary,
-                  width: 100,
-                  height: 36,
-                ),
-              ),
-            ],
-          ),
+  List<Visit> _getVisits() {
+    return [
+      Visit(
+        doctorName: 'Dr. P',
+        specialty: Lang.cardiology,
+        date: '09-12-2025',
+        details: [
+          VisitDetail(label: Lang.reason, value: Lang.chestPain),
+          VisitDetail(label: Lang.findings, value: Lang.midIssue),
+          VisitDetail(label: Lang.plan, value: Lang.midIssue),
         ],
+        onDetailsPressed: () {
+          // Handle details
+        },
       ),
-    );
-  }
-
-  Widget _buildVisitDetailRow(String label, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: 80,
-          child: subText3(
-            label,
-            color: AppColors.textColor,
-            align: TextAlign.start,
-          ),
-        ),
-        Expanded(
-          child: subText2(
-            value,
-            color: AppColors.headingTextColor,
-            align: TextAlign.start,
-          ),
-        ),
-      ],
-    );
+      Visit(
+        doctorName: 'Dr. P',
+        specialty: Lang.cardiology,
+        date: '09-12-2025',
+        details: [
+          VisitDetail(label: Lang.reason, value: Lang.chestPain),
+          VisitDetail(label: Lang.findings, value: Lang.midIssue),
+          VisitDetail(label: Lang.plan, value: Lang.midIssue),
+        ],
+        onDetailsPressed: () {
+          // Handle details
+        },
+      ),
+    ];
   }
 }

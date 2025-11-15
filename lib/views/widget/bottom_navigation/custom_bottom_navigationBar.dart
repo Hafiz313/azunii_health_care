@@ -16,10 +16,13 @@ class CustomBottomNavigationBar extends StatelessWidget {
   BottomNavigationBarItem _buildNavItem(
       String assetPath, int index, int selectedIndex) {
     return BottomNavigationBarItem(
-      icon: SvgPicture.asset(
-        assetPath,
-        color:
-            selectedIndex == index ? AppColors.primary : AppColors.blackColor,
+      icon: Container(
+        padding: const EdgeInsets.all(12),
+        child: SvgPicture.asset(
+          assetPath,
+          color:
+              selectedIndex == index ? AppColors.primary : AppColors.blackColor,
+        ),
       ),
       label: '',
     );
@@ -47,6 +50,9 @@ class CustomBottomNavigationBar extends StatelessWidget {
         currentIndex: currentIndex,
         selectedItemColor: AppColors.primary,
         onTap: onTap,
+        type: BottomNavigationBarType.fixed,
+        iconSize: 24,
+        elevation: 0,
       ),
     );
   }

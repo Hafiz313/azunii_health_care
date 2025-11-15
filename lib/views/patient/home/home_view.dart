@@ -2,6 +2,7 @@ import 'package:azunii_health_care/consts/assets.dart';
 import 'package:azunii_health_care/utils/percentage_size_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 import '../../../consts/colors.dart';
 import '../../../consts/lang.dart';
 import '../../widget/text.dart';
@@ -12,6 +13,7 @@ import '../../widget/Common_widgets/date_picker_button.dart';
 import '../../widget/Common_widgets/appointment_card.dart';
 import '../visits/visits_view.dart';
 import '../medicines/medicines_view.dart';
+import 'controller/home_controller.dart';
 
 class HomeView extends StatelessWidget {
   static const String routeName = '/HomeView';
@@ -19,6 +21,7 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(HomeController());
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
@@ -28,11 +31,11 @@ class HomeView extends StatelessWidget {
             children: [
               _buildHeader(context),
               _buildQuickActions(context),
-              const SizedBox(height: 8),
+              const SizedBox(height: 13),
               _buildMedicationAlert(context),
-              const SizedBox(height: 8),
+              const SizedBox(height: 13),
               _buildAsOfTodaySection(context),
-              const SizedBox(height: 8),
+              const SizedBox(height: 13),
               _buildFutureAppointmentsSection(context),
               const SizedBox(height: 20),
             ],
@@ -44,6 +47,7 @@ class HomeView extends StatelessWidget {
 
   /// Top Header with logo, welcome text, and profile picture
   Widget _buildHeader(BuildContext context) {
+    final controller = Get.find<HomeController>();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       child: Container(
@@ -83,12 +87,12 @@ class HomeView extends StatelessWidget {
                     color: AppColors.textColor,
                     align: TextAlign.start,
                   ),
-                  subText4(
-                    'Anne Shaen',
-                    color: AppColors.headingTextColor,
-                    align: TextAlign.start,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  Obx(() => subText4(
+                        controller.userName.value,
+                        color: AppColors.headingTextColor,
+                        align: TextAlign.start,
+                        fontWeight: FontWeight.w500,
+                      )),
                 ],
               ),
             ),
@@ -123,8 +127,7 @@ class HomeView extends StatelessWidget {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => const AddVisitView()),
+                      MaterialPageRoute(builder: (context) => AddVisitView()),
                     );
                   },
                 ),
@@ -200,13 +203,13 @@ class HomeView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          headline5(
+          headline6(
             Lang.medicationAlert,
             color: AppColors.headingTextColor,
             fontWeight: FontWeight.w500,
             //   textAlign: TextAlign.start,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           MedicationAlertCard(
             message: Lang.medContraindication,
           ),
@@ -217,6 +220,7 @@ class HomeView extends StatelessWidget {
 
   /// As of Today Section
   Widget _buildAsOfTodaySection(BuildContext context) {
+    final controller = Get.find<HomeController>();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -226,74 +230,33 @@ class HomeView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              headline5(
+              headline6(
                 fontWeight: FontWeight.w500,
                 Lang.asOfToday,
                 color: AppColors.headingTextColor,
 //textAlign: TextAlign.start,
               ),
               DatePickerButton(
-                date: '09-12-2025',
-                onTap: () {},
+                date: controller.selectedDate.value,
+                onTap: controller.onDatePickerTap,
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          TodayTaskCard(
-            backgroundColor: AppColors.lightBlue,
-            icon: FaIcon(
-              FontAwesomeIcons.pills,
-              color: Colors.blue[600],
-              size: 24,
-            ),
-            title: Lang.takeMedDaily,
-            isCompleted: true,
-          ),
           const SizedBox(height: 12),
-          TodayTaskCard(
-            backgroundColor: AppColors.lightOrange,
-            icon: Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: Colors.orange[300],
-                shape: BoxShape.circle,
-              ),
-              child: const Center(
-                child: Text(
-                  'X',
-                  style: TextStyle(
-                    color: AppColors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            title: Lang.doNotTakeMed,
-            isCompleted: true,
-          ),
-          const SizedBox(height: 12),
-          TodayTaskCard(
-            backgroundColor: AppColors.lightGreenCard,
-            icon: FaIcon(
-              FontAwesomeIcons.clipboardList,
-              color: AppColors.green,
-              size: 24,
-            ),
-            title: Lang.limitedExercise,
-            isCompleted: true,
-          ),
-          const SizedBox(height: 12),
-          TodayTaskCard(
-            backgroundColor: AppColors.lightPurple,
-            icon: FaIcon(
-              FontAwesomeIcons.clipboardList,
-              color: Colors.purple[600],
-              size: 24,
-            ),
-            title: Lang.limitedExercise,
-            isCompleted: true,
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: controller.todayTasks.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 12),
+            itemBuilder: (context, index) {
+              final task = controller.todayTasks[index];
+              return TodayTaskCard(
+                backgroundColor: task['backgroundColor'],
+                icon: task['icon'],
+                title: task['title'],
+                isCompleted: task['isCompleted'],
+              );
+            },
           ),
         ],
       ),
@@ -302,6 +265,8 @@ class HomeView extends StatelessWidget {
 
   /// Future Appointments Section
   Widget _buildFutureAppointmentsSection(BuildContext context) {
+    final controller = Get.find<HomeController>();
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -313,39 +278,33 @@ class HomeView extends StatelessWidget {
             children: [
               headline5(Lang.futureAppointments,
                   color: AppColors.headingTextColor,
-                  // textAlign: TextAlign.start,
-
                   fontWeight: FontWeight.w500),
               InkWell(
-                onTap: () {},
-                child: subText6(
+                onTap: controller.onViewAllTap,
+                child: subText5(
+                  fontSize: 12,
                   Lang.viewAll,
-                  color: AppColors.valueTextColor,
+                  color: AppColors.borderColor,
                   align: TextAlign.start,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          AppointmentCard(
-            date: '09-12-2025',
-            doctor: 'Dr. James Ray',
-            reason: 'Headache',
-            specialty: 'Neurologist',
-          ),
-          const SizedBox(height: 12),
-          AppointmentCard(
-            date: '09-12-2025',
-            doctor: 'Dr. James Ray',
-            reason: 'Headache',
-            specialty: 'Neurologist',
-          ),
-          const SizedBox(height: 12),
-          AppointmentCard(
-            date: '09-12-2025',
-            doctor: 'Dr. James Ray',
-            reason: 'Headache',
-            specialty: 'Neurologist',
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: controller.appointments.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 12),
+            itemBuilder: (context, index) {
+              final appointment = controller.appointments[index];
+              return AppointmentCard(
+                date: appointment['date']!,
+                doctor: appointment['doctor']!,
+                reason: appointment['reason']!,
+                specialty: appointment['specialty']!,
+              );
+            },
           ),
         ],
       ),

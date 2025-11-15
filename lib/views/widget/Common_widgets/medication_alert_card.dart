@@ -24,7 +24,7 @@ class MedicationAlertCard extends StatelessWidget {
         children: [
           CircleAvatar(
             backgroundColor: AppColors.redColor.withValues(alpha: 0.3),
-            radius: 16,
+            radius: 18,
             child: Center(
               child: FaIcon(
                 FontAwesomeIcons.triangleExclamation,
@@ -37,7 +37,8 @@ class MedicationAlertCard extends StatelessWidget {
           Expanded(
             child: subText5(
               message,
-              fontWeight: FontWeight.normal,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
               color: AppColors.headingTextColor,
               align: TextAlign.start,
             ),
