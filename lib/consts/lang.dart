@@ -271,6 +271,47 @@ class Lang {
   static const String confirmAndSave = 'Confirm & Save';
   static const String dose = 'Dose';
 
+  // FAQ Screen
+  static const String faq = 'FAQ';
+  static const String faqQuestion1 = 'How do I add a new medical visit?';
+  static const String faqAnswer1 = 'To add a new visit, go to your Dashboard and tap "Add Visit". Then enter your provider\'s name, specialty, date of visit, and any notes or documents. It\'s a good idea to add your visit when you\'re done. Tap "Save". Your visit will appear in your Timeline automatically!';
+  static const String faqQuestion2 = 'How do I create a new AzuNii Health account?';
+  static const String faqAnswer2 = 'You can create a new account by downloading the app and following the registration process. Enter your personal information and verify your email address.';
+  static const String faqQuestion3 = 'Is my health information safe in AzuNii Health?';
+  static const String faqAnswer3 = 'Yes, your health information is protected with industry-standard encryption and security measures. We comply with all healthcare privacy regulations.';
+  static const String faqQuestion4 = 'How is my data protected?';
+  static const String faqAnswer4 = 'Your data is encrypted both in transit and at rest. We use secure servers and follow strict privacy protocols to ensure your information remains confidential.';
+  static const String faqQuestion5 = 'Can I delete my account and data permanently?';
+  static const String faqAnswer5 = 'Yes, you can permanently delete your account and all associated data through the settings menu. This action cannot be undone.';
+  static const String faqQuestion6 = 'How can I see all my visits and medications in one place?';
+  static const String faqAnswer6 = 'Use the Timeline view to see all your visits and medications chronologically. You can also access the Summary section for a comprehensive overview.';
+  static const String faqQuestion7 = 'What is the "Timeline View"?';
+  static const String faqAnswer7 = 'The Timeline View shows all your health events in chronological order, including visits, medications, and important health milestones.';
+
+  // Medication Screen - Additional constants
+  static const String paracetamol = 'Paracetamol';
+  static const String ibuprofen = 'Ibuprofen';
+
+  // Caregiver Notes Screen
+  static const String caregiverNotes = 'Caregiver Notes';
+  static const String addNotes = 'Add Notes';
+  static const String category = 'Category';
+  static const String selectCategory = 'Select Category';
+  static const String yourNote = 'Your Note';
+  static const String writeYourNote = 'Write your Note';
+  static const String previousNotes = 'Previous Notes';
+  static const String generalHealth = 'General Health';
+  static const String patientReportedFeeling = 'Patient reported feeling more energetic today. Completed morning walk without shortness of breath. Blood pressure reading was 128/62';
+  static const String addedBySarahJohnson = 'Added by Sarah Johnson (Spouse)';
+
+  // Settings Screen
+  static const String settings = 'Settings';
+  static const String profile = 'Profile';
+  static const String accessibility = 'Accessibility';
+  static const String notifications = 'Notifications';
+  static const String privacySecurity = 'Privacy & Security';
+  static const String logOut = 'Log Out';
+
   // Timeline Screen
   static const String visitTimeline = 'Visit Timeline';
   static const String sortBy = 'Sort By';
