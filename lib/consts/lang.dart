@@ -328,6 +328,30 @@ class Lang {
   static const String privacySecurity = 'Privacy & Security';
   static const String logOut = 'Log Out';
 
+  // Profile Settings
+  static const String personalInformation = 'Personal Information';
+  static const String accountSettings = 'Account Settings';
+  static const String changePassword = 'Change Password';
+  static const String language = 'Language';
+
+  // Accessibility Settings
+  static const String fontSize = 'Font Size';
+  static const String highContrast = 'High Contrast';
+  static const String voiceOver = 'Voice Over';
+  static const String screenReader = 'Screen Reader';
+
+  // Notification Settings
+  static const String pushNotifications = 'Push Notifications';
+  static const String emailNotifications = 'Email Notifications';
+  static const String medicationReminders = 'Medication Reminders';
+  static const String appointmentReminders = 'Appointment Reminders';
+
+  // Privacy Settings
+  static const String dataSharing = 'Data Sharing';
+  static const String locationServices = 'Location Services';
+  static const String biometricAuth = 'Biometric Authentication';
+  static const String twoFactorAuth = 'Two-Factor Authentication';
+
   // Timeline Screen
   static const String visitTimeline = 'Visit Timeline';
   static const String sortBy = 'Sort By';

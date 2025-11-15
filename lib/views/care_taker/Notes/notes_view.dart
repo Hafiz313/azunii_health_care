@@ -256,7 +256,7 @@ class _NotesviewState extends State<Notesview> {
               ),
               SizedBox(width: context.screenWidth * 0.02),
               SizedBox(
-                width: context.screenWidth * 0.22,
+                width: context.screenWidth * 0.24,
                 height: context.screenWidth * 0.08,
                 child: AppElevatedButton(
                   onPressed: () {},
