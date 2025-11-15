@@ -93,7 +93,7 @@ class _BaseScaffoldState extends State<BaseScaffold> {
         onPointerUp: (_) => _inactivityService.resetTimer(),
         child: Scaffold(
             key: _scaffoldKey,
-            backgroundColor: widget.backgroundColor ?? AppColors.primary,
+            backgroundColor: widget.backgroundColor ?? AppColors.gradientColor,
             resizeToAvoidBottomInset: true,
             appBar: PreferredSize(
               preferredSize: const Size.fromHeight(

@@ -43,7 +43,7 @@ class AppElevatedButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 4.0),
           child: subText5(
             fontSize: fontSize ?? 13,
-            fontWeight: FontWeight.w400,
+            fontWeight: FontWeight.w500,
             title,
             color: textColor ?? AppColors.white,
           ),

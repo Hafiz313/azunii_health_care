@@ -2,10 +2,13 @@ import 'package:azunii_health_care/consts/lang.dart';
 import 'package:azunii_health_care/utils/percentage_size_ext.dart';
 import 'package:azunii_health_care/views/auth/sing_up/signup_view.dart';
 import 'package:azunii_health_care/views/auth/term_conditions_view.dart';
+import 'package:azunii_health_care/views/widget/Common_widgets/logo_widget.dart';
 import 'package:azunii_health_care/views/widget/text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../consts/assets.dart';
 import '../../consts/colors.dart';
 import '../base_view/base_scaffold_auth.dart';
@@ -89,19 +92,8 @@ class _SplashViewState extends State<SplashView>
             builder: (context, child) {
               return Transform.scale(
                 scale: _scaleAnimation.value,
-                child: Opacity(
-                  opacity: _fadeAnimation.value,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                          width: context.percentWidth * 40.0,
-                          child: Image.asset(AppAssets.logo)),
-                      SizedBox(height: context.percentHeight * 3.0),
-                      subText5(Lang.splashText, color: AppColors.white),
-                    ],
-                  ),
-                ),
+                child:
+                    Opacity(opacity: _fadeAnimation.value, child: LogoWidget()),
               );
             },
           ),

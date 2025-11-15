@@ -60,7 +60,7 @@ class _BaseScaffoldAuthState extends State<BaseScaffoldAuth> {
                       end: Alignment.bottomCenter,
                       stops: const [0.0, 0.35],
                       colors: [
-                        widget.backgroundColor ?? AppColors.primary,
+                        widget.backgroundColor ?? AppColors.gradientColor,
                         Colors.white,
                       ],
                     ),

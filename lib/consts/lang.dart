@@ -5,7 +5,12 @@ class Lang {
   static const int zero = 0;
 
   //String Constants
-  static const String appName = '';
+  static const String appName = 'AzuNii';
+  static const String appSlang = 'Care that speaks your language';
+  static const String welcomeBack = 'Welcome Back';
+  static const String welcomeyou = 'Welcome you';
+  static const String forgetPassword = 'Forgot Passoword';
+
   static const String email = 'Email';
   static const String splashText =
       'User friendly, simple, easy, few clicks to run payroll';
@@ -150,8 +155,7 @@ class Lang {
   static const String employeeRegisteredEmail = 'Employee Email';
   static const String createNewAccount = 'CREATE NEW ACCOUNT';
   static const String enterOtpCode = 'Enter OTP Code';
-  static const String welcomeBack = 'WELCOME BACK';
-  static const String forgetPassword = 'Forget Password';
+
   static const String restPassword = 'Rest Password';
   static const String signIn = 'Sign In';
   static const String password = 'Password';
@@ -274,19 +278,30 @@ class Lang {
   // FAQ Screen
   static const String faq = 'FAQ';
   static const String faqQuestion1 = 'How do I add a new medical visit?';
-  static const String faqAnswer1 = 'To add a new visit, go to your Dashboard and tap "Add Visit". Then enter your provider\'s name, specialty, date of visit, and any notes or documents. It\'s a good idea to add your visit when you\'re done. Tap "Save". Your visit will appear in your Timeline automatically!';
-  static const String faqQuestion2 = 'How do I create a new AzuNii Health account?';
-  static const String faqAnswer2 = 'You can create a new account by downloading the app and following the registration process. Enter your personal information and verify your email address.';
-  static const String faqQuestion3 = 'Is my health information safe in AzuNii Health?';
-  static const String faqAnswer3 = 'Yes, your health information is protected with industry-standard encryption and security measures. We comply with all healthcare privacy regulations.';
+  static const String faqAnswer1 =
+      'To add a new visit, go to your Dashboard and tap "Add Visit". Then enter your provider\'s name, specialty, date of visit, and any notes or documents. It\'s a good idea to add your visit when you\'re done. Tap "Save". Your visit will appear in your Timeline automatically!';
+  static const String faqQuestion2 =
+      'How do I create a new AzuNii Health account?';
+  static const String faqAnswer2 =
+      'You can create a new account by downloading the app and following the registration process. Enter your personal information and verify your email address.';
+  static const String faqQuestion3 =
+      'Is my health information safe in AzuNii Health?';
+  static const String faqAnswer3 =
+      'Yes, your health information is protected with industry-standard encryption and security measures. We comply with all healthcare privacy regulations.';
   static const String faqQuestion4 = 'How is my data protected?';
-  static const String faqAnswer4 = 'Your data is encrypted both in transit and at rest. We use secure servers and follow strict privacy protocols to ensure your information remains confidential.';
-  static const String faqQuestion5 = 'Can I delete my account and data permanently?';
-  static const String faqAnswer5 = 'Yes, you can permanently delete your account and all associated data through the settings menu. This action cannot be undone.';
-  static const String faqQuestion6 = 'How can I see all my visits and medications in one place?';
-  static const String faqAnswer6 = 'Use the Timeline view to see all your visits and medications chronologically. You can also access the Summary section for a comprehensive overview.';
+  static const String faqAnswer4 =
+      'Your data is encrypted both in transit and at rest. We use secure servers and follow strict privacy protocols to ensure your information remains confidential.';
+  static const String faqQuestion5 =
+      'Can I delete my account and data permanently?';
+  static const String faqAnswer5 =
+      'Yes, you can permanently delete your account and all associated data through the settings menu. This action cannot be undone.';
+  static const String faqQuestion6 =
+      'How can I see all my visits and medications in one place?';
+  static const String faqAnswer6 =
+      'Use the Timeline view to see all your visits and medications chronologically. You can also access the Summary section for a comprehensive overview.';
   static const String faqQuestion7 = 'What is the "Timeline View"?';
-  static const String faqAnswer7 = 'The Timeline View shows all your health events in chronological order, including visits, medications, and important health milestones.';
+  static const String faqAnswer7 =
+      'The Timeline View shows all your health events in chronological order, including visits, medications, and important health milestones.';
 
   // Medication Screen - Additional constants
   static const String paracetamol = 'Paracetamol';
@@ -301,7 +316,8 @@ class Lang {
   static const String writeYourNote = 'Write your Note';
   static const String previousNotes = 'Previous Notes';
   static const String generalHealth = 'General Health';
-  static const String patientReportedFeeling = 'Patient reported feeling more energetic today. Completed morning walk without shortness of breath. Blood pressure reading was 128/62';
+  static const String patientReportedFeeling =
+      'Patient reported feeling more energetic today. Completed morning walk without shortness of breath. Blood pressure reading was 128/62';
   static const String addedBySarahJohnson = 'Added by Sarah Johnson (Spouse)';
 
   // Settings Screen
@@ -328,6 +344,8 @@ class Lang {
   static const String plainLanguageSummary = 'Plain-Language Summary';
 
   static const String pleaseEnterValidEmail = 'Please enter a valid Email';
+  static const String pleaseEnterYourEmail = 'Please enter your email';
+  static const String pleaseEnterCorrectEmail = 'Please enter correct email';
   static const String verifyPassword = 'Verify Password';
   static const String enterYourFullName = 'Enter Your Full Name';
   static const String google = 'Google';

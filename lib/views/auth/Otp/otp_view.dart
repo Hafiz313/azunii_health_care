@@ -6,6 +6,7 @@ import 'package:azunii_health_care/views/widget/text.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import '../../../consts/assets.dart';
@@ -34,7 +35,7 @@ class OtpView extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(height: context.percentHeight * 8.0),
-                Image.asset(AppAssets.logo, width: context.percentWidth * 40.0),
+                SvgPicture.asset(AppAssets.logoMain, width: context.percentWidth * 40.0),
                 Container(
                   margin: EdgeInsets.symmetric(
                     vertical: context.percentHeight * 4.0,

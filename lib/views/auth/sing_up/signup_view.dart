@@ -4,10 +4,13 @@ import 'package:azunii_health_care/utils/my_loader.dart';
 import 'package:azunii_health_care/utils/percentage_size_ext.dart';
 import 'package:azunii_health_care/views/auth/Otp/otp_view.dart';
 import 'package:azunii_health_care/views/auth/term_conditions_view.dart';
+import 'package:azunii_health_care/views/widget/Common_widgets/logo_widget.dart';
 import 'package:azunii_health_care/views/widget/text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../consts/assets.dart';
 import '../../../consts/colors.dart';
 import '../../base_view/base_scaffold_auth.dart';
@@ -37,13 +40,19 @@ class SignUpView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SizedBox(
-                      width: context.percentWidth * 50.0,
-                      child: Image.asset(AppAssets.logo),
-                    ),
+                        width: context.percentWidth * 80.0,
+                        child: LogoWidget()),
                     SizedBox(
                       height: context.screenHeight * 0.02,
                     ),
-                    headline5('WELCOME YOU', color: AppColors.blue),
+                    Text(
+                      Lang.welcomeyou,
+                      style: GoogleFonts.michroma(
+                        fontSize: context.percentHeight * 2.5,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.blackColor,
+                      ),
+                    ),
                     SizedBox(
                       height: context.screenHeight * 0.015,
                     ),
@@ -102,6 +111,10 @@ class SignUpView extends StatelessWidget {
                     // SizedBox(
                     //   height: context.screenHeight * 0.01,
                     // ),
+                    SizedBox(
+                      height: context.screenHeight * 0.005,
+                    ),
+
                     CustomTxtField(
                       title: Lang.email,
                       hintTxt: Lang.enterYourEmail,
@@ -112,12 +125,15 @@ class SignUpView extends StatelessWidget {
                         size: context.percentHeight * 2.0,
                       ),
                       validator: (String? val) {
-                        if (val!.isEmpty) return Lang.empty;
-                        if (!emailExp.hasMatch(val)) return Lang.empty;
+                        if (val!.isEmpty) return Lang.pleaseEnterYourEmail;
+                        if (!emailExp.hasMatch(val))
+                          return Lang.pleaseEnterCorrectEmail;
                         return null;
                       },
                     ),
-
+                    SizedBox(
+                      height: context.screenHeight * 0.005,
+                    ),
                     CustomTxtField(
                       title: Lang.password,
                       hintTxt: Lang.enterYourPassword,
@@ -151,7 +167,9 @@ class SignUpView extends StatelessWidget {
                         return null;
                       },
                     ),
-
+                    SizedBox(
+                      height: context.screenHeight * 0.005,
+                    ),
                     CustomTxtField(
                       title: Lang.verifyPassword,
                       hintTxt: Lang.verifyPassword,

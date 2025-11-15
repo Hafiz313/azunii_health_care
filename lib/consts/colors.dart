@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const Color primary = Colors.blue;
+  static const Color primary = Color(0xFF0070FF);
   static const Color white = Color(0xFFffffff);
+
+  static const Color gradientColor = Color(0xFF7DB6FF);
   static const Color homeBG = Color(0xFFf8f8f8);
   static const Color yellow = Color(0xFFF8E300);
   static const Color primaryLight = Color(0xFF535483);
@@ -28,7 +30,7 @@ class AppColors {
   static const Color deleteColor = Color(0xFFFF605D);
 
   static const Color scaffoldGradiant1 = Color(0xFF202151);
-  static Color cardsColor = Color.fromARGB(184, 77, 128, 187).withOpacity(0.05);
+  static Color cardsColor = Color(0x80A6D4FF).withOpacity(0.05);
   static const Color dialogBackGroundColor = Color(0xFF3D3F75);
 
   // Additional colors for home screen
@@ -42,4 +44,5 @@ class AppColors {
   static const Color lightPurple = Color(0xFFE1BEE7);
   static const Color lightOrange = Color(0xFFFFE0B2);
   static const Color alertRed = Color(0xFFFFEBEE);
+  static const Color darkNavy = Color(0xFF1B1C3A);
 }

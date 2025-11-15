@@ -38,4 +38,5 @@ class AppAssets {
   static const String visits = 'assets/svg/visits.svg';
   static const String googleIcon = 'assets/icons/google.svg';
   static const String appleIcon = 'assets/icons/apple.svg';
+  static const String forgetsvg = 'assets/svg/forget.svg';
 }

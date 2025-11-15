@@ -6,6 +6,7 @@ import 'package:azunii_health_care/views/auth/login/login_widgets.dart';
 import 'package:azunii_health_care/views/auth/sing_up/signup_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'dart:io';
 import 'package:local_auth/local_auth.dart';
 import '../../../consts/colors.dart';
@@ -30,27 +31,27 @@ class _LoginViewState extends State<LoginView> {
   @override
   void initState() {
     super.initState();
-    _checkBiometrics();
+    //  _checkBiometrics();
   }
 
-  Future<void> _checkBiometrics() async {
-    try {
-      bool canCheck = await auth.canCheckBiometrics;
-      List<BiometricType> available = await auth.getAvailableBiometrics();
-      if (mounted) {
-        setState(() {
-          _showFingerprint =
-              canCheck && available.contains(BiometricType.fingerprint);
-          _showFace = canCheck && available.contains(BiometricType.face);
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _showFingerprint = false;
-        _showFace = false;
-      });
-    }
-  }
+  // Future<void> _checkBiometrics() async {
+  //   try {
+  //     bool canCheck = await auth.canCheckBiometrics;
+  //     List<BiometricType> available = await auth.getAvailableBiometrics();
+  //     if (mounted) {
+  //       setState(() {
+  //         _showFingerprint =
+  //             canCheck && available.contains(BiometricType.fingerprint);
+  //         _showFace = canCheck && available.contains(BiometricType.face);
+  //       });
+  //     }
+  //   } catch (e) {
+  //     setState(() {
+  //       _showFingerprint = false;
+  //       _showFace = false;
+  //     });
+  //   }
+  // }
 
   Future<void> _authenticateAndLogin(BuildContext context) async {
     try {
@@ -90,8 +91,11 @@ class _LoginViewState extends State<LoginView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              SizedBox(
+                height: context.screenHeight * 0.03,
+              ),
               LoginWidgets.buildLogo(context),
-              SizedBox(height: context.percentHeight * 3.0),
+              SizedBox(height: context.percentHeight * 1.0),
               _buildFormContainer(context),
               SizedBox(
                 height: context.percentHeight * 2.0,
@@ -116,9 +120,9 @@ class _LoginViewState extends State<LoginView> {
         child: Column(children: [
           Text(
             Lang.welcomeBack,
-            style: TextStyle(
+            style: GoogleFonts.michroma(
               fontSize: context.percentHeight * 2.5,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w500,
               color: AppColors.blackColor,
             ),
           ),
@@ -138,48 +142,48 @@ class _LoginViewState extends State<LoginView> {
                     SizedBox(height: context.percentHeight * 2.0),
                     // Biometric login button
                     // if (Platform.isAndroid)
-                    if (Platform.isAndroid && _showFingerprint)
-                      Column(
-                        children: [
-                          Icon(Icons.fingerprint,
-                              size: context.percentHeight * 5,
-                              color: AppColors.primary),
-                          SizedBox(height: context.percentHeight * 1),
-                          GestureDetector(
-                            onTap: () => _authenticateAndLogin(context),
-                            child: const Text(
-                              'Login with Fingerprint',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: context.percentHeight * 2.0),
-                        ],
-                      ),
+                    // if (Platform.isAndroid && _showFingerprint)
+                    //   Column(
+                    //     children: [
+                    //       Icon(Icons.fingerprint,
+                    //           size: context.percentHeight * 5,
+                    //           color: AppColors.primary),
+                    //       SizedBox(height: context.percentHeight * 1),
+                    //       // GestureDetector(
+                    //       //   onTap: () => _authenticateAndLogin(context),
+                    //       //   child: const Text(
+                    //       //     'Login with Fingerprint',
+                    //       //     style: TextStyle(
+                    //       //       fontWeight: FontWeight.bold,
+                    //       //       color: AppColors.primary,
+                    //       //     ),
+                    //       //   ),
+                    //       // ),
+                    //       SizedBox(height: context.percentHeight * 2.0),
+                    //     ],
+                    //   ),
                     // if (Platform.isIOS)
-                    if (Platform.isIOS && _showFace)
-                      Column(
-                        children: [
-                          Icon(Icons.face_6,
-                              size: context.percentHeight * 5,
-                              color: AppColors.primary),
-                          SizedBox(height: context.percentHeight * 1),
-                          GestureDetector(
-                            onTap: () => _authenticateAndLogin(context),
-                            child: const Text(
-                              'Login with Face Recognition',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: context.percentHeight * 2.0),
-                        ],
-                      ),
-                    SizedBox(height: context.percentHeight * 4),
+                    // if (Platform.isIOS && _showFace)
+                    //   Column(
+                    //     children: [
+                    //       Icon(Icons.face_6,
+                    //           size: context.percentHeight * 5,
+                    //           color: AppColors.primary),
+                    //       SizedBox(height: context.percentHeight * 1),
+                    //       GestureDetector(
+                    //         onTap: () => _authenticateAndLogin(context),
+                    //         child: const Text(
+                    //           'Login with Face Recognition',
+                    //           style: TextStyle(
+                    //             fontWeight: FontWeight.bold,
+                    //             color: AppColors.primary,
+                    //           ),
+                    //         ),
+                    //       ),
+                    //       SizedBox(height: context.percentHeight * 2.0),
+                    //     ],
+                    //   ),
+                    SizedBox(height: context.percentHeight * 3),
                     LoginWidgets.buildLoginButton(context,
                         onPress: () => controller.login(context)),
                     SizedBox(height: context.percentHeight * 4.0),

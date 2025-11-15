@@ -1,7 +1,9 @@
 import 'package:azunii_health_care/networking/api_provider.dart';
 import 'package:azunii_health_care/utils/percentage_size_ext.dart';
 import 'package:azunii_health_care/views/auth/forget/froget_view.dart';
+import 'package:azunii_health_care/views/widget/Common_widgets/logo_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import '../../../consts/assets.dart';
@@ -16,11 +18,7 @@ import 'controller/login_controller.dart';
 
 class LoginWidgets {
   static Widget buildLogo(BuildContext context) {
-    return Image.asset(
-      AppAssets.logo,
-      width: context.percentWidth * 40.0,
-      height: context.percentHeight * 15.0,
-    );
+    return LogoWidget();
   }
 
   static Widget buildEmailField(
@@ -36,8 +34,8 @@ class LoginWidgets {
         size: context.percentHeight * 2.0,
       ),
       validator: (String? val) {
-        if (val!.isEmpty) return Lang.enterYourEmail;
-        if (!emailExp.hasMatch(val)) return Lang.enterYourEmail;
+        if (val!.isEmpty) return Lang.pleaseEnterYourEmail;
+        if (!emailExp.hasMatch(val)) return Lang.pleaseEnterCorrectEmail;
         return null;
       },
     );

@@ -1,3 +1,4 @@
+import 'package:azunii_health_care/consts/assets.dart';
 import 'package:azunii_health_care/consts/lang.dart';
 import 'package:azunii_health_care/networking/api_provider.dart';
 import 'package:azunii_health_care/utils/my_loader.dart';
@@ -5,8 +6,10 @@ import 'package:azunii_health_care/utils/percentage_size_ext.dart';
 import 'package:azunii_health_care/views/auth/login/login_widgets.dart';
 import 'package:azunii_health_care/views/auth/sing_up/signup_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../consts/colors.dart';
 import '../../base_view/base_scaffold_auth.dart';
 import '../../widget/buttons.dart';
@@ -33,6 +36,13 @@ class ForgetView extends StatelessWidget {
             children: [
               LoginWidgets.buildLogo(context),
               SizedBox(height: context.percentHeight * 3.0),
+              SizedBox(
+                height: context.percentHeight * 30,
+                child: SvgPicture.asset(
+                  AppAssets.forgetsvg,
+                  fit: BoxFit.contain,
+                ),
+              ),
               _buildFormContainer(context),
               SizedBox(
                 height: context.percentHeight * 2.0,
@@ -55,11 +65,11 @@ class ForgetView extends StatelessWidget {
         child: Column(
           children: [
             Text(
-              Lang.forgetPassword.toUpperCase(),
-              style: TextStyle(
+              Lang.forgotPassword,
+              style: GoogleFonts.michroma(
                 fontSize: context.percentHeight * 2.5,
-                fontWeight: FontWeight.bold,
-                color: AppColors.borderColor,
+                fontWeight: FontWeight.w500,
+                color: AppColors.blackColor,
               ),
             ),
             SizedBox(height: context.percentHeight * 2.0),
@@ -94,8 +104,8 @@ class ForgetView extends StatelessWidget {
         size: context.percentHeight * 2.0,
       ),
       validator: (String? val) {
-        if (val!.isEmpty) return Lang.empty;
-        if (!emailExp.hasMatch(val)) return Lang.empty;
+        if (val!.isEmpty) return Lang.pleaseEnterYourEmail;
+        if (!emailExp.hasMatch(val)) return Lang.pleaseEnterCorrectEmail;
         return null;
       },
     );
