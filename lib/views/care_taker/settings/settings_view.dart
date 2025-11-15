@@ -5,6 +5,10 @@ import '../../../utils/percentage_size_ext.dart';
 import '../../widget/text.dart';
 import '../../widget/buttons.dart';
 import '../../widget/Common_widgets/customAppBar.dart';
+import 'profile/profile_view.dart';
+import 'accessibility/accessibility_view.dart';
+import 'notification/notification_view.dart';
+import 'privacy/privacy_view.dart';
 
 class Settingsview extends StatelessWidget {
   static const String routeName = '/settings-caregiver';
@@ -61,25 +65,25 @@ class Settingsview extends StatelessWidget {
         'title': Lang.profile,
         'icon': Icons.person_outline,
         'color': AppColors.primary,
-        'onTap': () => Navigator.pushNamed(context, '/profile-settings'),
+        'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileView())),
       },
       {
         'title': Lang.accessibility,
         'icon': Icons.accessibility_outlined,
         'color': AppColors.primary,
-        'onTap': () => Navigator.pushNamed(context, '/accessibility-settings'),
+        'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (context) => const AccessibilityView())),
       },
       {
         'title': Lang.notifications,
         'icon': Icons.notifications_outlined,
         'color': AppColors.primary,
-        'onTap': () => Navigator.pushNamed(context, '/notification-settings'),
+        'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationView())),
       },
       {
         'title': Lang.privacySecurity,
         'icon': Icons.security_outlined,
         'color': AppColors.primary,
-        'onTap': () => Navigator.pushNamed(context, '/privacy-settings'),
+        'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (context) => const PrivacyView())),
       },
     ];
 
