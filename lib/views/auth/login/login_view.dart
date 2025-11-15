@@ -11,6 +11,7 @@ import 'package:local_auth/local_auth.dart';
 import '../../../consts/colors.dart';
 import '../../base_view/base_scaffold_auth.dart';
 import '../../widget/text.dart';
+import '../../care_taker/dashboard/dashboard.dart';
 import 'controller/login_controller.dart';
 
 class LoginView extends StatefulWidget {
@@ -257,7 +258,36 @@ class _LoginViewState extends State<LoginView> {
                       ),
                     ),
                     SizedBox(
-                      height: context.percentHeight * 5,
+                      height: context.percentHeight * 2,
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          CareTakerDashboard.routeName,
+                          (Route<dynamic> route) => false,
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.secondary,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.percentWidth * 8,
+                          vertical: context.percentHeight * 1.5,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        'Go to Care Taker',
+                        style: TextStyle(
+                          color: AppColors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: context.percentHeight * 3,
                     ),
                     LoginWidgets.buildSocialButtons(context),
                   ],
