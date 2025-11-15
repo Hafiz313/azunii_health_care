@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import '../../../consts/colors.dart';
-import '../../../consts/lang.dart';
-import '../../../utils/percentage_size_ext.dart';
-import '../../widget/text.dart';
-import '../../widget/buttons.dart';
-import '../../widget/Common_widgets/customAppBar.dart';
+import '../../../../consts/colors.dart';
+import '../../../../consts/lang.dart';
+import '../../../../utils/percentage_size_ext.dart';
+import '../../../widget/text.dart';
+import '../../../widget/Common_widgets/customAppBar.dart';
 
-class Settingsview extends StatelessWidget {
-  static const String routeName = '/settings-caregiver';
+class ProfileView extends StatelessWidget {
+  static const String routeName = '/profile-settings';
   
-  const Settingsview({super.key});
+  const ProfileView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +18,7 @@ class Settingsview extends StatelessWidget {
         child: Column(
           children: [
             CustomAppBar(
-              title: Lang.settings,
+              title: Lang.profile,
               onIconTap: () {},
             ),
             Expanded(
@@ -28,11 +27,9 @@ class Settingsview extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: context.screenWidth * 0.05),
-                    _buildSettingsHeader(),
+                    _buildProfileHeader(),
                     SizedBox(height: context.screenWidth * 0.04),
-                    _buildSettingsMenu(context),
-                    SizedBox(height: context.screenWidth * 0.08),
-                    _buildActionButtons(context),
+                    _buildProfileMenu(context),
                     SizedBox(height: context.screenWidth * 0.05),
                   ],
                 ),
@@ -44,42 +41,42 @@ class Settingsview extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingsHeader() {
+  Widget _buildProfileHeader() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: headline6(
-        Lang.settings,
+        Lang.profile,
         color: AppColors.headingTextColor,
         fontWeight: FontWeight.w500,
       ),
     );
   }
 
-  Widget _buildSettingsMenu(BuildContext context) {
+  Widget _buildProfileMenu(BuildContext context) {
     final List<Map<String, dynamic>> menuItems = [
       {
-        'title': Lang.profile,
+        'title': Lang.personalInformation,
         'icon': Icons.person_outline,
         'color': AppColors.primary,
-        'onTap': () => Navigator.pushNamed(context, '/profile-settings'),
+        'onTap': () {},
       },
       {
-        'title': Lang.accessibility,
-        'icon': Icons.accessibility_outlined,
+        'title': Lang.accountSettings,
+        'icon': Icons.settings_outlined,
         'color': AppColors.primary,
-        'onTap': () => Navigator.pushNamed(context, '/accessibility-settings'),
+        'onTap': () {},
       },
       {
-        'title': Lang.notifications,
-        'icon': Icons.notifications_outlined,
+        'title': Lang.changePassword,
+        'icon': Icons.lock_outline,
         'color': AppColors.primary,
-        'onTap': () => Navigator.pushNamed(context, '/notification-settings'),
+        'onTap': () {},
       },
       {
-        'title': Lang.privacySecurity,
-        'icon': Icons.security_outlined,
+        'title': Lang.language,
+        'icon': Icons.language_outlined,
         'color': AppColors.primary,
-        'onTap': () => Navigator.pushNamed(context, '/privacy-settings'),
+        'onTap': () {},
       },
     ];
 
@@ -162,39 +159,6 @@ class Settingsview extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildActionButtons(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          Expanded(
-            child: SizedBox(
-              height: context.screenWidth * 0.12,
-              child: AppElevatedButton(
-                onPressed: () {},
-                title: Lang.logOut,
-                backgroundColor: AppColors.cardGray,
-                textColor: AppColors.headingTextColor,
-              ),
-            ),
-          ),
-          SizedBox(width: context.screenWidth * 0.04),
-          Expanded(
-            child: SizedBox(
-              height: context.screenWidth * 0.12,
-              child: AppElevatedButton(
-                onPressed: () {},
-                title: Lang.deleteAccount,
-                backgroundColor: AppColors.lightRed,
-                textColor: AppColors.redColor,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
