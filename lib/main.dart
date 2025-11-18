@@ -1,11 +1,10 @@
-import 'package:azunii_health_care/utils/localStorage/storage_service.dart';
-import 'package:azunii_health_care/views/auth/splash_view.dart';
-import 'package:azunii_health_care/utils/inactivity_service.dart';
-import 'package:azunii_health_care/utils/localStorage/storage_consts.dart';
-import 'package:azunii_health_care/utils/localStorage/storage_service.dart';
-import 'package:azunii_health_care/views/auth/login/controller/login_controller.dart';
-import 'package:azunii_health_care/views/auth/login/login_view.dart';
+import 'package:Azunii_Health/utils/localStorage/storage_consts.dart';
+import 'package:Azunii_Health/utils/localStorage/storage_service.dart';
+import 'package:Azunii_Health/views/auth/login/login_view.dart';
+import 'package:Azunii_Health/views/splash/splash_view.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -19,9 +18,20 @@ String deviceToken = '';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase only on mobile platforms
+  if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+    try {
+      await Firebase.initializeApp();
+    } catch (e) {
+      print('Firebase initialization failed: $e');
+    }
+  }
+
+  // Initialize local storage services
   await GetStorage.init();
+
   EasyLoading.init();
-  // _getToken();
   runApp(MyApp());
 }
 
@@ -45,7 +55,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'Employee App',
+      title: 'Anzuii Health care',
       debugShowCheckedModeBanner: false,
       navigatorKey: navigate,
       theme: ThemeData(

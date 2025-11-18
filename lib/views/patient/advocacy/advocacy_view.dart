@@ -1,5 +1,5 @@
-import 'package:azunii_health_care/utils/percentage_size_ext.dart';
-import 'package:azunii_health_care/views/widget/Common_widgets/customAppBar.dart';
+import 'package:Azunii_Health/utils/percentage_size_ext.dart';
+import 'package:Azunii_Health/views/widget/Common_widgets/customAppBar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';

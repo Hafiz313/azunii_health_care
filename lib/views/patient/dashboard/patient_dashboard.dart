@@ -1,6 +1,6 @@
-import 'package:azunii_health_care/views/patient/dashboard/controller/patient_home_controller.dart';
-import 'package:azunii_health_care/views/patient/home/home_view.dart';
-import 'package:azunii_health_care/views/patient/dashboard/widget/patient_bottom_nav.dart';
+import 'package:Azunii_Health/views/patient/dashboard/controller/patient_home_controller.dart';
+import 'package:Azunii_Health/views/patient/dashboard/widget/patient_bottom_nav.dart';
+import 'package:Azunii_Health/views/patient/home/home_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../consts/colors.dart';

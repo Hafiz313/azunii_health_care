@@ -1,6 +1,7 @@
 import 'dart:io';
-import 'package:azunii_health_care/consts/colors.dart';
-import 'package:azunii_health_care/views/widget/text.dart';
+
+import 'package:Azunii_Health/consts/colors.dart';
+import 'package:Azunii_Health/views/widget/text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

@@ -1,25 +1,22 @@
-import 'package:azunii_health_care/views/auth/Otp/otp_forget_view.dart';
-import 'package:azunii_health_care/views/auth/Otp/otp_signup_view.dart';
-import 'package:azunii_health_care/views/auth/forget/froget_view.dart';
-import 'package:azunii_health_care/views/auth/forget/rest_password_view.dart';
-import 'package:azunii_health_care/views/auth/login/login_view.dart';
-import 'package:azunii_health_care/views/auth/Otp/otp_view.dart';
-import 'package:azunii_health_care/views/auth/sing_up/signup_view.dart';
-import 'package:azunii_health_care/views/auth/splash_view.dart';
-import 'package:azunii_health_care/views/care_taker/home/home_view_caregiver.dart.dart';
-
-import 'package:azunii_health_care/views/patient/home/home_view.dart';
-import 'package:azunii_health_care/views/patient/dashboard/patient_dashboard.dart';
-import 'package:azunii_health_care/views/patient/visits/visits_view.dart';
-import 'package:azunii_health_care/views/patient/summary/feedback_view.dart';
-import 'package:azunii_health_care/views/patient/advocacy/add_caregiver_view.dart';
-import 'package:azunii_health_care/views/care_taker/dashboard/dashboard.dart';
-import 'package:azunii_health_care/views/care_taker/home/home_view_caregiver.dart';
-import 'package:azunii_health_care/views/care_taker/notes/notes_view.dart';
-import 'package:azunii_health_care/views/care_taker/medication/medication_caretaker_view.dart';
-import 'package:azunii_health_care/views/care_taker/faqs/faqs_view.dart';
-import 'package:azunii_health_care/views/care_taker/settings/settings_view.dart';
-
+import 'package:Azunii_Health/views/auth/Otp/otp_forget_view.dart';
+import 'package:Azunii_Health/views/auth/Otp/otp_signup_view.dart';
+import 'package:Azunii_Health/views/auth/Otp/otp_view.dart';
+import 'package:Azunii_Health/views/auth/forget/froget_view.dart';
+import 'package:Azunii_Health/views/auth/forget/rest_password_view.dart';
+import 'package:Azunii_Health/views/auth/login/login_view.dart';
+import 'package:Azunii_Health/views/auth/sing_up/signup_view.dart';
+import 'package:Azunii_Health/views/care_taker/FAQs/faqs_view.dart';
+import 'package:Azunii_Health/views/care_taker/Medication/medication_caretaker_view.dart';
+import 'package:Azunii_Health/views/care_taker/Notes/notes_view.dart';
+import 'package:Azunii_Health/views/care_taker/dashboard/dashboard.dart';
+import 'package:Azunii_Health/views/care_taker/feedback/feedback_view.dart';
+import 'package:Azunii_Health/views/care_taker/home/home_view_caregiver.dart.dart';
+import 'package:Azunii_Health/views/care_taker/settings/settings_view.dart';
+import 'package:Azunii_Health/views/patient/advocacy/add_caregiver_view.dart';
+import 'package:Azunii_Health/views/patient/dashboard/patient_dashboard.dart';
+import 'package:Azunii_Health/views/patient/home/home_view.dart';
+import 'package:Azunii_Health/views/patient/visits/visits_view.dart';
+import 'package:Azunii_Health/views/splash/splash_view.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
 
 class AppRoutes {

@@ -1,6 +1,6 @@
-import 'package:azunii_health_care/consts/assets.dart';
-import 'package:azunii_health_care/consts/colors.dart';
-import 'package:azunii_health_care/views/widget/text.dart';
+import 'package:Azunii_Health/consts/assets.dart';
+import 'package:Azunii_Health/consts/colors.dart';
+import 'package:Azunii_Health/views/widget/text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -53,10 +53,12 @@ class CustomAppBar extends StatelessWidget {
 
           // Trailing icon (e.g. bell)
           GestureDetector(
-            onTap: onIconTap ?? () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const NotificationView()),
-            ),
+            onTap: onIconTap ??
+                () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const NotificationView()),
+                    ),
             child: Container(
               width: MediaQuery.of(context).size.width * 0.11,
               height: MediaQuery.of(context).size.width * 0.11,

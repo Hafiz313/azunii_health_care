@@ -1,9 +1,8 @@
-import 'package:azunii_health_care/consts/lang.dart';
-import 'package:azunii_health_care/networking/api_provider.dart';
-import 'package:azunii_health_care/utils/my_loader.dart';
-import 'package:azunii_health_care/utils/percentage_size_ext.dart';
-import 'package:azunii_health_care/views/auth/login/login_view.dart';
-import 'package:azunii_health_care/views/widget/text.dart';
+import 'package:Azunii_Health/consts/lang.dart';
+import 'package:Azunii_Health/networking/api_provider.dart';
+import 'package:Azunii_Health/utils/my_loader.dart';
+import 'package:Azunii_Health/utils/percentage_size_ext.dart';
+import 'package:Azunii_Health/views/widget/text.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

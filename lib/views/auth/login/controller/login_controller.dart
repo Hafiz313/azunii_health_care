@@ -1,15 +1,16 @@
 import 'dart:convert';
 
-import 'package:azunii_health_care/consts/lang.dart';
-import 'package:azunii_health_care/core/models/response/GetLoginInfoModel.dart';
-import 'package:azunii_health_care/core/models/response/login_response.dart';
-import 'package:azunii_health_care/core/models/response/DashBoardModel.dart';
-import 'package:azunii_health_care/core/models/response/GetJobEmpModels.dart';
-import 'package:azunii_health_care/views/auth/Otp/otp_view.dart';
+import 'package:Azunii_Health/consts/lang.dart';
+import 'package:Azunii_Health/core/models/response/GetLoginInfoModel.dart';
+import 'package:Azunii_Health/core/models/response/login_response.dart';
+import 'package:Azunii_Health/core/services/google_auth_service.dart';
+import 'package:Azunii_Health/core/services/local_storage_service.dart';
+import 'package:Azunii_Health/views/auth/Otp/otp_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:stylish_dialog/stylish_dialog.dart';
 
 import '../../../../main.dart';
@@ -47,32 +48,43 @@ class LoginController extends GetxController {
   }
 
   void savePassword() {
-    if (isChecked.value) {
-      StorageService().saveData(StorageConsts.kUserEmail, emailTxtField.text);
-      StorageService()
-          .saveData(StorageConsts.kUserPassword, passwordTxtField.text);
-    } else {
-      StorageService().removeData(StorageConsts.kUserEmail);
-      StorageService().removeData(StorageConsts.kUserPassword);
+    try {
+      if (isChecked.value) {
+        StorageService().saveData(StorageConsts.kUserEmail, emailTxtField.text);
+        StorageService()
+            .saveData(StorageConsts.kUserPassword, passwordTxtField.text);
+      } else {
+        StorageService().removeData(StorageConsts.kUserEmail);
+        StorageService().removeData(StorageConsts.kUserPassword);
+      }
+    } catch (e) {
+      // Silently handle storage errors
     }
   }
 
   fetchSaveData() {
-    StorageService().saveData(StorageConsts.kAppRun, 'true');
-    String? email;
-    if (StorageService().containsKey(StorageConsts.kUserEmail)) {
-      email = StorageService().getData(StorageConsts.kUserEmail);
-      isChecked.value = true;
-    } else {
-      email = StorageService().containsKey(StorageConsts.kUserEmail)
-          ? StorageService().getData(StorageConsts.kUserEmail)
-          : '';
+    try {
+      StorageService().saveData(StorageConsts.kAppRun, 'true');
+      String? email;
+      if (StorageService().containsKey(StorageConsts.kUserEmail)) {
+        email = StorageService().getData(StorageConsts.kUserEmail);
+        isChecked.value = true;
+      } else {
+        email = StorageService().containsKey(StorageConsts.kUserEmail)
+            ? StorageService().getData(StorageConsts.kUserEmail)
+            : '';
+      }
+      String? password =
+          StorageService().containsKey(StorageConsts.kUserPassword)
+              ? StorageService().getData(StorageConsts.kUserPassword)
+              : '';
+      emailTxtField.text = email ?? '';
+      passwordTxtField.text = password ?? '';
+    } catch (e) {
+      // Set empty values on error
+      emailTxtField.text = '';
+      passwordTxtField.text = '';
     }
-    String? password = StorageService().containsKey(StorageConsts.kUserPassword)
-        ? StorageService().getData(StorageConsts.kUserPassword)
-        : '';
-    emailTxtField.text = email!;
-    passwordTxtField.text = password!;
   }
 
   void login(BuildContext context) {
@@ -337,7 +349,7 @@ class LoginController extends GetxController {
           getLoginInfoModel.value = getLoginInfoModelFromJson(res);
           debugPrint(
               "======getLoginInfoModel user:${getLoginInfoModel.value.result!.user!.contractorId}======");
-          saveUsersData(user: getLoginInfoModel.value);
+          // saveUsersData(user: getLoginInfoModel.value);
         }
       },
     );
@@ -356,25 +368,117 @@ class LoginController extends GetxController {
     super.onClose();
   }
 
-  void saveUsersData({required GetLoginInfoModel user}) {
-    StorageService()
-        .saveData(StorageConsts.kUserName, user.result!.user!.userName);
-    StorageService()
-        .saveData(StorageConsts.kUserSurName, user.result!.user!.surname);
-    StorageService()
-        .saveData(StorageConsts.kUserPassword, passwordTxtField.text);
-    StorageService().saveData(StorageConsts.kName, user.result!.user!.name);
-    StorageService()
-        .saveData(StorageConsts.kEmail, user.result!.user!.emailAddress);
-    StorageService()
-        .saveData(StorageConsts.kEmail, user.result!.user!.emailAddress);
-    StorageService()
-        .saveData(StorageConsts.kEmployeeId, user.result!.user!.employeeId);
-    StorageService()
-        .saveData(StorageConsts.kTenantName, user.result!.tenant!.name);
-    StorageService()
-        .saveData(StorageConsts.kTenancyName, user.result!.tenant!.tenancyName);
-    StorageService()
-        .saveData(StorageConsts.kCompanyId, user.result!.tenant!.companyId);
+  Future<void> loginInAsPatient(BuildContext context) async {
+    try {
+      mainLoading.value = true;
+
+      // final userModel = await GoogleAuthService.signInWithGoogle();
+
+      //  if (userModel != null) {
+      await LocalStorageService.setLoginStatus(true, userType: 'patient');
+
+      //  mainLoading.value = false;
+      Get.offAllNamed('/patient-dashboard');
+      // }
+      // else {
+      mainLoading.value = false;
+      // }
+    } catch (e) {
+      mainLoading.value = false;
+
+      if (!e.toString().contains('sign_in_canceled')) {
+        Get.offAllNamed('/patient-dashboard');
+        Get.snackbar(
+          'Sign-In Error',
+          'Google Sign-In failed. Please try again.',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.TOP,
+        );
+      }
+    }
   }
+
+  Future<void> loginInAsCaregiver(BuildContext context) async {
+    try {
+      mainLoading.value = true;
+
+      await LocalStorageService.setLoginStatus(true, userType: 'caregiver');
+
+      mainLoading.value = false;
+      Get.offAllNamed('/care-taker-dashboard');
+    } catch (e) {
+      mainLoading.value = false;
+
+      if (!e.toString().contains('sign_in_canceled')) {
+        Get.offAllNamed('/care-taker-dashboard');
+      }
+    }
+  }
+
+  /// Google Sign-In as Patient
+  Future<void> signInAsPatient(BuildContext context) async {
+    try {
+      mainLoading.value = true;
+
+      final userModel = await GoogleAuthService.signInWithGoogle();
+
+      if (userModel != null) {
+        await LocalStorageService.setLoginStatus(true, userType: 'patient');
+
+        mainLoading.value = false;
+        Get.offAllNamed('/patient-dashboard');
+      } else {
+        mainLoading.value = false;
+      }
+    } catch (e) {
+      mainLoading.value = false;
+      Get.offAllNamed('/patient-dashboard');
+      // if (!e.toString().contains('sign_in_canceled')) {
+      //   Get.snackbar(
+      //     'Sign-In Error',
+      //     'Google Sign-In failed. Please try again.',
+      //     backgroundColor: Colors.red,
+      //     colorText: Colors.white,
+      //     snackPosition: SnackPosition.TOP,
+      //   );
+    }
+  }
+
+  Future<void> signInAsCaregiver(BuildContext context) async {
+    try {
+      mainLoading.value = true;
+
+      final userModel = await GoogleAuthService.signInWithGoogle();
+
+      if (userModel != null) {
+        await LocalStorageService.setLoginStatus(true, userType: 'caregiver');
+
+        mainLoading.value = false;
+        Get.offAllNamed('/care-taker-dashboard');
+      } else {
+        mainLoading.value = false;
+      }
+    } catch (e) {
+      mainLoading.value = false;
+
+      if (!e.toString().contains('sign_in_canceled')) {
+        Get.offAllNamed('/care-taker-dashboard');
+        // Get.snackbar(
+        //   'Sign-In Error',
+        //   'Google Sign-In failed. Please try again.',
+        //   backgroundColor: Colors.red,
+        //   colorText: Colors.white,
+        //   snackPosition: SnackPosition.TOP,
+        // );
+      }
+    }
+  }
+
+  /// Check if user is already logged in
+  Future<bool> checkLoginStatus() async {
+    return await GoogleAuthService.isSignedIn();
+  }
+
+  /// Auto login if user is already signed in
 }

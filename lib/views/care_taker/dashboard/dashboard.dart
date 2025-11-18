@@ -1,16 +1,12 @@
-import 'package:azunii_health_care/consts/colors.dart';
-import 'package:azunii_health_care/views/care_taker/FAQs/faqs_view.dart';
-
-import 'package:azunii_health_care/views/care_taker/dashboard/controller/caretaker_home_controller.dart';
-
-import 'package:azunii_health_care/views/care_taker/dashboard/widgets/caretakerbottomnavbar.dart';
-import 'package:azunii_health_care/views/care_taker/feedback/feedback_view.dart';
-import 'package:azunii_health_care/views/care_taker/home/home_view_caregiver.dart.dart';
-import 'package:azunii_health_care/views/care_taker/medication/medication_caretaker_view.dart';
-import 'package:azunii_health_care/views/care_taker/notes/notes_view.dart';
-
-import 'package:azunii_health_care/views/care_taker/settings/settings_view.dart';
-
+import 'package:Azunii_Health/consts/colors.dart';
+import 'package:Azunii_Health/views/care_taker/FAQs/faqs_view.dart';
+import 'package:Azunii_Health/views/care_taker/Medication/medication_caretaker_view.dart';
+import 'package:Azunii_Health/views/care_taker/Notes/notes_view.dart';
+import 'package:Azunii_Health/views/care_taker/dashboard/controller/caretaker_home_controller.dart';
+import 'package:Azunii_Health/views/care_taker/dashboard/widgets/caretakerbottomnavbar.dart';
+import 'package:Azunii_Health/views/care_taker/feedback/feedback_view.dart';
+import 'package:Azunii_Health/views/care_taker/home/home_view_caregiver.dart.dart';
+import 'package:Azunii_Health/views/care_taker/settings/settings_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

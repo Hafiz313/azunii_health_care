@@ -1,11 +1,12 @@
-import 'package:azunii_health_care/consts/assets.dart';
-import 'package:azunii_health_care/utils/percentage_size_ext.dart';
+import 'package:Azunii_Health/consts/assets.dart';
+import 'package:Azunii_Health/utils/percentage_size_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../../consts/colors.dart';
 import '../../../consts/lang.dart';
+import '../../../core/services/google_auth_service.dart';
 import '../../widget/text.dart';
 import '../../widget/Common_widgets/quick_action_card.dart';
 import '../../widget/Common_widgets/medication_alert_card.dart';
@@ -20,8 +21,9 @@ import '../../auth/login/login_view.dart';
 class HomeView extends StatelessWidget {
   static const String routeName = '/HomeView';
   const HomeView({super.key});
-  
-  static final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  static final GlobalKey<ScaffoldState> _scaffoldKey =
+      GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +102,9 @@ class HomeView extends StatelessWidget {
                     align: TextAlign.start,
                   ),
                   Obx(() => subText4(
-                        controller.userName.value,
+                        controller.userName.value.isNotEmpty
+                            ? controller.userName.value
+                            : 'User',
                         color: AppColors.headingTextColor,
                         align: TextAlign.start,
                         fontWeight: FontWeight.w500,
@@ -109,11 +113,18 @@ class HomeView extends StatelessWidget {
               ),
             ),
             // Profile picture
-            CircleAvatar(
-              radius: 18,
-              backgroundColor: AppColors.cardGray,
-              backgroundImage: const AssetImage(AppAssets.profile),
-            ),
+            Obx(() => CircleAvatar(
+                  radius: 18,
+                  backgroundColor: AppColors.cardGray,
+                  backgroundImage: controller.userProfileImage.value.isNotEmpty
+                      ? NetworkImage(controller.userProfileImage.value)
+                      : const AssetImage(AppAssets.profile) as ImageProvider,
+                  onBackgroundImageError:
+                      controller.userProfileImage.value.isNotEmpty
+                          ? (exception, stackTrace) =>
+                              const AssetImage(AppAssets.profile)
+                          : null,
+                )),
           ],
         ),
       ),
@@ -332,7 +343,7 @@ class HomeView extends StatelessWidget {
           // Logo at top
           Container(
             padding: const EdgeInsets.all(40),
-            child: SvgPicture.asset(
+            child: Image.asset(
               AppAssets.logoMain,
               height: 80,
             ),
@@ -400,7 +411,8 @@ class HomeView extends StatelessWidget {
     );
   }
 
-  Widget _buildDrawerItem(BuildContext context, {
+  Widget _buildDrawerItem(
+    BuildContext context, {
     required IconData icon,
     required String title,
     required VoidCallback onTap,
@@ -442,10 +454,10 @@ class HomeView extends StatelessWidget {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.pop(context);
-                Navigator.popUntil(context, (route) => route.isFirst);
-                Navigator.pushReplacementNamed(context, LoginView.routeName);
+                final controller = Get.find<HomeController>();
+                await controller.logout();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,

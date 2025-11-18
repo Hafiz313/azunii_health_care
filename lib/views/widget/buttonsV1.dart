@@ -1,5 +1,3 @@
-import 'package:azunii_health_care/utils/percentage_size_ext.dart';
-import 'package:azunii_health_care/views/widget/text.dart';
 import 'package:flutter/material.dart';
 
 import '../../consts/colors.dart';
@@ -37,10 +35,10 @@ class _AppElevatedButtonV1State extends State<AppElevatedButtonV1> {
       child: Text(
         widget.title,
         style: textStyle ??
-             const TextStyle(
+            const TextStyle(
                 color: AppColors.white,
                 fontWeight: FontWeight.bold,
-                fontSize:  14),
+                fontSize: 14),
       ),
     );
   }

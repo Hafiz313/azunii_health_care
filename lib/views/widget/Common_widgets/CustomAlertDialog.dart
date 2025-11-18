@@ -1,6 +1,6 @@
-import 'package:azunii_health_care/consts/colors.dart';
-import 'package:azunii_health_care/consts/lang.dart';
-import 'package:azunii_health_care/views/widget/buttons.dart';
+import 'package:Azunii_Health/consts/colors.dart';
+import 'package:Azunii_Health/consts/lang.dart';
+import 'package:Azunii_Health/views/widget/buttons.dart';
 import 'package:flutter/material.dart';
 
 class CustomAlertDialog extends StatelessWidget {

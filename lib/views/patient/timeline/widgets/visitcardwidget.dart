@@ -1,7 +1,7 @@
-import 'package:azunii_health_care/consts/assets.dart';
-import 'package:azunii_health_care/consts/colors.dart';
-import 'package:azunii_health_care/views/widget/buttons.dart';
-import 'package:azunii_health_care/views/widget/text.dart';
+import 'package:Azunii_Health/consts/assets.dart';
+import 'package:Azunii_Health/consts/colors.dart';
+import 'package:Azunii_Health/views/widget/buttons.dart';
+import 'package:Azunii_Health/views/widget/text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 

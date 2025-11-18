@@ -1,9 +1,9 @@
-import 'package:azunii_health_care/consts/lang.dart';
-import 'package:azunii_health_care/networking/api_provider.dart';
-import 'package:azunii_health_care/utils/my_loader.dart';
-import 'package:azunii_health_care/utils/percentage_size_ext.dart';
-import 'package:azunii_health_care/views/auth/login/login_widgets.dart';
-import 'package:azunii_health_care/views/auth/sing_up/signup_view.dart';
+import 'package:Azunii_Health/consts/lang.dart';
+import 'package:Azunii_Health/networking/api_provider.dart';
+import 'package:Azunii_Health/utils/percentage_size_ext.dart';
+import 'package:Azunii_Health/views/auth/login/login_widgets.dart';
+import 'package:Azunii_Health/views/auth/sing_up/signup_view.dart';
+import 'package:Azunii_Health/views/widget/loading_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -114,77 +114,60 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
-  // Future<void> _checkBiometrics() async {
+  // Future<void> _authenticateAndLogin(BuildContext context) async {
   //   try {
-  //     bool canCheck = await auth.canCheckBiometrics;
-  //     List<BiometricType> available = await auth.getAvailableBiometrics();
-  //     if (mounted) {
-  //       setState(() {
-  //         _showFingerprint =
-  //             canCheck && available.contains(BiometricType.fingerprint);
-  //         _showFace = canCheck && available.contains(BiometricType.face);
-  //       });
+  //     bool isAvailable = await auth.canCheckBiometrics;
+  //     if (!isAvailable) {
+  //       print("Biometric not available");
+  //       return;
+  //     }
+
+  //     bool didAuthenticate = await auth.authenticate(
+  //       localizedReason: 'Please authenticate to access',
+  //       options: const AuthenticationOptions(
+  //         biometricOnly: true,
+  //         stickyAuth: true,
+  //       ),
+  //     );
+
+  //     if (didAuthenticate) {
+  //       print("Authenticated successfully!");
+  //     } else {
+  //       print("Authentication failed.");
   //     }
   //   } catch (e) {
-  //     setState(() {
-  //       _showFingerprint = false;
-  //       _showFace = false;
-  //     });
+  //     print("Error: $e");
   //   }
   // }
 
-  Future<void> _authenticateAndLogin(BuildContext context) async {
-    try {
-      bool isAvailable = await auth.canCheckBiometrics;
-      if (!isAvailable) {
-        print("Biometric not available");
-        return;
-      }
-
-      bool didAuthenticate = await auth.authenticate(
-        localizedReason: 'Please authenticate to access',
-        options: const AuthenticationOptions(
-          biometricOnly: true,
-          stickyAuth: true,
-        ),
-      );
-
-      if (didAuthenticate) {
-        print("Authenticated successfully!");
-      } else {
-        print("Authentication failed.");
-      }
-    } catch (e) {
-      print("Error: $e");
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return BaseScaffoldAuth(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: context.percentWidth * 5.0,
-            vertical: context.percentHeight * 5.0,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(
-                height: context.screenHeight * 0.03,
+    return Obx(() => LoadingOverlay(
+        isLoading: mainLoading.value,
+        child: BaseScaffoldAuth(
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.percentWidth * 5.0,
+                vertical: context.percentHeight * 5.0,
               ),
-              LoginWidgets.buildLogo(context),
-              SizedBox(height: context.percentHeight * 1.0),
-              _buildFormContainer(context),
-              SizedBox(
-                height: context.percentHeight * 2.0,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: context.screenHeight * 0.03,
+                  ),
+                  LoginWidgets.buildLogo(context),
+                  SizedBox(height: context.percentHeight * 1.0),
+                  _buildFormContainer(context),
+                  SizedBox(
+                    height: context.percentHeight * 2.0,
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
-    );
+        )));
   }
 
   Widget _buildFormContainer(BuildContext context) {
@@ -211,91 +194,103 @@ class _LoginViewState extends State<LoginView> {
           SizedBox(height: context.percentHeight * 2.0),
           LoginWidgets.buildPasswordField(context, controller),
           SizedBox(height: context.percentHeight * 2.0),
-          Obx(() => mainLoading.value
-              ? const MyLoader()
-              : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    LoginWidgets.buildRememberMeAndForgotPassword(
-                        context, controller),
-                    SizedBox(height: context.percentHeight * 2.0),
-                    // Biometric login button
-                    // if (Platform.isAndroid)
-                    // if (Platform.isAndroid && _showFingerprint)
-                    //   Column(
-                    //     children: [
-                    //       Icon(Icons.fingerprint,
-                    //           size: context.percentHeight * 5,
-                    //           color: AppColors.primary),
-                    //       SizedBox(height: context.percentHeight * 1),
-                    //       // GestureDetector(
-                    //       //   onTap: () => _authenticateAndLogin(context),
-                    //       //   child: const Text(
-                    //       //     'Login with Fingerprint',
-                    //       //     style: TextStyle(
-                    //       //       fontWeight: FontWeight.bold,
-                    //       //       color: AppColors.primary,
-                    //       //     ),
-                    //       //   ),
-                    //       // ),
-                    //       SizedBox(height: context.percentHeight * 2.0),
-                    //     ],
-                    //   ),
-                    // if (Platform.isIOS)
-                    // if (Platform.isIOS && _showFace)
-                    //   Column(
-                    //     children: [
-                    //       Icon(Icons.face_6,
-                    //           size: context.percentHeight * 5,
-                    //           color: AppColors.primary),
-                    //       SizedBox(height: context.percentHeight * 1),
-                    //       GestureDetector(
-                    //         onTap: () => _authenticateAndLogin(context),
-                    //         child: const Text(
-                    //           'Login with Face Recognition',
-                    //           style: TextStyle(
-                    //             fontWeight: FontWeight.bold,
-                    //             color: AppColors.primary,
-                    //           ),
-                    //         ),
-                    //       ),
-                    //       SizedBox(height: context.percentHeight * 2.0),
-                    //     ],
-                    //   ),
-                    SizedBox(height: context.percentHeight * 3),
-                    LoginWidgets.buildLoginButton(context,
-                        onPress: () => _showLoginTypeDialog(context)),
-                    SizedBox(height: context.percentHeight * 4.0),
+          Stack(
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  LoginWidgets.buildRememberMeAndForgotPassword(
+                      context, controller),
+                  SizedBox(height: context.percentHeight * 2.0),
+                  // Biometric login button
+                  // if (Platform.isAndroid)
+                  // if (Platform.isAndroid && _showFingerprint)
+                  //   Column(
+                  //     children: [
+                  //       Icon(Icons.fingerprint,
+                  //           size: context.percentHeight * 5,
+                  //           color: AppColors.primary),
+                  //       SizedBox(height: context.percentHeight * 1),
+                  //       // GestureDetector(
+                  //       //   onTap: () => _authenticateAndLogin(context),
+                  //       //   child: const Text(
+                  //       //     'Login with Fingerprint',
+                  //       //     style: TextStyle(
+                  //       //       fontWeight: FontWeight.bold,
+                  //       //       color: AppColors.primary,
+                  //       //     ),
+                  //       //   ),
+                  //       // ),
+                  //       SizedBox(height: context.percentHeight * 2.0),
+                  //     ],
+                  //   ),
+                  // if (Platform.isIOS)
+                  // if (Platform.isIOS && _showFace)
+                  //   Column(
+                  //     children: [
+                  //       Icon(Icons.face_6,
+                  //           size: context.percentHeight * 5,
+                  //           color: AppColors.primary),
+                  //       SizedBox(height: context.percentHeight * 1),
+                  //       GestureDetector(
+                  //         onTap: () => _authenticateAndLogin(context),
+                  //         child: const Text(
+                  //           'Login with Face Recognition',
+                  //           style: TextStyle(
+                  //             fontWeight: FontWeight.bold,
+                  //             color: AppColors.primary,
+                  //           ),
+                  //         ),
+                  //       ),
+                  //       SizedBox(height: context.percentHeight * 2.0),
+                  //     ],
+                  //   ),
+                  SizedBox(height: context.percentHeight * 3),
+                  LoginWidgets.buildLoginButton(context,
+                      onPress: () => _showLoginTypeDialog(context)),
+                  SizedBox(height: context.percentHeight * 4.0),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        subText4(
-                          Lang.donntHaveAnAccount,
-                          color: AppColors.blackColor,
-                          fontWeight: FontWeight.w400,
-                        ),
-                        SizedBox(width: context.percentWidth * 5),
-                        InkWell(
-                            onTap: () {
-                              Navigator.pushReplacementNamed(
-                                  context, SignUpView.routeName);
-                            },
-                            child: subText4(
-                              Lang.signUp,
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w400,
-                            )),
-                      ],
-                    ),
-                    SizedBox(
-                      height: context.percentHeight * 3,
-                    ),
-                    LoginWidgets.buildSocialButtons(context),
-                  ],
-                ))
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      subText4(
+                        Lang.donntHaveAnAccount,
+                        color: AppColors.blackColor,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      SizedBox(width: context.percentWidth * 5),
+                      InkWell(
+                          onTap: () {
+                            Navigator.pushReplacementNamed(
+                                context, SignUpView.routeName);
+                          },
+                          child: subText4(
+                            Lang.signUp,
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w400,
+                          )),
+                    ],
+                  ),
+                  SizedBox(
+                    height: context.percentHeight * 3,
+                  ),
+                  LoginWidgets.buildSocialButtons(context),
+                ],
+              ),
+              // Obx(() => mainLoading.value
+              //     ? Positioned.fill(
+              //         child: Container(
+              //           color: Colors.black.withOpacity(0.3),
+              //           child: const Center(
+              //             child: MyLoader(),
+              //           ),
+              //         ),
+              //       )
+              //     : const SizedBox.shrink()),
+            ],
+          )
         ]),
       ),
     );

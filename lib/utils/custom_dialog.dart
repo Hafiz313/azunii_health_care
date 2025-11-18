@@ -1,5 +1,3 @@
-
-import 'package:azunii_health_care/utils/percentage_size_ext.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:stylish_dialog/stylish_dialog.dart';
 
@@ -45,7 +43,7 @@ class CustomDialog {
       dismissOnTouchOutside: dismissible,
       controller: controller,
       confirmButton: AppElevatedButton(
-        width: context!.percentWidth * 30.0,
+        width: 150,
         onPressed: () {
           if (callBack == null) {
             Navigator.pop(context);

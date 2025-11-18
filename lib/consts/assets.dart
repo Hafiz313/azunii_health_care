@@ -19,7 +19,7 @@ class AppAssets {
   static const String dosage = 'assets/svg/dosage.svg';
   static const String frame4 = 'assets/svg/Frame 4.svg';
   static const String health = 'assets/svg/health.svg';
-  static const String logoMain = 'assets/svg/logomain.svg';
+  static const String logoMain = 'assets/images/Vector.png';
   static const String mail = 'assets/svg/mail.svg';
   static const String medicine = 'assets/svg/medicine.svg';
   static const String messages = 'assets/svg/messages.svg';

@@ -1,7 +1,7 @@
-import 'package:azunii_health_care/networking/api_provider.dart';
-import 'package:azunii_health_care/utils/percentage_size_ext.dart';
-import 'package:azunii_health_care/views/auth/forget/froget_view.dart';
-import 'package:azunii_health_care/views/widget/Common_widgets/logo_widget.dart';
+import 'package:Azunii_Health/utils/percentage_size_ext.dart';
+import 'package:Azunii_Health/views/auth/forget/froget_view.dart';
+import 'package:Azunii_Health/views/auth/login/controller/login_controller.dart';
+import 'package:Azunii_Health/views/widget/Common_widgets/logo_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -173,21 +173,31 @@ class LoginWidgets {
       {required Function() onPress}) {
     return AppElevatedButton(
       backgroundColor: AppColors.secondary,
-      onPressed: onPress,
+      onPressed: () {
+        _showUserTypeDialog(context, true);
+        // Get.snackbar(
+        //   'Coming Soon',
+        //   'Only Google Sign-In is available for now',
+        //   backgroundColor: AppColors.primary,
+        //   colorText: AppColors.white,
+        //   snackPosition: SnackPosition.TOP,
+
+        //  );
+      },
       title: Lang.signIn,
     );
   }
 
-  static Widget buildSocialButtons(BuildContext context) {
+  static Widget buildSocialButtons(
+    BuildContext context,
+  ) {
     return Row(
       children: [
         Expanded(
           child: SocialButton(
             text: Lang.google,
             iconPath: AppAssets.googleIcon,
-            onPressed: () {
-              // Handle Google sign in
-            },
+            onPressed: () => _showUserTypeDialog(context, false),
           ),
         ),
         SizedBox(width: context.percentWidth * 4.0),
@@ -196,11 +206,111 @@ class LoginWidgets {
             text: Lang.apple,
             iconPath: AppAssets.appleIcon,
             onPressed: () {
-              // Handle Apple sign in
+              Get.snackbar(
+                'Coming Soon',
+                'Only Google Sign-In is available for now',
+                backgroundColor: AppColors.primary,
+                colorText: AppColors.white,
+                snackPosition: SnackPosition.TOP,
+              );
             },
           ),
         ),
       ],
     );
+  }
+
+  static void _showUserTypeDialog(BuildContext context, bool isonloginApi) {
+    try {
+      final controller = Get.find<LoginController>();
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: AppColors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Text(
+              'Sign Up As',
+              style: TextStyle(
+                color: AppColors.headingTextColor,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      try {
+                        Navigator.pop(context);
+                        isonloginApi
+                            ? controller.loginInAsPatient(context)
+                            : controller.signInAsPatient(context);
+                      } catch (e) {
+                        Navigator.pop(context);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      'Sign in as Patient',
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      try {
+                        Navigator.pop(context);
+                        isonloginApi
+                            ? controller.loginInAsCaregiver(context)
+                            : controller.signInAsCaregiver(context);
+                      } catch (e) {
+                        Navigator.pop(context);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      'Sign in as Caregiver',
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      // Handle dialog creation error
+    }
   }
 }

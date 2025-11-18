@@ -1,8 +1,9 @@
-import 'package:azunii_health_care/consts/assets.dart';
-import 'package:azunii_health_care/utils/percentage_size_ext.dart';
-import 'package:azunii_health_care/views/care_taker/home/controller/care-giver-controller.dart';
-import 'package:azunii_health_care/views/patient/medicines/medicines_view.dart';
-import 'package:azunii_health_care/views/patient/visits/visits_view.dart';
+import 'package:Azunii_Health/consts/assets.dart';
+import 'package:Azunii_Health/utils/percentage_size_ext.dart';
+import 'package:Azunii_Health/views/care_taker/home/controller/care-giver-controller.dart';
+import 'package:Azunii_Health/views/patient/medicines/medicines_view.dart';
+import 'package:Azunii_Health/views/patient/visits/visits_view.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -20,8 +21,9 @@ import '../../auth/login/login_view.dart';
 class HomeView_caregiver extends StatelessWidget {
   static const String routeName = '/home-caregiver';
   const HomeView_caregiver({super.key});
-  
-  static final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  static final GlobalKey<ScaffoldState> _scaffoldKey =
+      GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -69,11 +71,18 @@ class HomeView_caregiver extends StatelessWidget {
             ),
             const SizedBox(width: 4),
 
-            CircleAvatar(
-              radius: 18,
-              backgroundColor: AppColors.cardGray,
-              backgroundImage: const AssetImage(AppAssets.profile),
-            ),
+            Obx(() => CircleAvatar(
+                  radius: 18,
+                  backgroundColor: AppColors.cardGray,
+                  backgroundImage: controller.userProfileImage.value.isNotEmpty
+                      ? NetworkImage(controller.userProfileImage.value)
+                      : const AssetImage(AppAssets.profile) as ImageProvider,
+                  onBackgroundImageError:
+                      controller.userProfileImage.value.isNotEmpty
+                          ? (exception, stackTrace) =>
+                              const AssetImage(AppAssets.profile)
+                          : null,
+                )),
             const SizedBox(width: 12),
             // Welcome text
             Expanded(
@@ -87,7 +96,9 @@ class HomeView_caregiver extends StatelessWidget {
                     align: TextAlign.start,
                   ),
                   Obx(() => subText4(
-                        controller.userName.value,
+                        controller.userName.value.isNotEmpty
+                            ? controller.userName.value
+                            : 'Caregiver',
                         color: AppColors.headingTextColor,
                         align: TextAlign.start,
                         fontWeight: FontWeight.w500,
@@ -314,7 +325,7 @@ class HomeView_caregiver extends StatelessWidget {
             // Logo at top
             Container(
               padding: const EdgeInsets.all(40),
-              child: SvgPicture.asset(
+              child: Image.asset(
                 AppAssets.logoMain,
                 height: 80,
               ),
@@ -358,10 +369,10 @@ class HomeView_caregiver extends StatelessWidget {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.popUntil(context, (route) => route.isFirst);
-                    Navigator.pushReplacementNamed(
-                        context, LoginView.routeName);
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    final controller = Get.find<HomeController_caregiver>();
+                    await controller.logout();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,

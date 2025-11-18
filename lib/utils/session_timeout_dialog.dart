@@ -1,7 +1,7 @@
-import 'package:azunii_health_care/consts/colors.dart';
-import 'package:azunii_health_care/utils/percentage_size_ext.dart';
-import 'package:azunii_health_care/views/widget/buttons.dart';
-import 'package:azunii_health_care/views/widget/text.dart';
+import 'package:Azunii_Health/consts/colors.dart';
+import 'package:Azunii_Health/utils/percentage_size_ext.dart';
+import 'package:Azunii_Health/views/widget/buttons.dart';
+import 'package:Azunii_Health/views/widget/text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

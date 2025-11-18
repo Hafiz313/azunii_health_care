@@ -1,5 +1,4 @@
-import 'package:azunii_health_care/consts/colors.dart';
-import 'package:azunii_health_care/utils/percentage_size_ext.dart';
+import 'package:Azunii_Health/consts/colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomTabView extends StatefulWidget {

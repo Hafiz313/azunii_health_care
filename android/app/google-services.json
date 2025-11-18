@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "599294145634",
+    "project_id": "anzuii-healthcare-app",
+    "storage_bucket": "anzuii-healthcare-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:599294145634:android:2791c1c4f834ba85130d3b",
+        "android_client_info": {
+          "package_name": "azunii.healthcare.azunii_health_care"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "599294145634-h4sim8cc6cf8jjjak5rf79oijd0lgiuk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "azunii.healthcare.azunii_health_care",
+            "certificate_hash": "95715588913289a664aa9d6a97af77eafd723259"
+          }
+        },
+        {
+          "client_id": "599294145634-o6bfbgddg66r611btshcjhubhrrs7ieo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCs5m2dpDHzgyW2P2B1ajpbOKoDI3IiL6U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "599294145634-o6bfbgddg66r611btshcjhubhrrs7ieo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

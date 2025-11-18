@@ -1,7 +1,7 @@
-import 'package:azunii_health_care/views/widget/Common_widgets/customAppBar.dart';
-import 'package:azunii_health_care/views/widget/Common_widgets/custom_dropdown.dart';
-import 'package:azunii_health_care/views/widget/Common_widgets/upload_section_widget.dart';
-import 'package:azunii_health_care/views/widget/text_fields.dart';
+import 'package:Azunii_Health/views/widget/Common_widgets/customAppBar.dart';
+import 'package:Azunii_Health/views/widget/Common_widgets/custom_dropdown.dart';
+import 'package:Azunii_Health/views/widget/Common_widgets/upload_section_widget.dart';
+import 'package:Azunii_Health/views/widget/text_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';

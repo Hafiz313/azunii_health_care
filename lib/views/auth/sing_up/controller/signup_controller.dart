@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:azunii_health_care/consts/lang.dart';
-import 'package:azunii_health_care/core/models/response/GetLoginInfoModel.dart';
-import 'package:azunii_health_care/core/models/response/SignUpModels.dart';
-import 'package:azunii_health_care/views/auth/Otp/otp_signup_view.dart';
+import 'package:Azunii_Health/core/models/response/SignUpModels.dart';
+import 'package:Azunii_Health/core/services/google_auth_service.dart';
+import 'package:Azunii_Health/core/services/local_storage_service.dart';
+import 'package:Azunii_Health/views/auth/Otp/otp_signup_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -54,76 +54,197 @@ class SignUpController extends GetxController {
   }
 
   Future<void> signupApi(BuildContext context, {bool moveToOtp = true}) async {
-    var url = Apis.signUpApi;
+    try {
+      var url = Apis.signUpApi;
 
-    var helper = ApiProvider(context, url, {
-      "fullName": nameTxtField.text,
-      "registeredPhoneNumber": registerTxtField.text,
-      "ssn": ssnTxtField.text,
-      "azunii_health_careEmailAddress": empRegisteredTxtField.text,
-      "password": passwordTxtField.text,
-      "id": 0
-    });
+      var helper = ApiProvider(context, url, {
+        "fullName": nameTxtField.text,
+        "registeredPhoneNumber": registerTxtField.text,
+        "ssn": ssnTxtField.text,
+        "azunii_health_careEmailAddress": empRegisteredTxtField.text,
+        "password": passwordTxtField.text,
+        "id": 0
+      });
 
-    await helper
-        .postApiWithoutHeader(
-      showSuccess: true,
-      showLoader: true,
-      showLoaderDismiss: true,
-    )
-        .then(
-      (res) async {
-        // signUpModel.value = SignUpModels(
-        //     result: SignUpResult(
-        //         fullName: nameTxtField.text,
-        //         registeredPhoneNumber: registerTxtField.text,
-        //         ssn: ssnTxtField.text,
-        //         companyEmailAddress: companyRegisteredTxtField.text,
-        //         azunii_health_careEmailAddress: empRegisteredTxtField.text,
-        //         password: passwordTxtField.text,
-        //         employeeId: 130896,
-        //         tenantId: 4109));
-        // Navigator.pushNamed(context, OtpSignUpView.routeName);
-        if (!isNullString(res)) {
-          signUpModel.value = SignUpModels.fromJson(jsonDecode(res));
-          if (moveToOtp) {
-            Navigator.pushNamed(context, OtpSignUpView.routeName);
+      await helper
+          .postApiWithoutHeader(
+        showSuccess: true,
+        showLoader: true,
+        showLoaderDismiss: true,
+      )
+          .then(
+        (res) async {
+          if (!isNullString(res)) {
+            signUpModel.value = SignUpModels.fromJson(jsonDecode(res));
+            if (moveToOtp) {
+              Navigator.pushNamed(context, OtpSignUpView.routeName);
+            }
           }
-        }
-      },
-    );
+        },
+      ).catchError((error) async {
+        await CustomDialog(
+          stylishDialogType: StylishDialogType.ERROR,
+          msg: 'Sign up failed: ${error.toString()}',
+        ).show(context);
+      });
+    } catch (e) {
+      await CustomDialog(
+        stylishDialogType: StylishDialogType.ERROR,
+        msg: 'Sign up failed: ${e.toString()}',
+      ).show(context);
+    }
   }
 
   Future<void> verifyOtp(BuildContext context, {required String otp}) async {
-    // "======userId.value:${userId.value}====isEmail.value:${isEmail.value}=====");
-    var url = Apis.otpVerifySignUpApi;
-    var helper = ApiProvider(context, url, {
-      "fullName": signUpModel.value.result!.fullName,
-      "registeredPhoneNumber": signUpModel.value.result!.registeredPhoneNumber,
-      "ssn": signUpModel.value.result!.ssn,
-      "companyEmailAddress": signUpModel.value.result!.companyEmailAddress,
-      "employeeEmailAddress": signUpModel.value.result!.employeeEmailAddress,
-      "password": signUpModel.value.result!.password,
-      "otpCode": otp,
-      "tenantId": signUpModel.value.result!.tenantId,
-      "employeeId": signUpModel.value.result!.employeeId,
-      "id": 0
-    });
+    try {
+      var url = Apis.otpVerifySignUpApi;
+      var helper = ApiProvider(context, url, {
+        "fullName": signUpModel.value.result!.fullName,
+        "registeredPhoneNumber":
+            signUpModel.value.result!.registeredPhoneNumber,
+        "ssn": signUpModel.value.result!.ssn,
+        "companyEmailAddress": signUpModel.value.result!.companyEmailAddress,
+        "employeeEmailAddress": signUpModel.value.result!.employeeEmailAddress,
+        "password": signUpModel.value.result!.password,
+        "otpCode": otp,
+        "tenantId": signUpModel.value.result!.tenantId,
+        "employeeId": signUpModel.value.result!.employeeId,
+        "id": 0
+      });
 
-    await helper
-        .postApiWithoutHeader(
-      showSuccess: true,
-      showLoader: true,
-      showLoaderDismiss: true,
-    )
-        .then(
-      (res) async {
-        debugPrint("======res:${res}=====");
-        if (!isNullString(res)) {
-          Get.offAllNamed(LoginView.routeName);
-        }
-      },
-    );
+      await helper
+          .postApiWithoutHeader(
+        showSuccess: true,
+        showLoader: true,
+        showLoaderDismiss: true,
+      )
+          .then(
+        (res) async {
+          debugPrint("======res:${res}=====");
+          if (!isNullString(res)) {
+            Get.offAllNamed(LoginView.routeName);
+          }
+        },
+      ).catchError((error) async {
+        await CustomDialog(
+          stylishDialogType: StylishDialogType.ERROR,
+          msg: 'OTP verification failed: ${error.toString()}',
+        ).show(context);
+      });
+    } catch (e) {
+      await CustomDialog(
+        stylishDialogType: StylishDialogType.ERROR,
+        msg: 'OTP verification failed: ${e.toString()}',
+      ).show(context);
+    }
+  }
+
+  /// Google Sign-In as Patient
+  Future<void> signInAsPatient(BuildContext context) async {
+    try {
+      mainLoading.value = true;
+
+      final userModel = await GoogleAuthService.signInWithGoogle();
+
+      if (userModel != null) {
+        await LocalStorageService.setLoginStatus(true, userType: 'patient');
+
+        mainLoading.value = false;
+        Get.offAllNamed('/patient-dashboard');
+      } else {
+        mainLoading.value = false;
+      }
+    } catch (e) {
+      mainLoading.value = false;
+
+      if (!e.toString().contains('sign_in_canceled')) {
+        Get.snackbar(
+          'Sign-In Error',
+          'Google Sign-In failed. Please try again.',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.TOP,
+        );
+      }
+    }
+  }
+
+  Future<void> signInAsCaregiver(BuildContext context) async {
+    try {
+      mainLoading.value = true;
+
+      final userModel = await GoogleAuthService.signInWithGoogle();
+
+      if (userModel != null) {
+        await LocalStorageService.setLoginStatus(true, userType: 'caregiver');
+
+        mainLoading.value = false;
+        Get.offAllNamed('/care-taker-dashboard');
+      } else {
+        mainLoading.value = false;
+      }
+    } catch (e) {
+      mainLoading.value = false;
+
+      if (!e.toString().contains('sign_in_canceled')) {
+        Get.offAllNamed('/care-taker-dashboard');
+        // Get.snackbar(
+        //   'Sign-In Error',
+        //   'Google Sign-In failed. Please try again.',
+        //   backgroundColor: Colors.red,
+        //   colorText: Colors.white,
+        //   snackPosition: SnackPosition.TOP,
+        // );
+      }
+    }
+  }
+
+  Future<void> SignupAsPatient(BuildContext context) async {
+    try {
+      mainLoading.value = true;
+
+      // final userModel = await GoogleAuthService.signInWithGoogle();
+
+      //  if (userModel != null) {
+      await LocalStorageService.setLoginStatus(true, userType: 'patient');
+
+      //  mainLoading.value = false;
+      Get.offAllNamed('/patient-dashboard');
+      // }
+      // else {
+      mainLoading.value = false;
+      // }
+    } catch (e) {
+      mainLoading.value = false;
+
+      if (!e.toString().contains('sign_in_canceled')) {
+        Get.offAllNamed('/patient-dashboard');
+        Get.snackbar(
+          'Sign-In Error',
+          'Google Sign-In failed. Please try again.',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.TOP,
+        );
+      }
+    }
+  }
+
+  Future<void> SignupAsCaregiver(BuildContext context) async {
+    try {
+      mainLoading.value = true;
+
+      await LocalStorageService.setLoginStatus(true, userType: 'caregiver');
+
+      mainLoading.value = false;
+      Get.offAllNamed('/care-taker-dashboard');
+    } catch (e) {
+      mainLoading.value = false;
+
+      if (!e.toString().contains('sign_in_canceled')) {
+        Get.offAllNamed('/care-taker-dashboard');
+      }
+    }
   }
 
   @override

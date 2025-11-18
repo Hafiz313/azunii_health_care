@@ -1,10 +1,9 @@
-import 'package:azunii_health_care/consts/assets.dart';
-import 'package:azunii_health_care/consts/lang.dart';
-import 'package:azunii_health_care/networking/api_provider.dart';
-import 'package:azunii_health_care/utils/my_loader.dart';
-import 'package:azunii_health_care/utils/percentage_size_ext.dart';
-import 'package:azunii_health_care/views/auth/login/login_widgets.dart';
-import 'package:azunii_health_care/views/auth/sing_up/signup_view.dart';
+import 'package:Azunii_Health/consts/assets.dart';
+import 'package:Azunii_Health/consts/lang.dart';
+import 'package:Azunii_Health/networking/api_provider.dart';
+import 'package:Azunii_Health/utils/my_loader.dart';
+import 'package:Azunii_Health/utils/percentage_size_ext.dart';
+import 'package:Azunii_Health/views/auth/login/login_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
