@@ -1,3 +1,4 @@
+import 'package:Azunii_Health/consts/appconsts.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../consts/assets.dart';
@@ -68,8 +69,8 @@ class SignUpWidgets {
                   onPressed: () {
                     Navigator.pop(context);
                     isApicall
-                        ? controller.signInAsPatient(context)
-                        : controller.signInAsPatient(context);
+                        ? controller.signup(Appconsts.patient)
+                        : controller.googleSignup(Appconsts.patient);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
@@ -95,8 +96,8 @@ class SignUpWidgets {
                   onPressed: () {
                     Navigator.pop(context);
                     isApicall
-                        ? controller.SignupAsCaregiver(context)
-                        : controller.signInAsCaregiver(context);
+                        ? controller.signup(Appconsts.caregiver)
+                        : controller.googleSignup(Appconsts.caregiver);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,

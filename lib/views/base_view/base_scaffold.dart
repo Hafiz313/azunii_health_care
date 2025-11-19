@@ -66,23 +66,11 @@ class _BaseScaffoldState extends State<BaseScaffold> {
         (Route<dynamic> route) => false,
       );
     }
-    // else if (index == 1) {
-    //   Navigator.pushReplacementNamed(context, AttendanceDetailsView.routeName);
-    // } else if (index == 2) {
-    //   Navigator.pushReplacementNamed(context, LeaveBalanceView.routeName);
-    // } else if (index == 3) {
-    //   Navigator.pushReplacementNamed(context, NotificationView.routeName);
-    // }
   }
 
   @override
   Widget build(BuildContext context) {
-    _inactivityService.initialize(() {
-      // Call your logout logic here
-      final loginController = Get.put(LoginController());
-      loginController.logout();
-      // Optionally, navigate to login screen
-    });
+    _inactivityService.initialize(() {});
     return WillPopScope(
       onWillPop: () async {
         return await NavigationUtils.handleBackNavigation(context);
@@ -134,106 +122,6 @@ class _BaseScaffoldState extends State<BaseScaffold> {
                               child: const Icon(Icons.menu,
                                   size: 28, color: Colors.black),
                             ),
-
-                      // Title
-                      // Row(
-                      //   mainAxisAlignment: MainAxisAlignment.center,
-                      //   crossAxisAlignment: CrossAxisAlignment.center,
-                      //   children: [
-                      //     Obx(() {
-                      //       final homeController = Get.find<HomeController>();
-                      //       final selectedJob =
-                      //           homeController.selectedJob.value;
-                      //       final jobTitle = selectedJob.jobTitle?.toString() ??
-                      //           'Eworkforce Payroll';
-
-                      //       return Column(
-                      //         mainAxisSize: MainAxisSize.min,
-                      //         children: [
-                      //           Text(
-                      //             'Eworkforce Payroll',
-                      //             style: TextStyle(
-                      //               fontSize: 18,
-                      //               fontWeight: FontWeight.bold,
-                      //               color: Color(0xFF2F308C), // Navy blue color
-                      //             ),
-                      //           ),
-                      //           if (selectedJob.jobTitle != null &&
-                      //               homeController.isMultiJob.value)
-                      //             Text(
-                      //               jobTitle,
-                      //               style: TextStyle(
-                      //                 fontSize: 14,
-                      //                 fontWeight: FontWeight.w500,
-                      //                 color: Color(0xFF2F308C).withOpacity(0.8),
-                      //               ),
-                      //               textAlign: TextAlign.center,
-                      //             ),
-                      //         ],
-                      //       );
-                      //     }),
-                      //   ],
-                      // ),
-                      Container(),
-
-                      // Notification Icons
-                      // Row(
-                      //   children: [
-                      //     const Stack(
-                      //       clipBehavior: Clip.none,
-                      //       children: [
-                      //         Icon(Icons.mail_outline,
-                      //             size: 28, color: Colors.black),
-                      //         Positioned(
-                      //           right: -4,
-                      //           top: -4,
-                      //           child: CircleAvatar(
-                      //             radius: 8,
-                      //             backgroundColor: Colors.red,
-                      //             child: Text(
-                      //               '2',
-                      //               style: TextStyle(
-                      //                 fontSize: 10,
-                      //                 color: Colors.white,
-                      //               ),
-                      //             ),
-                      //           ),
-                      //         ),
-                      //       ],
-                      //     ),
-                      //     const SizedBox(width: 16), // Spacing between icons
-                      //
-                      //     // Bell Icon with Badge
-                      //     InkWell(
-                      //       onTap: () {
-                      //         Navigator.pushNamed(
-                      //             context, NotificationView.routeName);
-                      //       },
-                      //       child: const Stack(
-                      //         clipBehavior: Clip.none,
-                      //         children: [
-                      //           Icon(Icons.notifications_none,
-                      //               size: 28, color: Colors.black),
-                      //           Positioned(
-                      //             right: -4,
-                      //             top: -4,
-                      //             child: CircleAvatar(
-                      //               radius: 8,
-                      //               backgroundColor: Colors.red,
-                      //               child: Text(
-                      //                 '2',
-                      //                 style: TextStyle(
-                      //                   fontSize: 10,
-                      //                   color: Colors.white,
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //           ),
-                      //         ],
-                      //       ),
-                      //     ),
-                      //   ],
-                      // ),
                     ],
                   ),
                 ),

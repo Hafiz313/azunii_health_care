@@ -1,259 +1,102 @@
-import 'dart:convert';
-
-import 'package:Azunii_Health/core/models/response/SignUpModels.dart';
-import 'package:Azunii_Health/core/services/google_auth_service.dart';
-import 'package:Azunii_Health/core/services/local_storage_service.dart';
-import 'package:Azunii_Health/views/auth/Otp/otp_signup_view.dart';
+import 'package:Azunii_Health/consts/appconsts.dart';
+import 'package:Azunii_Health/views/auth/login/login_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
-import 'package:stylish_dialog/stylish_dialog.dart';
+import '../../../../core/controllers/base_controller.dart';
+import '../../../../core/repositories/auth_repository.dart';
+import '../../../../core/services/google_auth_service.dart';
+import '../../../../core/services/local_storage_service.dart';
+import '../../../../utils/snackbar_helper.dart';
+import '../../../patient/dashboard/patient_dashboard.dart';
+import '../../../care_taker/dashboard/dashboard.dart';
+import '../../Otp/otp_signup_view.dart';
 
-import '../../../../networking/api_provider.dart';
-import '../../../../networking/api_ref.dart';
-import '../../../../utils/custom_dialog.dart';
-import '../../../../utils/helper.dart';
-import '../../../../utils/localStorage/storage_consts.dart';
-import '../../../../utils/localStorage/storage_service.dart';
-
-import '../../../patient/home/home_view.dart';
-import '../../Otp/otp_view.dart';
-import '../../login/login_view.dart';
-
-class SignUpController extends GetxController {
+class SignUpController extends BaseController {
   final nameTxtField = TextEditingController();
-  final registerTxtField = TextEditingController();
-  final ssnTxtField = TextEditingController();
-  // final companyRegisteredTxtField = TextEditingController();
-  final empRegisteredTxtField = TextEditingController();
+  final emailTxtField = TextEditingController();
   final passwordTxtField = TextEditingController();
   final confirmPasswordTxtField = TextEditingController();
   final formKey = GlobalKey<FormState>();
-  RxBool isPasswordVisible = false.obs;
-  RxBool isConformPasswordVisible = false.obs;
-  RxBool acceptTermsAndConditions = false.obs;
-  Rx<SignUpModels> signUpModel = SignUpModels().obs;
-  Future<void> signup(BuildContext context, {bool moveToOtp = true}) async {
-    if (formKey.currentState!.validate()) {
-      if (!acceptTermsAndConditions.value) {
-        await CustomDialog(
-                stylishDialogType: StylishDialogType.ERROR,
-                msg: "Please accept Terms & Conditions")
-            .show(context);
-        return;
-      }
-      if (passwordTxtField.text == confirmPasswordTxtField.text) {
-        signupApi(context);
-      } else {
-        await CustomDialog(
-                stylishDialogType: StylishDialogType.ERROR,
-                msg: "Password not match")
-            .show(context);
-      }
+  final GoogleAuthService _googleAuthService = GoogleAuthService();
+  final RxBool isPasswordVisible = false.obs;
+  final RxBool isConformPasswordVisible = false.obs;
+  final RxBool acceptTermsAndConditions = false.obs;
+
+  final AuthRepository _authRepository = AuthRepository();
+
+  Future<void> signup(String userType) async {
+    if (!formKey.currentState!.validate()) return;
+
+    if (!acceptTermsAndConditions.value) {
+      SnackbarHelper.showWarning("Please accept Terms & Conditions");
+      return;
+    }
+
+    if (passwordTxtField.text != confirmPasswordTxtField.text) {
+      SnackbarHelper.showError("Password not match");
+      return;
+    }
+
+    final result = await safeApiCall(() => _authRepository.register({
+          "name": nameTxtField.text,
+          "email": emailTxtField.text,
+          "password": passwordTxtField.text,
+          "password_confirmation": confirmPasswordTxtField.text,
+        }));
+
+    if (result != null) {
+      SnackbarHelper.showSuccess('Registration successful! Please login.');
+      Get.offAllNamed(LoginView.routeName);
     }
   }
 
-  Future<void> signupApi(BuildContext context, {bool moveToOtp = true}) async {
-    try {
-      var url = Apis.signUpApi;
+  Future<void> googleSignup(String userType) async {
+    final result = await safeApiCall(() async {
+      // Get Google sign-in data
+      final googleData = await _googleAuthService.signInWithGoogle();
 
-      var helper = ApiProvider(context, url, {
-        "fullName": nameTxtField.text,
-        "registeredPhoneNumber": registerTxtField.text,
-        "ssn": ssnTxtField.text,
-        "azunii_health_careEmailAddress": empRegisteredTxtField.text,
-        "password": passwordTxtField.text,
-        "id": 0
-      });
-
-      await helper
-          .postApiWithoutHeader(
-        showSuccess: true,
-        showLoader: true,
-        showLoaderDismiss: true,
-      )
-          .then(
-        (res) async {
-          if (!isNullString(res)) {
-            signUpModel.value = SignUpModels.fromJson(jsonDecode(res));
-            if (moveToOtp) {
-              Navigator.pushNamed(context, OtpSignUpView.routeName);
-            }
-          }
-        },
-      ).catchError((error) async {
-        await CustomDialog(
-          stylishDialogType: StylishDialogType.ERROR,
-          msg: 'Sign up failed: ${error.toString()}',
-        ).show(context);
-      });
-    } catch (e) {
-      await CustomDialog(
-        stylishDialogType: StylishDialogType.ERROR,
-        msg: 'Sign up failed: ${e.toString()}',
-      ).show(context);
-    }
-  }
-
-  Future<void> verifyOtp(BuildContext context, {required String otp}) async {
-    try {
-      var url = Apis.otpVerifySignUpApi;
-      var helper = ApiProvider(context, url, {
-        "fullName": signUpModel.value.result!.fullName,
-        "registeredPhoneNumber":
-            signUpModel.value.result!.registeredPhoneNumber,
-        "ssn": signUpModel.value.result!.ssn,
-        "companyEmailAddress": signUpModel.value.result!.companyEmailAddress,
-        "employeeEmailAddress": signUpModel.value.result!.employeeEmailAddress,
-        "password": signUpModel.value.result!.password,
-        "otpCode": otp,
-        "tenantId": signUpModel.value.result!.tenantId,
-        "employeeId": signUpModel.value.result!.employeeId,
-        "id": 0
-      });
-
-      await helper
-          .postApiWithoutHeader(
-        showSuccess: true,
-        showLoader: true,
-        showLoaderDismiss: true,
-      )
-          .then(
-        (res) async {
-          debugPrint("======res:${res}=====");
-          if (!isNullString(res)) {
-            Get.offAllNamed(LoginView.routeName);
-          }
-        },
-      ).catchError((error) async {
-        await CustomDialog(
-          stylishDialogType: StylishDialogType.ERROR,
-          msg: 'OTP verification failed: ${error.toString()}',
-        ).show(context);
-      });
-    } catch (e) {
-      await CustomDialog(
-        stylishDialogType: StylishDialogType.ERROR,
-        msg: 'OTP verification failed: ${e.toString()}',
-      ).show(context);
-    }
-  }
-
-  /// Google Sign-In as Patient
-  Future<void> signInAsPatient(BuildContext context) async {
-    try {
-      mainLoading.value = true;
-
-      final userModel = await GoogleAuthService.signInWithGoogle();
-
-      if (userModel != null) {
-        await LocalStorageService.setLoginStatus(true, userType: 'patient');
-
-        mainLoading.value = false;
-        Get.offAllNamed('/patient-dashboard');
-      } else {
-        mainLoading.value = false;
-      }
-    } catch (e) {
-      mainLoading.value = false;
-
-      if (!e.toString().contains('sign_in_canceled')) {
-        Get.snackbar(
-          'Sign-In Error',
-          'Google Sign-In failed. Please try again.',
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.TOP,
+      if (googleData.isNotEmpty) {
+        // Call Google login API with the data
+        final apiResponse = await _authRepository.googleAuth(
+          googleId: googleData['google_id'],
+          email: googleData['email'],
+          name: googleData['name'],
+          deviceToken: googleData['device_token'],
         );
+
+        await LocalStorageService.setLoginStatus(true, userType: userType);
+        return apiResponse;
+      }
+      return null;
+    });
+
+    if (result != null) {
+      SnackbarHelper.showSuccess('Google login successful!');
+
+      if (userType == Appconsts.patient) {
+        Get.offAllNamed(PatientDashboard.routeName);
+      } else if (userType == Appconsts.caregiver) {
+        Get.offAllNamed(CareTakerDashboard.routeName);
       }
     }
   }
 
-  Future<void> signInAsCaregiver(BuildContext context) async {
-    try {
-      mainLoading.value = true;
-
-      final userModel = await GoogleAuthService.signInWithGoogle();
-
-      if (userModel != null) {
-        await LocalStorageService.setLoginStatus(true, userType: 'caregiver');
-
-        mainLoading.value = false;
-        Get.offAllNamed('/care-taker-dashboard');
-      } else {
-        mainLoading.value = false;
-      }
-    } catch (e) {
-      mainLoading.value = false;
-
-      if (!e.toString().contains('sign_in_canceled')) {
-        Get.offAllNamed('/care-taker-dashboard');
-        // Get.snackbar(
-        //   'Sign-In Error',
-        //   'Google Sign-In failed. Please try again.',
-        //   backgroundColor: Colors.red,
-        //   colorText: Colors.white,
-        //   snackPosition: SnackPosition.TOP,
-        // );
-      }
-    }
+  void togglePasswordVisibility() {
+    isPasswordVisible.value = !isPasswordVisible.value;
   }
 
-  Future<void> SignupAsPatient(BuildContext context) async {
-    try {
-      mainLoading.value = true;
-
-      // final userModel = await GoogleAuthService.signInWithGoogle();
-
-      //  if (userModel != null) {
-      await LocalStorageService.setLoginStatus(true, userType: 'patient');
-
-      //  mainLoading.value = false;
-      Get.offAllNamed('/patient-dashboard');
-      // }
-      // else {
-      mainLoading.value = false;
-      // }
-    } catch (e) {
-      mainLoading.value = false;
-
-      if (!e.toString().contains('sign_in_canceled')) {
-        Get.offAllNamed('/patient-dashboard');
-        Get.snackbar(
-          'Sign-In Error',
-          'Google Sign-In failed. Please try again.',
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.TOP,
-        );
-      }
-    }
+  void toggleConfirmPasswordVisibility() {
+    isConformPasswordVisible.value = !isConformPasswordVisible.value;
   }
 
-  Future<void> SignupAsCaregiver(BuildContext context) async {
-    try {
-      mainLoading.value = true;
-
-      await LocalStorageService.setLoginStatus(true, userType: 'caregiver');
-
-      mainLoading.value = false;
-      Get.offAllNamed('/care-taker-dashboard');
-    } catch (e) {
-      mainLoading.value = false;
-
-      if (!e.toString().contains('sign_in_canceled')) {
-        Get.offAllNamed('/care-taker-dashboard');
-      }
-    }
+  void toggleTermsAndConditions(bool? value) {
+    acceptTermsAndConditions.value = value ?? false;
   }
 
   @override
   void onClose() {
     nameTxtField.dispose();
-    registerTxtField.dispose();
-    ssnTxtField.dispose();
-    // companyRegisteredTxtField.dispose();
-    empRegisteredTxtField.dispose();
+    emailTxtField.dispose();
     passwordTxtField.dispose();
     confirmPasswordTxtField.dispose();
     super.onClose();

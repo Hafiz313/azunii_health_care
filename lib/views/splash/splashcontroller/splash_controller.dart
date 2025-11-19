@@ -1,3 +1,4 @@
+import 'package:Azunii_Health/consts/appconsts.dart';
 import 'package:Azunii_Health/views/auth/login/login_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -18,10 +19,10 @@ class SplashController extends GetxController {
         // Get user type and navigate to appropriate dashboard
         final userType = StorageService().getData('userType');
 
-        if (userType == 'patient') {
+        if (userType == Appconsts.patient) {
           Navigator.of(context)
               .pushReplacementNamed(PatientDashboard.routeName);
-        } else if (userType == 'caregiver') {
+        } else if (userType == Appconsts.caregiver) {
           Navigator.of(context)
               .pushReplacementNamed(CareTakerDashboard.routeName);
         } else {

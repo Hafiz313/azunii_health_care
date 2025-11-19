@@ -1,484 +1,85 @@
-import 'dart:convert';
-
-import 'package:Azunii_Health/consts/lang.dart';
-import 'package:Azunii_Health/core/models/response/GetLoginInfoModel.dart';
-import 'package:Azunii_Health/core/models/response/login_response.dart';
+import 'package:Azunii_Health/consts/appconsts.dart';
 import 'package:Azunii_Health/core/services/google_auth_service.dart';
 import 'package:Azunii_Health/core/services/local_storage_service.dart';
-import 'package:Azunii_Health/views/auth/Otp/otp_view.dart';
+import 'package:Azunii_Health/views/care_taker/dashboard/dashboard.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:stylish_dialog/stylish_dialog.dart';
+import '../../../../core/controllers/base_controller.dart';
+import '../../../../core/repositories/auth_repository.dart';
+import '../../../../utils/snackbar_helper.dart';
+import '../../../patient/dashboard/patient_dashboard.dart';
 
-import '../../../../main.dart';
-import '../../../../networking/api_provider.dart';
-import '../../../../networking/api_ref.dart';
-import '../../../../utils/custom_dialog.dart';
-import '../../../../utils/helper.dart';
-import '../../../../utils/localStorage/storage_consts.dart';
-import '../../../../utils/localStorage/storage_service.dart';
-
-import '../../../patient/home/home_view.dart';
-import '../login_view.dart';
-
-class LoginController extends GetxController {
-  var isChecked = false.obs;
-  var isSaveThisDevice = false.obs;
-  TextEditingController emailTxtField = TextEditingController();
-  TextEditingController passwordTxtField = TextEditingController();
-
-  // RxBool loginLoading = false.obs;
-
-  Rx<LoginResponse> loginResponse = LoginResponse().obs;
-  // RxString userId = ''.obs;
-  // RxString isEmail = ''.obs;
-
+class LoginController extends BaseController {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
   final formKey = GlobalKey<FormState>();
-  RxBool isPasswordVisible = true.obs;
-
+  final RxBool isPasswordVisible = false.obs;
+  final RxBool isChecked = false.obs;
+  final GoogleAuthService _googleAuthService = GoogleAuthService();
+  final AuthRepository _authRepository = AuthRepository();
   void toggleRememberMe(bool? value) {
     isChecked.value = value ?? false;
   }
 
-  void toggleSaveThisDevice(bool? value) {
-    isSaveThisDevice.value = value ?? false;
-  }
+  Future<void> login(String userType) async {
+    if (!formKey.currentState!.validate()) return;
 
-  void savePassword() {
-    try {
-      if (isChecked.value) {
-        StorageService().saveData(StorageConsts.kUserEmail, emailTxtField.text);
-        StorageService()
-            .saveData(StorageConsts.kUserPassword, passwordTxtField.text);
+    final result = await safeApiCall(() => _authRepository.login(
+          emailController.text.trim(),
+          passwordController.text,
+        ));
+
+    if (result != null) {
+      SnackbarHelper.showSuccess('Login successful!');
+      if (userType == Appconsts.patient) {
+        await LocalStorageService.setLoginStatus(true, userType: userType);
+        Get.offAllNamed(PatientDashboard.routeName);
       } else {
-        StorageService().removeData(StorageConsts.kUserEmail);
-        StorageService().removeData(StorageConsts.kUserPassword);
+        await LocalStorageService.setLoginStatus(true, userType: userType);
+        Get.offAllNamed(CareTakerDashboard.routeName);
       }
-    } catch (e) {
-      // Silently handle storage errors
     }
   }
 
-  fetchSaveData() {
-    try {
-      StorageService().saveData(StorageConsts.kAppRun, 'true');
-      String? email;
-      if (StorageService().containsKey(StorageConsts.kUserEmail)) {
-        email = StorageService().getData(StorageConsts.kUserEmail);
-        isChecked.value = true;
-      } else {
-        email = StorageService().containsKey(StorageConsts.kUserEmail)
-            ? StorageService().getData(StorageConsts.kUserEmail)
-            : '';
+  void togglePasswordVisibility() {
+    isPasswordVisible.value = !isPasswordVisible.value;
+  }
+
+  Future<void> googleLogin(String userType) async {
+    final result = await safeApiCall(() async {
+      // Get Google sign-in data
+      final googleData = await _googleAuthService.signInWithGoogle();
+
+      if (googleData.isNotEmpty) {
+        // Call Google login API with the data
+        final apiResponse = await _authRepository.googleAuth(
+          googleId: googleData['google_id'],
+          email: googleData['email'],
+          name: googleData['name'],
+          deviceToken: googleData['device_token'],
+        );
+
+        await LocalStorageService.setLoginStatus(true, userType: userType);
+        return apiResponse;
       }
-      String? password =
-          StorageService().containsKey(StorageConsts.kUserPassword)
-              ? StorageService().getData(StorageConsts.kUserPassword)
-              : '';
-      emailTxtField.text = email ?? '';
-      passwordTxtField.text = password ?? '';
-    } catch (e) {
-      // Set empty values on error
-      emailTxtField.text = '';
-      passwordTxtField.text = '';
-    }
-  }
-
-  void login(BuildContext context) {
-    if (formKey.currentState!.validate()) {
-      String email = emailTxtField.text;
-      String paswwod = passwordTxtField.text;
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        '/patient-dashboard',
-        (Route<dynamic> route) => false,
-      );
-    }
-  }
-
-  Future<void> isTenantAvailable(BuildContext context,
-      {required String email, required String password}) async {
-    // loginLoading.value = true;
-    var url = Apis.isTenantAvailableApi;
-    var helper = ApiProvider(context, url, {
-      "tenantKey": "00000000-0000-0000-0000-000000000000",
-      "userName": '$email',
-      "companyId": 0
-    });
-    await helper
-        .postApiWithoutHeader(
-      showSuccess: false,
-      showLoader: true,
-      showLoaderDismiss: false,
-    )
-        .then(
-      (res) async {
-        try {
-          if (!isNullString(res)) {
-            Map<String, dynamic> decodedResponse = jsonDecode(res);
-            var tenantId = decodedResponse['result']['tenantId'];
-            if (tenantId != null) {
-              StorageService()
-                  .saveData(StorageConsts.kTenantId, tenantId.toString());
-
-              loginApi(context, email: email, password: password);
-            } else {
-              EasyLoading.dismiss();
-              mainLoading.value = false;
-              await CustomDialog(
-                stylishDialogType: StylishDialogType.ERROR,
-                msg: Lang.emailNotFond,
-              ).show(context);
-            }
-          }
-        } catch (e) {
-          EasyLoading.dismiss();
-          mainLoading.value = false;
-        }
-      },
-    );
-  }
-
-  Future<void> verifyOtp(BuildContext context, {required String otp}) async {
-    // "======userId.value:${userId.value}====isEmail.value:${isEmail.value}=====");
-    var url = Apis.otpVerifyAuthApi;
-    var helper = ApiProvider(context, url, {
-      "accessToken": null,
-      "encryptedAccessToken": null,
-      "expireInSeconds": loginResponse.value.result!.expireInSeconds,
-      "userId": loginResponse.value.result!.userId,
-      "isPhoneAuthentication":
-          loginResponse.value.result!.isPhoneAuthentication,
-      "isEmailAuthentication":
-          loginResponse.value.result!.isEmailAuthentication,
-      "phoneNumber": loginResponse.value.result!.phoneNumber,
-      "emailAddress": loginResponse.value.result!.emailAddress,
-      "viewPath": loginResponse.value.result!.viewPath,
-      "isTwoFactorRequired": loginResponse.value.result!.isTwoFactorRequired,
-      "isNewDevice": loginResponse.value.result!.isSaveNewDevice,
-      "isSaveNewDevice": true,
-      "otpCode": otp,
-      // "deviceId": fcmToken,
-      "deviceId": "sss ss s",
-      "browerInfo": null,
-      "deviceType": "Mobile"
+      return null;
     });
 
-    await helper
-        .postApiDataHeaderWithTenantId(
-      showSuccess: false,
-      showLoader: true,
-      showLoaderDismiss: true,
-    )
-        .then(
-      (res) async {
-        if (!isNullString(res)) {
-          String email = emailTxtField.text;
-          String paswwod = passwordTxtField.text;
+    if (result != null) {
+      SnackbarHelper.showSuccess('Google login successful!');
 
-          loginApi(
-            context,
-            email: email,
-            password: paswwod,
-          );
-        }
-      },
-    );
-  }
-
-  Future<void> loginApi(BuildContext context,
-      {required String email,
-      required String password,
-      bool moveToOtp = true}) async {
-    var url = Apis.authenticateApi;
-    var helper = ApiProvider(context, url, {
-      "userNameOrEmailAddress": "$email",
-      "password": "$password",
-      "userId": 0,
-      "rememberClient": isChecked.value,
-      "isPhoneVerified": false,
-      "isTwoFactorEnabled": false,
-      "ipAddress": "string",
-      // "deviceId": fcmToken,
-      "deviceId": "sss ss s",
-      "browerInfo": null,
-      "isSaveNewDevice": true,
-    });
-
-    await helper
-        .postApiDataHeaderWithTenantId(
-      showSuccess: false,
-      showLoader: true,
-    )
-        .then(
-      (res) async {
-        debugPrint("=====loginApi res:${res}=====");
-
-        // loginLoading.value = false;
-        if (!isNullString(res)) {
-          loginResponse.value = LoginResponse.fromJson(jsonDecode(res));
-          Map<String, dynamic> decodedResponse = jsonDecode(res);
-          try {
-            RxString userId = "${decodedResponse['result']['userId']}".obs;
-            StorageService()
-                .saveData(StorageConsts.kUserId, userId.value.toString());
-          } catch (e) {}
-          String accessToken = "${decodedResponse['result']['accessToken']}";
-          debugPrint("========accessToken:${accessToken}========");
-
-          if (accessToken != "null") {
-            StorageService()
-                .saveData(StorageConsts.kAccessToken, accessToken.toString());
-            savePassword();
-            afterLoginInfoApi(context);
-
-            // Check company count for switch company feature
-
-            Navigator.of(context).pushNamedAndRemoveUntil(
-              '/patient-dashboard',
-              (Route<dynamic> route) => false,
-            );
-          } else {
-            EasyLoading.dismiss();
-            mainLoading.value = false;
-            if ("${decodedResponse['result']['isTwoFactorRequired']}" ==
-                'true') {
-              if (moveToOtp) {
-                await CustomDialog(
-                  stylishDialogType: StylishDialogType.ERROR,
-                  msg: 'You have to authenticate your device',
-                  callBack: () {
-                    Navigator.pop(context);
-                    Navigator.pushNamed(context, OtpView.routeName);
-                  },
-                ).show(context);
-              }
-            } else {
-              await CustomDialog(
-                stylishDialogType: StylishDialogType.ERROR,
-                msg: Lang.somethingWentWrong,
-              ).show(context);
-            }
-          }
-        } else {
-          await CustomDialog(
-            stylishDialogType: StylishDialogType.ERROR,
-            msg: Lang.invalidUserNamePassword,
-          ).show(context);
-        }
-      },
-    ).catchError((error) async {
-      EasyLoading.dismiss();
-      mainLoading.value = false;
-
-      // Handle network connectivity errors
-      String errorMessage = Lang.somethingWentWrong;
-      if (error.toString().contains('SocketException') ||
-          error.toString().contains('Failed host lookup') ||
-          error.toString().contains('No address associated with hostname')) {
-        errorMessage =
-            'Network connection failed. Please check your internet connection and try again.';
+      if (userType == Appconsts.patient) {
+        Get.offAllNamed(PatientDashboard.routeName);
+      } else if (userType == Appconsts.caregiver) {
+        Get.offAllNamed(CareTakerDashboard.routeName);
       }
-
-      await CustomDialog(
-        stylishDialogType: StylishDialogType.ERROR,
-        msg: errorMessage,
-      ).show(context);
-    });
-  }
-
-  void logout(
-      {bool isNavToLogin = true, String email = '', String password = ''}) {
-    // Clear all data in GetStorage
-    // final box = GetStorage();
-    // box.erase();
-
-    // Clear home controller data
-    try {
-      // final homeController = Get.find<HomeController>();
-
-      // // Reset dashboard model
-      // homeController.dashboardModel.value = DashBoardModel(
-      //   result: DashBoardResult(
-      //     workHoursDetails: WorkHoursDetails(),
-      //     announcements: [],
-      //     todayActivities: [],
-      //     leaves: Leaves(),
-      //   ),
-      // );
-
-      // // Clear job lists
-      // homeController.jobEmpList.clear();
-      // homeController.selectedJob.value = GetJobResult();
-
-      // // Reset timer variables
-      // homeController.hours.value = 0;
-      // homeController.minutes.value = 0;
-      // homeController.seconds.value = 0;
-
-      // // Reset boolean flags
-      // homeController.isPunchIn.value = true;
-      // homeController.isMultiJob.value = true;
-
-      // // Cancel timer if running
-      // if (homeController.timer?.isActive == true) {
-      //   homeController.timer?.cancel();
-      // }
-    } catch (e) {
-      // HomeController might not be initialized, ignore error
-      print('HomeController not found during logout: $e');
     }
-
-    if (isNavToLogin) {
-      Get.offAllNamed(LoginView.routeName);
-    } else {
-      isTenantAvailable(Get.context!, email: email, password: password);
-    }
-  }
-
-  Future<void> afterLoginInfoApi(BuildContext context) async {
-    var url = Apis.getCurrentLoginInformationsApi;
-    var helper = ApiProvider(context, url, {});
-    await helper.getApiData2().then(
-      (res) async {
-        debugPrint("======afterLoginInfoApi res:${res}======");
-        if (!isNullString(res)) {
-          Rx<GetLoginInfoModel> getLoginInfoModel = GetLoginInfoModel().obs;
-          getLoginInfoModel.value = getLoginInfoModelFromJson(res);
-          debugPrint(
-              "======getLoginInfoModel user:${getLoginInfoModel.value.result!.user!.contractorId}======");
-          // saveUsersData(user: getLoginInfoModel.value);
-        }
-      },
-    );
-  }
-
-  @override
-  void onInit() {
-    fetchSaveData();
-    super.onInit();
   }
 
   @override
   void onClose() {
-    // emailTxtField.dispose();
-    // passwordTxtField.dispose();
+    emailController.dispose();
+    passwordController.dispose();
     super.onClose();
   }
-
-  Future<void> loginInAsPatient(BuildContext context) async {
-    try {
-      mainLoading.value = true;
-
-      // final userModel = await GoogleAuthService.signInWithGoogle();
-
-      //  if (userModel != null) {
-      await LocalStorageService.setLoginStatus(true, userType: 'patient');
-
-      //  mainLoading.value = false;
-      Get.offAllNamed('/patient-dashboard');
-      // }
-      // else {
-      mainLoading.value = false;
-      // }
-    } catch (e) {
-      mainLoading.value = false;
-
-      if (!e.toString().contains('sign_in_canceled')) {
-        Get.offAllNamed('/patient-dashboard');
-        Get.snackbar(
-          'Sign-In Error',
-          'Google Sign-In failed. Please try again.',
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.TOP,
-        );
-      }
-    }
-  }
-
-  Future<void> loginInAsCaregiver(BuildContext context) async {
-    try {
-      mainLoading.value = true;
-
-      await LocalStorageService.setLoginStatus(true, userType: 'caregiver');
-
-      mainLoading.value = false;
-      Get.offAllNamed('/care-taker-dashboard');
-    } catch (e) {
-      mainLoading.value = false;
-
-      if (!e.toString().contains('sign_in_canceled')) {
-        Get.offAllNamed('/care-taker-dashboard');
-      }
-    }
-  }
-
-  /// Google Sign-In as Patient
-  Future<void> signInAsPatient(BuildContext context) async {
-    try {
-      mainLoading.value = true;
-
-      final userModel = await GoogleAuthService.signInWithGoogle();
-
-      if (userModel != null) {
-        await LocalStorageService.setLoginStatus(true, userType: 'patient');
-
-        mainLoading.value = false;
-        Get.offAllNamed('/patient-dashboard');
-      } else {
-        mainLoading.value = false;
-      }
-    } catch (e) {
-      mainLoading.value = false;
-      Get.offAllNamed('/patient-dashboard');
-      // if (!e.toString().contains('sign_in_canceled')) {
-      //   Get.snackbar(
-      //     'Sign-In Error',
-      //     'Google Sign-In failed. Please try again.',
-      //     backgroundColor: Colors.red,
-      //     colorText: Colors.white,
-      //     snackPosition: SnackPosition.TOP,
-      //   );
-    }
-  }
-
-  Future<void> signInAsCaregiver(BuildContext context) async {
-    try {
-      mainLoading.value = true;
-
-      final userModel = await GoogleAuthService.signInWithGoogle();
-
-      if (userModel != null) {
-        await LocalStorageService.setLoginStatus(true, userType: 'caregiver');
-
-        mainLoading.value = false;
-        Get.offAllNamed('/care-taker-dashboard');
-      } else {
-        mainLoading.value = false;
-      }
-    } catch (e) {
-      mainLoading.value = false;
-
-      if (!e.toString().contains('sign_in_canceled')) {
-        Get.offAllNamed('/care-taker-dashboard');
-        // Get.snackbar(
-        //   'Sign-In Error',
-        //   'Google Sign-In failed. Please try again.',
-        //   backgroundColor: Colors.red,
-        //   colorText: Colors.white,
-        //   snackPosition: SnackPosition.TOP,
-        // );
-      }
-    }
-  }
-
-  /// Check if user is already logged in
-  Future<bool> checkLoginStatus() async {
-    return await GoogleAuthService.isSignedIn();
-  }
-
-  /// Auto login if user is already signed in
 }

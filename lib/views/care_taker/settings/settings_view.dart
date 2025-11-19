@@ -1,4 +1,8 @@
+import 'package:Azunii_Health/views/auth/login/controller/login_controller.dart';
+import 'package:Azunii_Health/views/care_taker/settings/controller/settings_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import '../../../consts/colors.dart';
 import '../../../consts/lang.dart';
 import '../../../utils/percentage_size_ext.dart';
@@ -18,33 +22,70 @@ class Settingsview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            CustomAppBar(
-              title: Lang.settings,
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: context.screenWidth * 0.05),
-                    _buildSettingsHeader(),
-                    SizedBox(height: context.screenWidth * 0.04),
-                    _buildSettingsMenu(context),
-                    SizedBox(height: context.screenWidth * 0.08),
-                    _buildActionButtons(context),
-                    SizedBox(height: context.screenWidth * 0.05),
-                  ],
+    final SettingsController controller = Get.put(SettingsController());
+
+    return Stack(
+      children: [
+        Scaffold(
+          backgroundColor: AppColors.white,
+          body: SafeArea(
+            child: Column(
+              children: [
+                CustomAppBar(
+                  title: Lang.settings,
                 ),
-              ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: context.screenWidth * 0.05),
+                        _buildSettingsHeader(),
+                        SizedBox(height: context.screenWidth * 0.04),
+                        _buildSettingsMenu(context),
+                        SizedBox(height: context.screenWidth * 0.08),
+                        _buildActionButtons(context),
+                        SizedBox(height: context.screenWidth * 0.05),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
+        // Overlay Loader
+        Obx(
+          () => controller.isLoading.value
+              ? Container(
+                  color: Colors.black.withOpacity(0.2),
+                  child: Center(
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.15),
+                            blurRadius: 8,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
+                      child: const CircularProgressIndicator(
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(AppColors.primary),
+                        strokeWidth: 3,
+                      ),
+                    ),
+                  ),
+                )
+              : const SizedBox.shrink(),
+        ),
+      ],
     );
   }
 
@@ -176,6 +217,7 @@ class Settingsview extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context) {
+    final SettingsController controller = Get.put(SettingsController());
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
@@ -185,11 +227,7 @@ class Settingsview extends StatelessWidget {
               height: context.screenWidth * 0.12,
               child: AppElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    LoginView.routeName,
-                    (route) => false,
-                  );
+                  controller.logout();
                 },
                 title: Lang.logOut,
                 backgroundColor: AppColors.cardGray,
@@ -202,7 +240,9 @@ class Settingsview extends StatelessWidget {
             child: SizedBox(
               height: context.screenWidth * 0.12,
               child: AppElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  controller.deleteAccount();
+                },
                 title: Lang.deleteAccount,
                 backgroundColor: AppColors.lightRed,
                 textColor: AppColors.redColor,

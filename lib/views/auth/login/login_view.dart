@@ -60,7 +60,7 @@ class _LoginViewState extends State<LoginView> {
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    controller.login(context);
+                    controller.login('patient');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
@@ -85,10 +85,7 @@ class _LoginViewState extends State<LoginView> {
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      CareTakerDashboard.routeName,
-                      (Route<dynamic> route) => false,
-                    );
+                    controller.login('caregiver');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
@@ -113,32 +110,6 @@ class _LoginViewState extends State<LoginView> {
       },
     );
   }
-
-  // Future<void> _authenticateAndLogin(BuildContext context) async {
-  //   try {
-  //     bool isAvailable = await auth.canCheckBiometrics;
-  //     if (!isAvailable) {
-  //       print("Biometric not available");
-  //       return;
-  //     }
-
-  //     bool didAuthenticate = await auth.authenticate(
-  //       localizedReason: 'Please authenticate to access',
-  //       options: const AuthenticationOptions(
-  //         biometricOnly: true,
-  //         stickyAuth: true,
-  //       ),
-  //     );
-
-  //     if (didAuthenticate) {
-  //       print("Authenticated successfully!");
-  //     } else {
-  //       print("Authentication failed.");
-  //     }
-  //   } catch (e) {
-  //     print("Error: $e");
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -203,54 +174,10 @@ class _LoginViewState extends State<LoginView> {
                   LoginWidgets.buildRememberMeAndForgotPassword(
                       context, controller),
                   SizedBox(height: context.percentHeight * 2.0),
-                  // Biometric login button
-                  // if (Platform.isAndroid)
-                  // if (Platform.isAndroid && _showFingerprint)
-                  //   Column(
-                  //     children: [
-                  //       Icon(Icons.fingerprint,
-                  //           size: context.percentHeight * 5,
-                  //           color: AppColors.primary),
-                  //       SizedBox(height: context.percentHeight * 1),
-                  //       // GestureDetector(
-                  //       //   onTap: () => _authenticateAndLogin(context),
-                  //       //   child: const Text(
-                  //       //     'Login with Fingerprint',
-                  //       //     style: TextStyle(
-                  //       //       fontWeight: FontWeight.bold,
-                  //       //       color: AppColors.primary,
-                  //       //     ),
-                  //       //   ),
-                  //       // ),
-                  //       SizedBox(height: context.percentHeight * 2.0),
-                  //     ],
-                  //   ),
-                  // if (Platform.isIOS)
-                  // if (Platform.isIOS && _showFace)
-                  //   Column(
-                  //     children: [
-                  //       Icon(Icons.face_6,
-                  //           size: context.percentHeight * 5,
-                  //           color: AppColors.primary),
-                  //       SizedBox(height: context.percentHeight * 1),
-                  //       GestureDetector(
-                  //         onTap: () => _authenticateAndLogin(context),
-                  //         child: const Text(
-                  //           'Login with Face Recognition',
-                  //           style: TextStyle(
-                  //             fontWeight: FontWeight.bold,
-                  //             color: AppColors.primary,
-                  //           ),
-                  //         ),
-                  //       ),
-                  //       SizedBox(height: context.percentHeight * 2.0),
-                  //     ],
-                  //   ),
                   SizedBox(height: context.percentHeight * 3),
                   LoginWidgets.buildLoginButton(context,
                       onPress: () => _showLoginTypeDialog(context)),
                   SizedBox(height: context.percentHeight * 4.0),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
@@ -279,16 +206,6 @@ class _LoginViewState extends State<LoginView> {
                   LoginWidgets.buildSocialButtons(context),
                 ],
               ),
-              // Obx(() => mainLoading.value
-              //     ? Positioned.fill(
-              //         child: Container(
-              //           color: Colors.black.withOpacity(0.3),
-              //           child: const Center(
-              //             child: MyLoader(),
-              //           ),
-              //         ),
-              //       )
-              //     : const SizedBox.shrink()),
             ],
           )
         ]),

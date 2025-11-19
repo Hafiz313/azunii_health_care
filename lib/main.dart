@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -27,6 +28,7 @@ Future<void> main() async {
       print('Firebase initialization failed: $e');
     }
   }
+  await dotenv.load(fileName: ".env");
 
   // Initialize local storage services
   await GetStorage.init();

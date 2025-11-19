@@ -57,7 +57,6 @@ class SignUpView extends StatelessWidget {
                     SizedBox(
                       height: context.screenHeight * 0.015,
                     ),
-
                     CustomTxtField(
                       title: Lang.fullName,
                       hintTxt: Lang.enterYourFullName,
@@ -73,53 +72,13 @@ class SignUpView extends StatelessWidget {
                         }
                       },
                     ),
-                    //CustomTxtField(
-                    //   hintTxt: Lang.ssn,
-                    //   textEditingController: controller.ssnTxtField,
-                    //   inputFormatters: [
-                    //     FilteringTextInputFormatter.digitsOnly,
-                    //     SSNInputFormatter(),
-                    //     LengthLimitingTextInputFormatter(11),
-                    //   ],
-                    //   // suffixIcon: Icon(
-                    //   //   FontAwesomeIcons.hashtag,
-                    //   //   color: AppColors.borderColor,
-                    //   //   size: context.screenHeight * 0.02,
-                    //   // ),
-                    //   isRequired: true,
-                    //   validator: (String? val) {
-                    //     if (val!.isEmpty) {
-                    //       return Lang.empty;
-                    //     }
-                    //
-                    //     return null;
-                    //   },
-                    // ),
-                    // SizedBox(
-                    //   height: context.screenHeight * 0.01,
-                    // ),
-                    // CustomTxtField(
-                    //   hintTxt: Lang.companyRegisteredEmail,
-                    //   textEditingController:
-                    //       controller.companyRegisteredTxtField,
-                    //   suffixIcon: Icon(
-                    //     FontAwesomeIcons.solidEnvelope,
-                    //     color: AppColors.borderColor,
-                    //     size: context.screenHeight * 0.02,
-                    //   ),
-                    //   validator: (String? val) {},
-                    // ),
-                    // SizedBox(
-                    //   height: context.screenHeight * 0.01,
-                    // ),
                     SizedBox(
                       height: context.screenHeight * 0.005,
                     ),
-
                     CustomTxtField(
                       title: Lang.email,
                       hintTxt: Lang.enterYourEmail,
-                      textEditingController: controller.empRegisteredTxtField,
+                      textEditingController: controller.emailTxtField,
                       prefixIcon: Icon(
                         FontAwesomeIcons.envelope,
                         color: AppColors.borderColor,
@@ -204,41 +163,6 @@ class SignUpView extends StatelessWidget {
                     SizedBox(
                       height: context.percentHeight * 2.0,
                     ),
-                    // subText5(
-                    //     "Note: Password must contain at least one uppercase letter, one number, and one special character ",
-                    //     fontWeight: FontWeight.normal,
-                    //     color: AppColors.blackColor),
-                    // SizedBox(
-                    //   height: context.percentHeight * 2.0,
-                    // ),
-                    // Row(
-                    //   children: [
-                    //     Obx(() => Checkbox(
-                    //           side: const BorderSide(
-                    //               color: AppColors.textColor),
-                    //           value: controller
-                    //               .acceptTermsAndConditions.value,
-                    //           onChanged: (bool? value) {
-                    //             controller.acceptTermsAndConditions
-                    //                 .value = value ?? false;
-                    //           },
-                    //           activeColor: AppColors.blue,
-                    //           checkColor: AppColors.white,
-                    //         )),
-                    //     InkWell(
-                    //       onTap: () {
-                    //         showDialog(
-                    //             context: context,
-                    //             builder: (context) =>
-                    //                 TermsConditionView());
-                    //       },
-                    //       child: subText5("Accept Terms & Condition",
-                    //           fontSize: 16,
-                    //           fontWeight: FontWeight.normal,
-                    //           color: AppColors.blackColor),
-                    //     ),
-                    //   ],
-                    // ),
                     SizedBox(
                       height: context.percentHeight * 2.0,
                     ),

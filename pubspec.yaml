@@ -64,13 +64,22 @@ dependencies:
   google_fonts: ^6.3.2
   flutter_launcher_icons: ^0.14.4
   google_sign_in: ^5.4.0
-  firebase_core: ^2.24.2
-  firebase_auth: ^4.12.1
+
+
+  firebase_core: ^2.32.0
+  firebase_auth: ^4.19.6
+  firebase_messaging: ^14.7.10  # Use this compatible version
+  flutter_dotenv: ^5.1.0
+
+
+
+
   # cloud_firestore: ^4.13.6  # COMMENTED OUT - Not using Firestore DB
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   shared_preferences: ^2.2.2
   cached_network_image: ^3.3.0
+  
 
 dev_dependencies:
   flutter_test:
@@ -95,6 +104,7 @@ flutter:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   assets:
+    - .env
     - assets/images/
     - assets/logo/
     - assets/svg/

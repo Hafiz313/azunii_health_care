@@ -1,3 +1,4 @@
+import 'package:Azunii_Health/consts/appconsts.dart';
 import 'package:Azunii_Health/utils/percentage_size_ext.dart';
 import 'package:Azunii_Health/views/auth/forget/froget_view.dart';
 import 'package:Azunii_Health/views/auth/login/controller/login_controller.dart';
@@ -27,7 +28,7 @@ class LoginWidgets {
       title: Lang.email,
       hintTxt: Lang.enterYourEmail,
       // enabled: !mainLoading.value,
-      textEditingController: controller.emailTxtField,
+      textEditingController: controller.emailController,
       prefixIcon: Icon(
         FontAwesomeIcons.envelope,
         color: AppColors.borderColor,
@@ -47,7 +48,7 @@ class LoginWidgets {
           title: Lang.password,
           hintTxt: Lang.enterYourPassword,
           // enabled: !mainLoading.value,
-          textEditingController: controller.passwordTxtField,
+          textEditingController: controller.passwordController,
           keyboardType: TextInputType.visiblePassword,
           isHiddenPassword: controller.isPasswordVisible.value,
           prefixIcon: Icon(
@@ -148,26 +149,26 @@ class LoginWidgets {
     );
   }
 
-  static Widget saveDeviceForFurtherUse(
-      BuildContext context, LoginController controller) {
-    return Obx(
-      () => Row(
-        children: [
-          Checkbox(
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            visualDensity: VisualDensity.compact,
-            value: controller.isSaveThisDevice.value,
-            onChanged: controller.toggleSaveThisDevice,
-            side: const BorderSide(color: Colors.grey, width: 1.5),
-          ),
-          const Text(
-            Lang.saveThisDeviceForFurtherUse,
-            style: TextStyle(color: AppColors.headingTextColor),
-          ),
-        ],
-      ),
-    );
-  }
+  // static Widget saveDeviceForFurtherUse(
+  //     BuildContext context, LoginController controller) {
+  //   return Obx(
+  //     () => Row(
+  //       children: [
+  //         Checkbox(
+  //           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+  //           visualDensity: VisualDensity.compact,
+  //           value: controller.isSaveThisDevice.value,
+  //           onChanged: controller.toggleSaveThisDevice,
+  //           side: const BorderSide(color: Colors.grey, width: 1.5),
+  //         ),
+  //         const Text(
+  //           Lang.saveThisDeviceForFurtherUse,
+  //           style: TextStyle(color: AppColors.headingTextColor),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   static Widget buildLoginButton(BuildContext context,
       {required Function() onPress}) {
@@ -175,14 +176,6 @@ class LoginWidgets {
       backgroundColor: AppColors.secondary,
       onPressed: () {
         _showUserTypeDialog(context, true);
-        // Get.snackbar(
-        //   'Coming Soon',
-        //   'Only Google Sign-In is available for now',
-        //   backgroundColor: AppColors.primary,
-        //   colorText: AppColors.white,
-        //   snackPosition: SnackPosition.TOP,
-
-        //  );
       },
       title: Lang.signIn,
     );
@@ -250,8 +243,8 @@ class LoginWidgets {
                       try {
                         Navigator.pop(context);
                         isonloginApi
-                            ? controller.loginInAsPatient(context)
-                            : controller.signInAsPatient(context);
+                            ? controller.login(Appconsts.patient)
+                            : controller.googleLogin(Appconsts.patient);
                       } catch (e) {
                         Navigator.pop(context);
                       }
@@ -281,8 +274,8 @@ class LoginWidgets {
                       try {
                         Navigator.pop(context);
                         isonloginApi
-                            ? controller.loginInAsCaregiver(context)
-                            : controller.signInAsCaregiver(context);
+                            ? controller.login(Appconsts.caregiver)
+                            : controller.googleLogin(Appconsts.caregiver);
                       } catch (e) {
                         Navigator.pop(context);
                       }

@@ -78,9 +78,9 @@ class ForgetView extends StatelessWidget {
               () => mainLoading.value
                   ? const MyLoader()
                   : btn(context, onPress: () {
-                      if (controller.formKey.currentState!.validate()) {
-                        controller.forget(context);
-                      }
+                      //if (controller.formKey.currentState!.validate()) {
+                      controller.forgotPassword();
+                      //}
                     }),
             ),
             SizedBox(height: context.percentHeight * 1),
