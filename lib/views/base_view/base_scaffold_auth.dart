@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 
 import '../../consts/colors.dart';
 import '../../utils/navigation_dailog.dart';
@@ -48,7 +49,7 @@ class _BaseScaffoldAuthState extends State<BaseScaffoldAuth> {
         child: Scaffold(
             backgroundColor: widget.backgroundColor ??
                 const Color.fromARGB(255, 255, 255, 255),
-            resizeToAvoidBottomInset: true,
+            resizeToAvoidBottomInset: false,
             body: InkWell(
               onTap: () {
                 FocusManager.instance.primaryFocus?.unfocus();

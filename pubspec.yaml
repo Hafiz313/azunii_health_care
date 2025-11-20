@@ -46,8 +46,8 @@ dependencies:
   flutter_svg: ^2.0.15
   percent_indicator: ^4.2.4
   carousel_slider: ^5.0.0
-  fluttertoast: ^8.2.8
-  get_storage:
+  fluttertoast: ^9.0.0
+  get_storage: ^2.1.1
   connectivity_plus: ^6.1.0
   stylish_dialog: ^1.0.2
   syncfusion_flutter_datepicker: ^24.2.9
@@ -57,7 +57,7 @@ dependencies:
   local_auth: ^2.3.0
   pdf: ^3.10.4
   path_provider: ^2.1.2
-  open_file: ^3.3.2
+  open_file: ^3.5.7
   pin_code_fields: ^8.0.1
   image_picker: ^1.2.1
   permission_handler: ^11.3.1
@@ -67,7 +67,7 @@ dependencies:
 
 
   firebase_core: ^2.32.0
-  firebase_auth: ^4.19.6
+  firebase_auth: ^4.16.0
   firebase_messaging: ^14.7.10  # Use this compatible version
   flutter_dotenv: ^5.1.0
 
@@ -136,7 +136,20 @@ flutter:
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
 
-flutter_icons:
+flutter_launcher_icons:
   android: true
   ios: true
-  image_path: assets/images/Vector.png
+  image_path: "assets/images/logomain2.png"
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: "assets/images/logomain2.png"
+    background_color: "#hexcode"
+    theme_color: "#hexcode"
+  windows:
+    generate: true
+    image_path: "assets/images/logomain2.png"
+    icon_size: 48
+  macos:
+    generate: true
+    image_path: "assets/images/logomain2.png"

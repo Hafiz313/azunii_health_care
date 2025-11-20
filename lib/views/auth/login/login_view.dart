@@ -114,7 +114,7 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Obx(() => LoadingOverlay(
-        isLoading: mainLoading.value,
+        isLoading: controller.isLoading.value,
         child: BaseScaffoldAuth(
           body: SingleChildScrollView(
             child: Padding(

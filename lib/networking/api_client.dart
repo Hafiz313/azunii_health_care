@@ -8,6 +8,14 @@ import 'api_ref.dart';
 class ApiClient {
   static const Duration _timeout = Duration(seconds: 30);
   
+  // Helper method to get authorization headers
+  static Map<String, String> _getAuthHeaders() {
+    return {
+      'Authorization': 'Bearer ${Apis.token}',
+      'Content-Type': 'application/json',
+    };
+  }
+  
   // GET Request
   static Future<Map<String, dynamic>> get(String endpoint, {Map<String, String>? headers}) async {
     try {
@@ -30,6 +38,25 @@ class ApiClient {
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json', ...?headers},
+        body: body != null ? jsonEncode(body) : null,
+      ).timeout(_timeout);
+      return _handleResponse(response);
+    } on SocketException {
+      throw NetworkException('No internet connection');
+    } on HttpException {
+      throw NetworkException('Network error occurred');
+    } catch (e) {
+      throw ServerException('Something went wrong: ${e.toString()}');
+    }
+  }
+
+  // POST Request with Auth
+  static Future<Map<String, dynamic>> postWithAuth(String endpoint, {Map<String, dynamic>? body}) async {
+    try {
+      final url = Uri.parse('${Apis.baseUrl}$endpoint');
+      final response = await http.post(
+        url,
+        headers: _getAuthHeaders(),
         body: body != null ? jsonEncode(body) : null,
       ).timeout(_timeout);
       return _handleResponse(response);
@@ -76,6 +103,46 @@ class ApiClient {
     }
   }
 
+  // DELETE Request with Auth
+  static Future<Map<String, dynamic>> deleteWithAuth(String endpoint) async {
+    try {
+      final url = Uri.parse('${Apis.baseUrl}$endpoint');
+      final response = await http.delete(url, headers: _getAuthHeaders()).timeout(_timeout);
+      return _handleResponse(response);
+    } on SocketException {
+      throw NetworkException('No internet connection');
+    } on HttpException {
+      throw NetworkException('Network error occurred');
+    } catch (e) {
+      throw ServerException('Something went wrong: ${e.toString()}');
+    }
+  }
+
+  // Logout API
+  static Future<Map<String, dynamic>> logout() async {
+    try {
+      final url = Uri.parse('${Apis.baseUrl}${Apis.logout}');
+      final response = await http.get(url, headers: _getAuthHeaders()).timeout(_timeout);
+      return _handleResponse(response);
+    } on SocketException {
+      throw NetworkException('No internet connection');
+    } on HttpException {
+      throw NetworkException('Network error occurred');
+    } catch (e) {
+      throw ServerException('Something went wrong: ${e.toString()}');
+    }
+  }
+
+  // Delete Account API
+  static Future<Map<String, dynamic>> deleteAccount() async {
+    return await deleteWithAuth(Apis.deleteAccount);
+  }
+
+  // Forgot Password API
+  static Future<Map<String, dynamic>> forgotPassword(Map<String, dynamic> body) async {
+    return await postWithAuth(Apis.forgotPassword, body: body);
+  }
+
   // Handle Response
   static Map<String, dynamic> _handleResponse(http.Response response) {
     switch (response.statusCode) {
@@ -88,6 +155,8 @@ class ApiClient {
         throw UnauthorizedException();
       case 404:
         throw NotFoundException('Resource not found');
+      case 405:
+        throw ServerException('Method not allowed - Check API endpoint method');
       case 500:
         throw ServerException('Internal server error');
       default:

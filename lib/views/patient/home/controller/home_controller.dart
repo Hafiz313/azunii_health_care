@@ -166,13 +166,14 @@ class HomeController extends BaseController {
   /// Logout functionality
   /// Logout functionality
   Future<void> logout() async {
+    print('function executed');
     final result = await safeApiCall(() => _authRepository.logout());
 
-    if (result != null) {
-      StorageService().removeData('isLoggedIn');
-      StorageService().removeData('userType');
-      Get.offAllNamed(LoginView.routeName);
-      SnackbarHelper.showSuccess('Logged out successfully');
-    }
+    // if (result != null) {
+    StorageService().removeData('isLoggedIn');
+    StorageService().removeData('userType');
+    Get.offAllNamed(LoginView.routeName);
+    // SnackbarHelper.showSuccess('Logged out successfully');
+    //}
   }
 }

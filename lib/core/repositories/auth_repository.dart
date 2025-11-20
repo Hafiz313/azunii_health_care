@@ -16,7 +16,7 @@ class AuthRepository {
   // Login User
   Future<Map<String, dynamic>> login(String email, String password) async {
     try {
-      final response = await ApiClient.post('${Apis}Apis.login', body: {
+      final response = await ApiClient.post(Apis.login, body: {
         'email': email,
         'password': password,
       });
@@ -29,7 +29,7 @@ class AuthRepository {
   // Forgot Password
   Future<Map<String, dynamic>> forgotPassword(String email) async {
     try {
-      final response = await ApiClient.post(Apis.forgotPassword, body: {
+      final response = await ApiClient.forgotPassword({
         'email': email,
       });
       return response;
@@ -83,7 +83,7 @@ class AuthRepository {
   // Logout
   Future<Map<String, dynamic>> logout() async {
     try {
-      final response = await ApiClient.get(Apis.logout);
+      final response = await ApiClient.logout();
       return response;
     } catch (e) {
       rethrow;
@@ -93,7 +93,7 @@ class AuthRepository {
   // Delete Account
   Future<Map<String, dynamic>> deleteAccount() async {
     try {
-      final response = await ApiClient.delete(Apis.deleteAccount);
+      final response = await ApiClient.deleteAccount();
       return response;
     } catch (e) {
       rethrow;
