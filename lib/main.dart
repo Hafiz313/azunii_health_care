@@ -64,9 +64,11 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      initialRoute: StorageService().containsKey(StorageConsts.kAppRun)
-          ? SplashView.routeName
-          : LoginView.routeName,
+      initialRoute: SplashView.routeName,
+
+      // StorageService().containsKey(StorageConsts.kAppRun)
+      //     ? SplashView.routeName
+      //     : LoginView.routeName,
       builder: EasyLoading.init(),
       getPages: AppRoutes.pages,
     );

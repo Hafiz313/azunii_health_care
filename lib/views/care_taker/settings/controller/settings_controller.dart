@@ -10,14 +10,14 @@ class SettingsController extends BaseController {
   final AuthRepository _authRepository = AuthRepository();
 
   Future<void> logout() async {
-    final result = await safeApiCall(() => _authRepository.logout());
+    // final result = await safeApiCall(() => _authRepository.logout());
 
-    if (result != null) {
+    // if (result != null) {
       StorageService().removeData('isLoggedIn');
       StorageService().removeData('userType');
       Get.offAllNamed(LoginView.routeName);
-      SnackbarHelper.showSuccess('Logged out successfully');
-    }
+      // SnackbarHelper.showSuccess('Logged out successfully');
+    // }
   }
 
   Future<void> deleteAccount() async {

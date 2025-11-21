@@ -46,7 +46,7 @@ dependencies:
   flutter_svg: ^2.0.15
   percent_indicator: ^4.2.4
   carousel_slider: ^5.0.0
-  fluttertoast: ^8.2.8
+  fluttertoast: ^8.2.10
   get_storage:
   connectivity_plus: ^6.1.0
   stylish_dialog: ^1.0.2
@@ -62,7 +62,7 @@ dependencies:
   image_picker: ^1.2.1
   permission_handler: ^11.3.1
   google_fonts: ^6.3.2
-  flutter_launcher_icons: ^0.14.4
+#  flutter_launcher_icons: ^0.14.4
   google_sign_in: ^5.4.0
 
 

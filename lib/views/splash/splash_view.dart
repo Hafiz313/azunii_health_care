@@ -7,6 +7,8 @@ import 'package:get/get.dart';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../base_view/base_scaffold_auth.dart';
+
 class SplashView extends StatefulWidget {
   SplashView({super.key});
   static const String routeName = '/SplashView';
@@ -79,7 +81,7 @@ class _SplashViewState extends State<SplashView>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BaseScaffoldAuth(
       body: Center(
         child: AnimatedBuilder(
           animation: _animationController,
