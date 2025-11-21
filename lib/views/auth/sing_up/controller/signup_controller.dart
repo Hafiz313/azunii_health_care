@@ -27,10 +27,10 @@ class SignUpController extends BaseController {
   Future<void> signup(String userType) async {
     if (!formKey.currentState!.validate()) return;
 
-    if (!acceptTermsAndConditions.value) {
-      SnackbarHelper.showWarning("Please accept Terms & Conditions");
-      return;
-    }
+    // if (!acceptTermsAndConditions.value) {
+    //   SnackbarHelper.showWarning("Please accept Terms & Conditions");
+    //   return;
+    // }
 
     if (passwordTxtField.text != confirmPasswordTxtField.text) {
       SnackbarHelper.showError("Password not match");

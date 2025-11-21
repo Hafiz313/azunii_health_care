@@ -27,7 +27,7 @@ class SignUpView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() => LoadingOverlay(
-          isLoading: mainLoading.value,
+          isLoading: controller.isLoading.value,
           child: BaseScaffoldAuth(
             body: Form(
               key: controller.formKey,
@@ -119,10 +119,8 @@ class SignUpView extends StatelessWidget {
                         if (val == null || val.isEmpty) {
                           return "Password cannot be empty";
                         }
-                        if (!RegExp(
-                                r'^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$')
-                            .hasMatch(val)) {
-                          return "Weak password!";
+                        if (val.length < 4) {
+                          return "Password must be at least 4 characters";
                         }
                         return null;
                       },

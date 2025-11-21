@@ -32,23 +32,38 @@ class HomeView extends StatelessWidget {
       key: _scaffoldKey,
       backgroundColor: AppColors.white,
       drawer: _buildDrawer(context),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(context),
-              _buildQuickActions(context),
-              const SizedBox(height: 13),
-              _buildMedicationAlert(context),
-              const SizedBox(height: 13),
-              _buildAsOfTodaySection(context),
-              const SizedBox(height: 13),
-              _buildFutureAppointmentsSection(context),
-              const SizedBox(height: 20),
-            ],
+      body: Stack(
+        children: [
+          SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(context),
+                  _buildQuickActions(context),
+                  const SizedBox(height: 13),
+                  _buildMedicationAlert(context),
+                  const SizedBox(height: 13),
+                  _buildAsOfTodaySection(context),
+                  const SizedBox(height: 13),
+                  _buildFutureAppointmentsSection(context),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
           ),
-        ),
+          Obx(() => controller.isLoading.value
+              ? Container(
+                  color: Colors.black.withOpacity(0.3),
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(AppColors.primary),
+                    ),
+                  ),
+                )
+              : const SizedBox.shrink()),
+        ],
       ),
     );
   }
@@ -338,9 +353,11 @@ class HomeView extends StatelessWidget {
 
   Widget _buildDrawer(BuildContext context) {
     return Drawer(
+      backgroundColor: Colors.white,
       child: Column(
         children: [
           // Logo at top
+          SizedBox(height: 20),
           Container(
             padding: const EdgeInsets.all(40),
             child: Image.asset(
@@ -388,7 +405,7 @@ class HomeView extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.pop(context); // Close drawer first
                   _showLogoutDialog(context);
                 },
                 style: ElevatedButton.styleFrom(
@@ -432,6 +449,7 @@ class HomeView extends StatelessWidget {
   }
 
   void _showLogoutDialog(BuildContext context) {
+    final controller = Get.find<HomeController>();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -456,7 +474,7 @@ class HomeView extends StatelessWidget {
             ElevatedButton(
               onPressed: () async {
                 Navigator.pop(context);
-                final controller = Get.find<HomeController>();
+
                 await controller.logout();
               },
               style: ElevatedButton.styleFrom(

@@ -1,8 +1,11 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class Apis {
-  static String get baseUrl => "https://azunii.devdioxide.com/api";
-  // static String get baseUrl => dotenv.env['BASE_API_URL'] ?? 'https://fallback-url.com/api';
+  static String get baseUrl =>
+      dotenv.env['BASE_API_URL'] ?? 'https://fallback-url.com/api';
+  static String get token =>
+      dotenv.env['Token'] ??
+      '8|3oKnnOhB8cG8nBZJaEzieXZtzAiC3N8wvbOL8uO86fcb9c06';
 
   // Auth endpoints
   static const String register = '/register';
