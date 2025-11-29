@@ -3,15 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:intl/intl.dart';
+import '../../../../core/controllers/base_controller.dart';
+import '../../../../core/models/visit_model.dart';
+import '../../../../core/repositories/visits_repo.dart';
+import 'package:intl/intl.dart';
 
-class VisitsController extends GetxController {
+class VisitsController extends BaseController {
+  final VisitsRepository _VisitsRepository = VisitsRepository();
   final TextEditingController providerNameController = TextEditingController();
   final TextEditingController notesController = TextEditingController();
-  
+
   final RxString selectedSpecialty = RxString('');
   final Rx<DateTime?> selectedDate = Rx<DateTime?>(null);
   final Rx<File?> selectedImage = Rx<File?>(null);
-  
+
   final ImagePicker _picker = ImagePicker();
 
   void setSpecialty(String? value) {
@@ -81,44 +87,124 @@ class VisitsController extends GetxController {
     selectedImage.value = null;
   }
 
-  void saveVisit() {
+  Future<void> updateVisit(int visitId) async {
+    // Validation with simple bottom snackbar
     if (providerNameController.text.trim().isEmpty) {
-      Get.snackbar(
-        'Error',
-        'Please enter provider name',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      _showBottomSnackBar('Please enter provider name');
       return;
     }
 
     if (selectedSpecialty.value.isEmpty) {
-      Get.snackbar(
-        'Error',
-        'Please select a specialty',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      _showBottomSnackBar('Please select a specialty');
       return;
     }
 
-    Get.snackbar(
-      'Success',
-      'Visit saved successfully!',
-      backgroundColor: Colors.green,
-      colorText: Colors.white,
-      snackPosition: SnackPosition.TOP,
+    if (selectedDate.value == null) {
+      _showBottomSnackBar('Please select a visit date');
+      return;
+    }
+
+    // Format date as required: 2025-11-29 10:59:29
+    final formattedDate =
+        DateFormat('yyyy-MM-dd HH:mm:ss').format(selectedDate.value!);
+
+    // Create update request
+    final updateRequest = UpdateVisitRequest(
+      id: visitId,
+      providerName: providerNameController.text.trim(),
+      specialty: selectedSpecialty.value,
+      visitDate: formattedDate,
+      notes: notesController.text.trim(),
+      attachment: selectedImage.value,
     );
 
-    Future.delayed(const Duration(seconds: 1), () {
-      Get.back();
-    });
+    // Call API using safeApiCall
+    final result =
+        await safeApiCall(() => _VisitsRepository.updateVisit(updateRequest));
+
+    if (result != null) {
+      _showBottomSnackBar('Visit updated successfully!', isSuccess: true);
+
+      // Clear all fields immediately after success
+      _clearAllFields();
+
+      // Close screen after delay
+      Future.delayed(const Duration(seconds: 1), () {
+        Get.back();
+      });
+    }
+  }
+
+  Future<void> saveVisit() async {
+    // Validation with simple bottom snackbar
+    if (providerNameController.text.trim().isEmpty) {
+      _showBottomSnackBar('Please enter provider name');
+      return;
+    }
+
+    if (selectedSpecialty.value.isEmpty) {
+      _showBottomSnackBar('Please select a specialty');
+      return;
+    }
+
+    if (selectedDate.value == null) {
+      _showBottomSnackBar('Please select a visit date');
+      return;
+    }
+
+    // Format date as required: 2025-11-29 10:59:29
+    final formattedDate =
+        DateFormat('yyyy-MM-dd HH:mm:ss').format(selectedDate.value!);
+
+    // Create visit request
+    final visitRequest = StoreVisitRequest(
+      providerName: providerNameController.text.trim(),
+      specialty: selectedSpecialty.value,
+      visitDate: formattedDate,
+      notes: notesController.text.trim(),
+      attachment: selectedImage.value,
+    );
+
+    // Call API using safeApiCall
+    final result =
+        await safeApiCall(() => _VisitsRepository.storeVisit(visitRequest));
+
+    if (result != null) {
+      _showBottomSnackBar('Visit saved successfully!', isSuccess: true);
+
+      // Clear all fields immediately after success
+      _clearAllFields();
+
+      // Close after delay
+      Future.delayed(const Duration(seconds: 1), () {
+        Get.back();
+      });
+    }
+  }
+
+  void _showBottomSnackBar(String message, {bool isSuccess = false}) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      backgroundColor: isSuccess ? Colors.green : Colors.red,
+      duration: const Duration(seconds: 2),
+      behavior: SnackBarBehavior.floating,
+      margin: const EdgeInsets.all(16),
+    );
+
+    ScaffoldMessenger.of(Get.context!).showSnackBar(snackBar);
+  }
+
+  void _clearAllFields() {
+    providerNameController.clear();
+    notesController.clear();
+    selectedSpecialty.value = '';
+    selectedDate.value = null;
+    selectedImage.value = null;
   }
 
   @override
   void onClose() {
+    _clearAllFields();
     providerNameController.dispose();
     notesController.dispose();
     super.onClose();

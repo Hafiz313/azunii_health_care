@@ -1,26 +1,37 @@
+import 'package:Azunii_Health/core/models/Auth_model.dart';
+
 import '../../networking/api_client.dart';
 import '../../networking/api_ref.dart';
 import '../exceptions/app_exceptions.dart';
 
 class AuthRepository {
   // Register User
-  Future<Map<String, dynamic>> register(Map<String, dynamic> userData) async {
+  Future<AuthResponse> register(Map<String, dynamic> userData) async {
     try {
+      print('\n📝 SIGNUP Request 📝');
+      print('📧 Email: ${userData['email']}');
+      print('👤 Name: ${userData['name']}');
+      print('🔐 Password: [HIDDEN]\n');
+
       final response = await ApiClient.post(Apis.register, body: userData);
-      return response;
+      return AuthResponse.fromJson(response);
     } catch (e) {
       rethrow;
     }
   }
 
   // Login User
-  Future<Map<String, dynamic>> login(String email, String password) async {
+  Future<AuthResponse> login(String email, String password) async {
     try {
+      print('\n🔑 LOGIN Request 🔑');
+      print('📧 Email: $email');
+      print('🔐 Password: [HIDDEN]\n');
+
       final response = await ApiClient.post(Apis.login, body: {
         'email': email,
         'password': password,
       });
-      return response;
+      return AuthResponse.fromJson(response);
     } catch (e) {
       rethrow;
     }
@@ -39,42 +50,38 @@ class AuthRepository {
   }
 
   // Google Login
-  // Future<Map<String, dynamic>> googleLogin(String token) async {
-  //   try {
-  //     final response = await ApiClient.post(Apis.googleLogin, body: {
-  //       'token': token,
-  //     });
-  //     return response;
-  //   } catch (e) {
-  //     rethrow;
-  //   }
-  // }
-  Future<Map<String, dynamic>> googleAuth({
+  Future<AuthResponse> googleAuth({
     required String googleId,
     required String email,
     required String name,
     required String deviceToken,
   }) async {
     try {
+      print('\n🚀 Google Auth Request 🚀');
+      print('📧 Email: $email');
+      print('👤 Name: $name');
+      print('🆔 Google ID: $googleId');
+      print('📱 Device Token: $deviceToken\n');
+
       final response = await ApiClient.post(Apis.googleLogin, body: {
         'google_id': googleId,
         'email': email,
         'name': name,
         'device_token': deviceToken,
       });
-      return response;
+      return AuthResponse.fromJson(response);
     } catch (e) {
       rethrow;
     }
   }
 
   // Apple Login
-  Future<Map<String, dynamic>> appleLogin(String token) async {
+  Future<AuthResponse> appleLogin(String token) async {
     try {
       final response = await ApiClient.post(Apis.appleLogin, body: {
         'token': token,
       });
-      return response;
+      return AuthResponse.fromJson(response);
     } catch (e) {
       rethrow;
     }
@@ -101,11 +108,14 @@ class AuthRepository {
   }
 
   // Get Profile Info
-  Future<Map<String, dynamic>> getProfileInfo() async {
+  Future<ProfileResponse> getProfileInfo() async {
     try {
-      final response = await ApiClient.get(Apis.profileInfo);
-      return response;
+      print('\n👤 PROFILE INFO Request 👤');
+      final response = await ApiClient.getWithAuth(Apis.profileInfo);
+      print('📄 Profile Response: $response\n');
+      return ProfileResponse.fromJson(response);
     } catch (e) {
+      print('❌ Profile Info Error: $e');
       rethrow;
     }
   }

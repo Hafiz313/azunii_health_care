@@ -24,4 +24,15 @@ class Apis {
   static const String getPatientVisits = '/patient/visits/index';
   static const String getVisitDetails = '/patient/visits/show';
   static const String updatePatientVisit = '/patient/visits/update';
+
+  // Patient summaries endpoints
+  static const String getPatientSummary = '/patient/summary';
+  static const String storePatientSummary = '/patient/summary/store';
+  static const String updatePatientSummary = '/patient/summary/update';
+
+  // Patient medicines endpoints
+  static const String getPatientMedicines = '/patient/medicines';
+  static const String storePatientMedicine = '/patient/medicines/store';
+  static const String getMedicineDetails = '/patient/medicines/show';
+  static const String updatePatientMedicine = '/patient/medicines/update';
 }

@@ -27,51 +27,49 @@ class SignUpController extends BaseController {
   Future<void> signup(String userType) async {
     if (!formKey.currentState!.validate()) return;
 
-    // if (!acceptTermsAndConditions.value) {
-    //   SnackbarHelper.showWarning("Please accept Terms & Conditions");
-    //   return;
-    // }
-
     if (passwordTxtField.text != confirmPasswordTxtField.text) {
       SnackbarHelper.showError("Password not match");
       return;
     }
 
+    // Commented out API call for testing
     final result = await safeApiCall(() => _authRepository.register({
           "name": nameTxtField.text,
           "email": emailTxtField.text,
           "password": passwordTxtField.text,
           "password_confirmation": confirmPasswordTxtField.text,
         }));
-
     if (result != null) {
-      SnackbarHelper.showSuccess('Registration successful! Please login.');
+      SnackbarHelper.showSuccess('Signup successful! Please login.');
       Get.offAllNamed(LoginView.routeName);
+    } else {
+      print('signup Api failed');
     }
   }
 
   Future<void> googleSignup(String userType) async {
-    final result = await safeApiCall(() async {
-      // Get Google sign-in data
-      final googleData = await _googleAuthService.signInWithGoogle();
+    // Show loader for 2 seconds instead of API call
 
+    // await Future.delayed(Duration(seconds: 2));
+
+    // Commented out API call for testing
+    final result = await safeApiCall(() async {
+      final googleData = await _googleAuthService.signInWithGoogle();
       if (googleData.isNotEmpty) {
-        // Call Google login API with the data
         final apiResponse = await _authRepository.googleAuth(
           googleId: googleData['google_id'],
           email: googleData['email'],
           name: googleData['name'],
           deviceToken: googleData['device_token'],
         );
-
         await LocalStorageService.setLoginStatus(true, userType: userType);
         return apiResponse;
       }
       return null;
     });
-
     if (result != null) {
-      SnackbarHelper.showSuccess('Google login successful!');
+      await LocalStorageService.setLoginStatus(true, userType: userType);
+      SnackbarHelper.showSuccess('Google signin successful!');
 
       if (userType == Appconsts.patient) {
         Get.offAllNamed(PatientDashboard.routeName);
@@ -87,10 +85,6 @@ class SignUpController extends BaseController {
 
   void toggleConfirmPasswordVisibility() {
     isConformPasswordVisible.value = !isConformPasswordVisible.value;
-  }
-
-  void toggleTermsAndConditions(bool? value) {
-    acceptTermsAndConditions.value = value ?? false;
   }
 
   @override

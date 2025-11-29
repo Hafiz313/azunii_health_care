@@ -14,20 +14,23 @@ class ForgetController extends BaseController {
   Future<void> forgotPassword() async {
     if (!formKey.currentState!.validate()) return;
 
+    // Show loader for 2 seconds instead of API call
+    setLoading(true);
+    // await Future.delayed(Duration(seconds: 2));
+
+    // Commented out API call for testing
     final result = await safeApiCall(() => _authRepository.forgotPassword(
           emailTxtField.text.trim(),
         ));
-
-    if (result != null) {
-      InfoDialog.show(
-        title: 'Email Sent',
-        message:
-            'Password reset email has been sent to ${emailTxtField.text}. Please check your Gmail to reset your password.',
-        onPressed: () {
-          Get.back(); // Navigate back to login
-        },
-      );
-    }
+    setLoading(false);
+    InfoDialog.show(
+      title: 'Email Sent',
+      message:
+          'Password reset email has been sent to ${emailTxtField.text}. Please check your Gmail to reset your password.',
+      onPressed: () {
+        Get.back(); // Navigate back to login
+      },
+    );
   }
 
   String? validateEmail(String? value) {

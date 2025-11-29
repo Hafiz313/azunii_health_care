@@ -24,7 +24,10 @@ class LogoWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
-              width: context.percentWidth * 45.0,
+              height: context.screenHeight * 0.02,
+            ),
+            SizedBox(
+              width: context.percentWidth * 40.0,
               child: Image.asset(AppAssets.logoMain),
             ),
           ],
