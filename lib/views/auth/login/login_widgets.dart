@@ -15,7 +15,6 @@ import '../../patient/home/home_view.dart';
 import '../../widget/buttons.dart';
 import '../../widget/text_fields.dart';
 import '../../widget/social_button.dart';
-import 'controller/login_controller.dart';
 
 class LoginWidgets {
   static Widget buildLogo(BuildContext context) {

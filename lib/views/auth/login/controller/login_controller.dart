@@ -31,7 +31,6 @@ class LoginController extends BaseController {
           emailController.text.trim(),
           passwordController.text,
         ));
-
     print('Login api call result is this ${result}');
 
     if (result != null) {
@@ -59,7 +58,6 @@ class LoginController extends BaseController {
 
   Future<void> googleLogin(String userType) async {
     // Show loader for 2 seconds instead of API call
-    setLoading(true);
 
     //Commented out API call for testing
     final result = await safeApiCall(() async {
@@ -77,7 +75,7 @@ class LoginController extends BaseController {
       }
       return null;
     });
-    setLoading(false);
+
     if (result != null) {
       await LocalStorageService.setLoginStatus(true,
           userType: userType, token: result.token);
@@ -89,10 +87,8 @@ class LoginController extends BaseController {
     SnackbarHelper.showSuccess('Google signin successful!');
 
     if (userType == Appconsts.patient) {
-      setLoading(false);
       Get.offAllNamed(PatientDashboard.routeName);
     } else if (userType == Appconsts.caregiver) {
-      setLoading(false);
       Get.offAllNamed(CareTakerDashboard.routeName);
     }
   }
