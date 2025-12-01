@@ -31,8 +31,8 @@ class Apis {
   static const String updatePatientSummary = '/patient/summary/update';
 
   // Patient medicines endpoints
-  static const String getPatientMedicines = '/patient/medicines';
-  static const String storePatientMedicine = '/patient/medicines/store';
-  static const String getMedicineDetails = '/patient/medicines/show';
-  static const String updatePatientMedicine = '/patient/medicines/update';
+  static const String getPatientMedicines = '/patient/medicine';
+  static const String storePatientMedicine = '/patient/medicine/store';
+  static const String getMedicineDetails = '/patient/medicine/show';
+  static const String updatePatientMedicine = '/patient/medicine/update';
 }

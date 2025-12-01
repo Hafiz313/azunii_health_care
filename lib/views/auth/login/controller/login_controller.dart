@@ -23,10 +23,10 @@ class LoginController extends BaseController {
     isChecked.value = value ?? false;
   }
 
-  Future<void> login(String userType) async {
+  Future<void> login() async {
+    print('Login api call result is this ');
     if (!formKey.currentState!.validate()) return;
 
-    // Commented out API call for testing
     final result = await safeApiCall(() => _authRepository.login(
           emailController.text.trim(),
           passwordController.text,
@@ -34,6 +34,11 @@ class LoginController extends BaseController {
     print('Login api call result is this ${result}');
 
     if (result != null) {
+      // Get user role from API response
+      final userRole = result.user?.role ?? 'patient';
+      final userType =
+          userRole == 'patient' ? Appconsts.patient : Appconsts.caregiver;
+
       await LocalStorageService.setLoginStatus(true,
           userType: userType, token: result.token);
 
@@ -41,8 +46,10 @@ class LoginController extends BaseController {
       Staticdata.userModel = result.user;
       print('✅ User data stored from login response');
 
-      SnackbarHelper.showSuccess('Signin successful!');
-      if (userType == Appconsts.patient) {
+      SnackbarHelper.showSuccess('Login successful');
+
+      // Navigate based on user role from API
+      if (userRole == 'patient') {
         Get.offAllNamed(PatientDashboard.routeName);
       } else {
         Get.offAllNamed(CareTakerDashboard.routeName);
@@ -56,10 +63,7 @@ class LoginController extends BaseController {
     isPasswordVisible.value = !isPasswordVisible.value;
   }
 
-  Future<void> googleLogin(String userType) async {
-    // Show loader for 2 seconds instead of API call
-
-    //Commented out API call for testing
+  Future<void> googleLogin() async {
     final result = await safeApiCall(() async {
       final googleData = await _googleAuthService.signInWithGoogle();
       if (googleData.isNotEmpty) {
@@ -69,27 +73,32 @@ class LoginController extends BaseController {
           name: googleData['name'],
           deviceToken: googleData['device_token'],
         );
-        await LocalStorageService.setLoginStatus(true,
-            userType: userType, token: apiResponse.token);
         return apiResponse;
       }
       return null;
     });
 
     if (result != null) {
+      // Get user role from API response
+      final userRole = result.user?.role ?? 'patient';
+      final userType =
+          userRole == 'patient' ? Appconsts.patient : Appconsts.caregiver;
+
       await LocalStorageService.setLoginStatus(true,
           userType: userType, token: result.token);
 
       // Store user data from Google login response
       Staticdata.userModel = result.user;
       print('✅ User data stored from Google login response');
-    }
-    SnackbarHelper.showSuccess('Google signin successful!');
 
-    if (userType == Appconsts.patient) {
-      Get.offAllNamed(PatientDashboard.routeName);
-    } else if (userType == Appconsts.caregiver) {
-      Get.offAllNamed(CareTakerDashboard.routeName);
+      SnackbarHelper.showSuccess('Google signin successful!');
+
+      // Navigate based on user role from API
+      if (userRole == 'patient') {
+        Get.offAllNamed(PatientDashboard.routeName);
+      } else {
+        Get.offAllNamed(CareTakerDashboard.routeName);
+      }
     }
   }
 

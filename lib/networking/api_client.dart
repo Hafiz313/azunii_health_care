@@ -244,8 +244,23 @@ class ApiClient {
       case 201:
         return jsonDecode(response.body);
       case 400:
-        throw ValidationException(
-            jsonDecode(response.body)['message'] ?? 'Invalid request');
+        final responseBody = jsonDecode(response.body);
+        String errorMessage = 'Invalid request';
+        
+        // Handle nested error structure
+        if (responseBody['message'] != null) {
+          errorMessage = responseBody['message'];
+        } else if (responseBody['errors'] != null) {
+          final errors = responseBody['errors'];
+          if (errors is Map && errors.isNotEmpty) {
+            final firstError = errors.values.first;
+            if (firstError is List && firstError.isNotEmpty) {
+              errorMessage = firstError.first.toString();
+            }
+          }
+        }
+        
+        throw ValidationException(errorMessage);
       case 401:
         throw UnauthorizedException();
       case 404:

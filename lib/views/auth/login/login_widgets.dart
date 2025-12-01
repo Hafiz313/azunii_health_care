@@ -173,9 +173,7 @@ class LoginWidgets {
       {required Function() onPress}) {
     return AppElevatedButton(
       backgroundColor: AppColors.secondary,
-      onPressed: () {
-        _showUserTypeDialog(context, true);
-      },
+      onPressed: onPress,
       title: Lang.signIn,
     );
   }
@@ -183,14 +181,14 @@ class LoginWidgets {
   static Widget buildSocialButtons(
     BuildContext context,
   ) {
+    final controller = Get.find<LoginController>();
     return Row(
       children: [
         Expanded(
           child: SocialButton(
-            text: Lang.google,
-            iconPath: AppAssets.googleIcon,
-            onPressed: () => _showUserTypeDialog(context, false),
-          ),
+              text: Lang.google,
+              iconPath: AppAssets.googleIcon,
+              onPressed: () => controller.login()),
         ),
         SizedBox(width: context.percentWidth * 4.0),
         Expanded(
@@ -212,97 +210,97 @@ class LoginWidgets {
     );
   }
 
-  static void _showUserTypeDialog(BuildContext context, bool isonloginApi) {
-    try {
-      final controller = Get.find<LoginController>();
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            backgroundColor: AppColors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            title: Text(
-              'Sign Up As',
-              style: TextStyle(
-                color: AppColors.headingTextColor,
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      try {
-                        Navigator.pop(context);
-                        isonloginApi
-                            ? controller.login(Appconsts.patient)
-                            : controller.googleLogin(Appconsts.patient);
-                      } catch (e) {
-                        Navigator.pop(context);
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      'Sign in as Patient',
-                      style: TextStyle(
-                        color: AppColors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      try {
-                        Navigator.pop(context);
-                        isonloginApi
-                            ? controller.login(Appconsts.caregiver)
-                            : controller.googleLogin(Appconsts.caregiver);
-                      } catch (e) {
-                        Navigator.pop(context);
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: Text(
-                      'Sign in as Caregiver',
-                      style: TextStyle(
-                        color: AppColors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      );
-    } catch (e) {
-      // Handle dialog creation error
-    }
-  }
+  // static void _showUserTypeDialog(BuildContext context, bool isonloginApi) {
+  //   try {
+  //     final controller = Get.find<LoginController>();
+  //     showDialog(
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return AlertDialog(
+  //           backgroundColor: AppColors.white,
+  //           shape: RoundedRectangleBorder(
+  //             borderRadius: BorderRadius.circular(16),
+  //           ),
+  //           title: Text(
+  //             'Sign Up As',
+  //             style: TextStyle(
+  //               color: AppColors.headingTextColor,
+  //               fontSize: 18,
+  //               fontWeight: FontWeight.w500,
+  //             ),
+  //             textAlign: TextAlign.center,
+  //           ),
+  //           content: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: [
+  //               SizedBox(
+  //                 width: double.infinity,
+  //                 child: ElevatedButton(
+  //                   onPressed: () {
+  //                     try {
+  //                       Navigator.pop(context);
+  //                       isonloginApi
+  //                           ? controller.login()
+  //                           : controller.googleLogin();
+  //                     } catch (e) {
+  //                       Navigator.pop(context);
+  //                     }
+  //                   },
+  //                   style: ElevatedButton.styleFrom(
+  //                     backgroundColor: AppColors.primary,
+  //                     padding: EdgeInsets.symmetric(vertical: 12),
+  //                     shape: RoundedRectangleBorder(
+  //                       borderRadius: BorderRadius.circular(8),
+  //                     ),
+  //                   ),
+  //                   child: Text(
+  //                     'Sign in as Patient',
+  //                     style: TextStyle(
+  //                       color: AppColors.white,
+  //                       fontSize: 16,
+  //                       fontWeight: FontWeight.w500,
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //               SizedBox(height: 12),
+  //               SizedBox(
+  //                 width: double.infinity,
+  //                 child: ElevatedButton(
+  //                   onPressed: () {
+  //                     try {
+  //                       Navigator.pop(context);
+  //                       isonloginApi
+  //                           ? controller.login()
+  //                           : controller.googleLogin();
+  //                     } catch (e) {
+  //                       Navigator.pop(context);
+  //                     }
+  //                   },
+  //                   style: ElevatedButton.styleFrom(
+  //                     backgroundColor: AppColors.primary,
+  //                     padding: EdgeInsets.symmetric(vertical: 12),
+  //                     shape: RoundedRectangleBorder(
+  //                       borderRadius: BorderRadius.circular(8),
+  //                     ),
+  //                   ),
+  //                   child: Text(
+  //                     'Sign in as Caregiver',
+  //                     style: TextStyle(
+  //                       color: AppColors.white,
+  //                       fontSize: 16,
+  //                       fontWeight: FontWeight.w500,
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         );
+  //       },
+  //     );
+  //   } catch (e) {
+  //     // Handle dialog creation error
+  //   }
+  // }
 }

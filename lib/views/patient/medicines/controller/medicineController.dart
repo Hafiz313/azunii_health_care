@@ -7,6 +7,14 @@ import '../../../../core/controllers/base_controller.dart';
 import '../../../../core/models/Medicine_model.dart';
 import '../../../../core/repositories/Medicine_repo.dart';
 
+class MedicineFrequencyInput {
+  final RxString frequency = RxString('');
+  final TextEditingController timeController = TextEditingController();
+  final RxString amPm = RxString('AM');
+
+  MedicineFrequencyInput();
+}
+
 class MedicineController extends BaseController {
   final MedicineRepository _medicineRepository = MedicineRepository();
   // Text Controllers
@@ -15,57 +23,92 @@ class MedicineController extends BaseController {
 
   // Observable variables
   final RxString selectedDosage = RxString('');
-  final RxString selectedStatus = RxString('Active');
+  final RxString selectedStatus = RxString('active');
   final Rx<File?> selectedImage = Rx<File?>(null);
 
   // Frequency management
-  final RxList<MedicineFrequency> frequencies = RxList<MedicineFrequency>([]);
-  final RxString selectedFrequency = RxString('Once daily');
-  final RxString selectedTime = RxString('08:00');
+  final RxList<MedicineFrequencyInput> frequencyRows =
+      RxList<MedicineFrequencyInput>([]);
 
   // Dropdown lists
   final List<String> dosageList = ['10mg', '20mg', '40mg', '50mg', '100mg'];
 
   final List<String> frequencyList = [
-    'Once daily',
-    'Twice daily',
-    'Three times daily',
-    'Four times daily',
-    'As needed',
+    'Daily',
+    'Weekly',
+    'Monthly',
+    'Hourly',
+    'Custom',
   ];
 
-  final List<String> statusList = ['Active', 'Inactive', 'Paused', 'Completed'];
+  final List<String> statusList = ['active', 'inactive'];
 
   final ImagePicker _picker = ImagePicker();
+
+  @override
+  void onInit() {
+    super.onInit();
+    addFrequencyRow(); // Start with one row
+  }
 
   // Setter functions
   void setDosage(String? value) {
     selectedDosage.value = value ?? '';
   }
 
-  void setFrequency(String? value) {
-    selectedFrequency.value = value ?? 'Once daily';
-  }
-
-  void setTime(String? value) {
-    selectedTime.value = value ?? '08:00';
-  }
-
   void setStatus(String? value) {
-    selectedStatus.value = value ?? 'Active';
+    selectedStatus.value = value ?? 'active';
   }
 
-  void addFrequency() {
-    final frequency = MedicineFrequency(
-      frequency: selectedFrequency.value,
-      time: selectedTime.value,
-    );
-    frequencies.add(frequency);
+  void setFrequencyForRow(int index, String? value) {
+    if (index >= 0 && index < frequencyRows.length) {
+      frequencyRows[index].frequency.value = value ?? '';
+    }
   }
 
-  void removeFrequency(int index) {
-    if (index >= 0 && index < frequencies.length) {
-      frequencies.removeAt(index);
+  void setAmPmForRow(int index, String? value) {
+    if (index >= 0 && index < frequencyRows.length) {
+      frequencyRows[index].amPm.value = value ?? 'AM';
+    }
+  }
+
+  String _convertTo24HourFormat(String time, String amPm) {
+    if (time.isEmpty) return time;
+    
+    String processedTime = time.trim();
+    
+    // Handle single digit or number without colon (e.g., "10" -> "10:00")
+    if (!processedTime.contains(':')) {
+      int hour = int.tryParse(processedTime) ?? 0;
+      processedTime = '${hour.toString().padLeft(2, '0')}:00';
+    }
+    
+    final parts = processedTime.split(':');
+    if (parts.length != 2) return processedTime;
+    
+    int hour = int.tryParse(parts[0]) ?? 0;
+    String minute = parts[1].padLeft(2, '0');
+    
+    // Convert to 24-hour format based on AM/PM
+    if (amPm == 'PM' && hour != 12) {
+      hour += 12;
+    } else if (amPm == 'AM' && hour == 12) {
+      hour = 0;
+    }
+    
+    return '${hour.toString().padLeft(2, '0')}:$minute';
+  }
+
+  void addFrequencyRow() {
+    frequencyRows.add(MedicineFrequencyInput());
+  }
+
+  void removeFrequencyRow(int index) {
+    if (frequencyRows.length > 1 &&
+        index >= 0 &&
+        index < frequencyRows.length) {
+      frequencyRows[index].timeController.dispose();
+      frequencyRows.removeAt(index);
     }
   }
 
@@ -141,30 +184,72 @@ class MedicineController extends BaseController {
       return;
     }
 
-    if (frequencies.isEmpty) {
+    if (frequencyRows.isEmpty) {
       _showBottomSnackBar('Please add at least one frequency');
       return;
     }
+
+    // Validate each frequency row
+    for (int i = 0; i < frequencyRows.length; i++) {
+      if (frequencyRows[i].frequency.value.isEmpty) {
+        _showBottomSnackBar('Please select frequency for row ${i + 1}');
+        return;
+      }
+      if (frequencyRows[i].timeController.text.trim().isEmpty) {
+        _showBottomSnackBar('Please enter time for row ${i + 1}');
+        return;
+      }
+    }
+
+    // Build frequencies list
+    final frequencies = frequencyRows
+        .map((row) => MedicineFrequency(
+              frequency: row.frequency.value,
+              time: _convertTo24HourFormat(
+                  row.timeController.text.trim(), row.amPm.value),
+            ))
+        .toList();
 
     // Create request
     final medicineRequest = StoreMedicineRequest(
       medicineName: medNameController.text.trim(),
       dosage: selectedDosage.value,
-      status: selectedStatus.value.toLowerCase(),
+      status: selectedStatus.value,
       attachment: selectedImage.value,
       frequencies: frequencies,
     );
 
-    // Call API
-    final result = await safeApiCall(
-        () => _medicineRepository.storeMedicine(medicineRequest));
+    // Print payload for debugging
+    print('\n🔍 MEDICINE REQUEST PAYLOAD 🔍');
+    print('Medicine Name: ${medicineRequest.medicineName}');
+    print('Dosage: ${medicineRequest.dosage}');
+    print('Status: ${medicineRequest.status}');
+    print('Attachment: ${medicineRequest.attachment?.path ?? 'null'}');
+    print('Frequencies:');
+    for (int i = 0; i < medicineRequest.frequencies.length; i++) {
+      print('  [$i] Frequency: ${medicineRequest.frequencies[i].frequency}');
+      print('  [$i] Time: ${medicineRequest.frequencies[i].time}');
+    }
+    print('JSON Payload: ${medicineRequest.toJson()}');
+    print('🔍 END PAYLOAD 🔍\n');
 
-    if (result != null) {
-      _showBottomSnackBar('Medicine added successfully!', isSuccess: true);
-      _clearAllFields();
-      Future.delayed(const Duration(seconds: 1), () {
-        Get.back();
-      });
+    // Show loading
+    setLoading(true);
+
+    try {
+      // Call API
+      final result = await safeApiCall(
+          () => _medicineRepository.storeMedicine(medicineRequest));
+
+      if (result != null) {
+        // _showBottomSnackBar('Medicine added successfully!', isSuccess: true);
+        _clearAllFields();
+        Future.delayed(const Duration(seconds: 1), () {
+          Get.back();
+        });
+      }
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -193,54 +278,131 @@ class MedicineController extends BaseController {
       return;
     }
 
-    if (frequencies.isEmpty) {
+    if (frequencyRows.isEmpty) {
       _showBottomSnackBar('Please add at least one frequency');
       return;
     }
+
+    // Validate each frequency row
+    for (int i = 0; i < frequencyRows.length; i++) {
+      if (frequencyRows[i].frequency.value.isEmpty) {
+        _showBottomSnackBar('Please select frequency for row ${i + 1}');
+        return;
+      }
+      if (frequencyRows[i].timeController.text.trim().isEmpty) {
+        _showBottomSnackBar('Please enter time for row ${i + 1}');
+        return;
+      }
+    }
+
+    // Build frequencies list
+    final frequencies = frequencyRows
+        .map((row) => MedicineFrequency(
+              frequency: row.frequency.value,
+              time: _convertTo24HourFormat(
+                  row.timeController.text.trim(), row.amPm.value),
+            ))
+        .toList();
 
     // Create request
     final updateRequest = UpdateMedicineRequest(
       id: medicineId,
       medicineName: medNameController.text.trim(),
       dosage: selectedDosage.value,
-      status: selectedStatus.value.toLowerCase(),
+      status: selectedStatus.value,
       attachment: selectedImage.value,
       frequencies: frequencies,
     );
 
-    // Call API
-    final result = await safeApiCall(
-        () => _medicineRepository.updateMedicine(updateRequest));
+    // Show loading
+    setLoading(true);
 
-    if (result != null) {
-      _showBottomSnackBar('Medicine updated successfully!', isSuccess: true);
-      _clearAllFields();
-      Future.delayed(const Duration(seconds: 1), () {
-        Get.back();
-      });
+    try {
+      // Call API
+      final result = await safeApiCall(
+          () => _medicineRepository.updateMedicine(updateRequest));
+
+      if (result != null) {
+        _showBottomSnackBar('Medicine updated successfully!', isSuccess: true);
+        _clearAllFields();
+        Future.delayed(const Duration(seconds: 1), () {
+          Get.back();
+        });
+      }
+    } finally {
+      setLoading(false);
     }
   }
 
   void _showBottomSnackBar(String message, {bool isSuccess = false}) {
-    final snackBar = SnackBar(
-      content: Text(message),
-      backgroundColor: isSuccess ? Colors.green : Colors.red,
-      duration: const Duration(seconds: 2),
-      behavior: SnackBarBehavior.floating,
-      margin: const EdgeInsets.all(16),
+    final overlay = Overlay.of(Get.context!);
+    late OverlayEntry overlayEntry;
+
+    overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: MediaQuery.of(context).padding.top + 10,
+        left: 16,
+        right: 16,
+        child: Material(
+          color: Colors.transparent,
+          child: TweenAnimationBuilder<double>(
+            duration: const Duration(milliseconds: 300),
+            tween: Tween(begin: 0.0, end: 1.0),
+            builder: (context, value, child) {
+              return Transform.translate(
+                offset: Offset(0, -50 * (1 - value)),
+                child: Opacity(
+                  opacity: value,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: isSuccess ? Colors.green : Colors.red,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      message,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'Satoshi',
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
     );
 
-    ScaffoldMessenger.of(Get.context!).showSnackBar(snackBar);
+    overlay.insert(overlayEntry);
+
+    Future.delayed(const Duration(milliseconds: 1200), () {
+      overlayEntry.remove();
+    });
   }
 
   void _clearAllFields() {
     medNameController.clear();
     dosageController.clear();
     selectedDosage.value = '';
-    selectedStatus.value = 'Active';
-    selectedFrequency.value = 'Once daily';
-    selectedTime.value = '08:00';
-    frequencies.clear();
+    selectedStatus.value = 'active';
+    // Clear frequency rows
+    for (var row in frequencyRows) {
+      row.timeController.dispose();
+    }
+    frequencyRows.clear();
+    addFrequencyRow(); // Add one empty row
     selectedImage.value = null;
   }
 
@@ -249,6 +411,9 @@ class MedicineController extends BaseController {
     _clearAllFields();
     medNameController.dispose();
     dosageController.dispose();
+    for (var row in frequencyRows) {
+      row.timeController.dispose();
+    }
     super.onClose();
   }
 }
