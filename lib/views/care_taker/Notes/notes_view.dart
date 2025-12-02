@@ -200,7 +200,9 @@ class Notesview extends StatelessWidget {
             ],
           ),
           SizedBox(height: context.screenWidth * 0.03),
-          subText3(
+          subText5(
+            fontSize: 13,
+            fontWeight: FontWeight.normal,
             note['note'],
             color: AppColors.textColor,
             align: TextAlign.start,
@@ -214,11 +216,13 @@ class Notesview extends StatelessWidget {
                     Icon(
                       Icons.person_outline,
                       color: AppColors.textColor,
-                      size: context.screenWidth * 0.04,
+                      size: context.screenWidth * 0.06,
                     ),
                     SizedBox(width: context.screenWidth * 0.01),
                     Expanded(
-                      child: subText3(
+                      child: subText5(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
                         note['addedBy'],
                         color: AppColors.textColor,
                         align: TextAlign.start,

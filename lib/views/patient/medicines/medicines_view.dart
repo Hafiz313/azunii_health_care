@@ -1,5 +1,6 @@
 import 'package:Azunii_Health/views/widget/Common_widgets/customAppBar.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/custom_dropdown.dart';
+import 'package:Azunii_Health/views/widget/Common_widgets/overlayloader.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/upload_section_widget.dart';
 import 'package:Azunii_Health/views/widget/loading_overlay.dart';
 import 'package:Azunii_Health/views/widget/text_fields.dart';
@@ -60,7 +61,8 @@ class MedicinesView extends StatelessWidget {
 }
 
 class AddMedicineView extends StatefulWidget {
-  const AddMedicineView({super.key});
+  final bool? isOndashboard;
+  const AddMedicineView({super.key, this.isOndashboard});
 
   static const String routeName = '/add-medicine';
 
@@ -75,7 +77,7 @@ class _AddMedicineViewState extends State<AddMedicineView> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
-      child: Obx(() => LoadingOverlay(
+      child: Obx(() => OverlayLoader(
             isLoading: controller.isLoading.value,
             child: Scaffold(
               resizeToAvoidBottomInset: false,
@@ -85,6 +87,7 @@ class _AddMedicineViewState extends State<AddMedicineView> {
                   children: [
                     CustomAppBar(
                       title: Lang.medication,
+                      isOndashboard: widget.isOndashboard ?? true,
                       onIconTap: () {},
                     ),
                     Expanded(

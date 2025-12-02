@@ -61,8 +61,8 @@ class Settingsview extends StatelessWidget {
                   color: Colors.black.withOpacity(0.2),
                   child: Center(
                     child: Container(
-                      width: 80,
-                      height: 80,
+                      width: 50,
+                      height: 50,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: Colors.white,

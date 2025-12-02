@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import '../../../consts/colors.dart';
 import '../../../consts/lang.dart';
 import '../../../utils/percentage_size_ext.dart';
@@ -30,7 +31,7 @@ class Medication_caretaker extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 5),
                     _buildHeader(context, controller),
                     const SizedBox(height: 20),
                     _buildMedicationList(context, controller),
@@ -59,8 +60,7 @@ class Medication_caretaker extends StatelessWidget {
           GestureDetector(
             onTap: () => controller.selectDate(context),
             child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 border: Border.all(color: AppColors.dividerGray),
                 borderRadius: BorderRadius.circular(8),
@@ -70,11 +70,13 @@ class Medication_caretaker extends StatelessWidget {
                 children: [
                   const Icon(
                     Icons.calendar_today,
-                    size: 16,
+                    size: 14,
                     color: AppColors.textColor,
                   ),
                   const SizedBox(width: 8),
-                  Obx(() => subText3(
+                  Obx(() => subText5(
+                        fontSize: 12,
+                        fontWeight: FontWeight.normal,
                         '${controller.selectedDate.value.day.toString().padLeft(2, '0')}-${controller.selectedDate.value.month.toString().padLeft(2, '0')}-${controller.selectedDate.value.year}',
                         color: AppColors.textColor,
                       )),
@@ -93,7 +95,8 @@ class Medication_caretaker extends StatelessWidget {
     );
   }
 
-  Widget _buildMedicationList(BuildContext context, MedicationController controller) {
+  Widget _buildMedicationList(
+      BuildContext context, MedicationController controller) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Obx(() => ListView.separated(
@@ -109,7 +112,8 @@ class Medication_caretaker extends StatelessWidget {
     );
   }
 
-  Widget _buildMedicationCard(BuildContext context, Map<String, dynamic> medication, MedicationController controller) {
+  Widget _buildMedicationCard(BuildContext context,
+      Map<String, dynamic> medication, MedicationController controller) {
     return Container(
       padding: EdgeInsets.all(context.screenWidth * 0.04),
       decoration: BoxDecoration(
@@ -128,122 +132,155 @@ class Medication_caretaker extends StatelessWidget {
         ],
       ),
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Medication name and dosage
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                subText4(
-                  medication['name'],
-                  color: AppColors.headingTextColor,
-                  fontWeight: FontWeight.w500,
-                  align: TextAlign.start,
-                ),
-                subText3(
-                  medication['dosage'],
-                  color: AppColors.textColor,
-                  align: TextAlign.start,
-                ),
-              ],
-            ),
-            SizedBox(height: context.screenWidth * 0.02),
-            // Timing and dates
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                subText3(
-                  medication['timing'],
-                  color: AppColors.textColor,
-                  align: TextAlign.start,
-                ),
-                SizedBox(height: context.screenWidth * 0.01),
-                Row(
-                  children: [
-                    Expanded(
-                      child: subText3(
-                        '${Lang.startDate} ${medication['startDate']}',
-                        color: AppColors.textColor,
-                        align: TextAlign.start,
-                      ),
-                    ),
-                    SizedBox(width: context.screenWidth * 0.03),
-                    Expanded(
-                      child: subText3(
-                        '${Lang.endDate} ${medication['endDate']}',
-                        color: AppColors.textColor,
-                        align: TextAlign.start,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(height: context.screenWidth * 0.03),
-            // Drug interactions section - matching Figma design
-            if (medication['hasInteraction'])
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Medication name and dosage
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              subText4(
+                medication['name'],
+                color: AppColors.headingTextColor,
+                fontWeight: FontWeight.w500,
+                align: TextAlign.start,
+              ),
+              subText5(
+                fontSize: 12,
+                fontWeight: FontWeight.normal,
+                medication['dosage'],
+                color: AppColors.textColor,
+                align: TextAlign.start,
+              ),
+            ],
+          ),
+          SizedBox(height: context.screenWidth * 0.02),
+          // Timing and dates
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              subText5(
+                fontSize: 13,
+                fontWeight: FontWeight.normal,
+                medication['timing'],
+                color: AppColors.textColor,
+                align: TextAlign.start,
+              ),
+              SizedBox(height: context.screenWidth * 0.01),
               Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: context.screenWidth * 0.06,
-                    height: context.screenWidth * 0.06,
-                    decoration: const BoxDecoration(
-                      color: AppColors.lightRed,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Center(
-                      child: Text(
-                        '!',
-                        style: TextStyle(
-                          color: AppColors.redColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+                  subText5(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    '${Lang.startDate}: ',
+                    color: AppColors.textColor,
+                    align: TextAlign.start,
+                  ),
+                  subText5(
+                    fontSize: 13,
+                    fontWeight: FontWeight.normal,
+                    '${medication['startDate']}',
+                    color: AppColors.textColor,
+                    align: TextAlign.start,
                   ),
                   SizedBox(width: context.screenWidth * 0.03),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        subText4(
-                          Lang.drugInteractions,
-                          color: AppColors.headingTextColor,
-                          fontWeight: FontWeight.w500,
-                          align: TextAlign.start,
-                        ),
-                        SizedBox(height: context.screenWidth * 0.005),
-                        subText3(
-                          '${Lang.interactsWith} ${medication['interactionWith']}',
-                          color: AppColors.textColor,
-                          align: TextAlign.start,
-                        ),
-                        SizedBox(height: context.screenWidth * 0.005),
-                        subText3(
-                          medication['interactionMessage'],
-                          color: AppColors.textColor,
-                          align: TextAlign.start,
-                        ),
-                      ],
-                    ),
+                  subText5(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    '${Lang.endDate} ',
+                    color: AppColors.textColor,
+                    align: TextAlign.start,
+                  ),
+                  subText5(
+                    fontSize: 13,
+                    fontWeight: FontWeight.normal,
+                    '${medication['endDate']}',
+                    color: AppColors.textColor,
+                    align: TextAlign.start,
                   ),
                 ],
               ),
-            SizedBox(height: context.screenWidth * 0.03),
-            // View Details button
-            SizedBox(
-              width: context.screenWidth * 0.35,
-              height: context.screenWidth * 0.1,
-              child: AppElevatedButton(
-                onPressed: () => controller.viewMedicationDetails(medication),
-                title: Lang.viewDetails,
-                backgroundColor: AppColors.primary,
-              ),
+            ],
+          ),
+          SizedBox(height: context.screenWidth * 0.03),
+          // Drug interactions section - matching Figma design
+          if (medication['hasInteraction'])
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: context.screenWidth * 0.06,
+                  height: context.screenWidth * 0.06,
+                  decoration: const BoxDecoration(
+                    color: AppColors.lightRed,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Center(
+                    child: Text(
+                      '!',
+                      style: TextStyle(
+                        color: AppColors.redColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: context.screenWidth * 0.03),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      subText4(
+                        Lang.drugInteractions,
+                        color: AppColors.headingTextColor,
+                        fontWeight: FontWeight.w500,
+                        align: TextAlign.start,
+                      ),
+                      SizedBox(height: context.screenWidth * 0.005),
+                      Row(
+                        children: [
+                          subText5(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            '${Lang.interactsWith}',
+                            color: AppColors.textColor,
+                            align: TextAlign.start,
+                          ),
+                          subText5(
+                            fontSize: 12,
+                            fontWeight: FontWeight.normal,
+                            ' ${medication['interactionWith']}',
+                            color: AppColors.textColor,
+                            align: TextAlign.start,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: context.screenWidth * 0.005),
+                      subText5(
+                        fontSize: 12,
+                        fontWeight: FontWeight.normal,
+                        medication['interactionMessage'],
+                        color: AppColors.textColor,
+                        align: TextAlign.start,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          SizedBox(height: context.screenWidth * 0.03),
+          // View Details button
+          SizedBox(
+            width: context.screenWidth * 0.35,
+            height: context.screenWidth * 0.09,
+            child: AppElevatedButton(
+              onPressed: () => controller.viewMedicationDetails(medication),
+              title: Lang.viewDetails,
+              backgroundColor: AppColors.primary,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

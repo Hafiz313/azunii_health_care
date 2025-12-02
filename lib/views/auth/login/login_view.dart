@@ -3,6 +3,7 @@ import 'package:Azunii_Health/networking/api_provider.dart';
 import 'package:Azunii_Health/utils/percentage_size_ext.dart';
 import 'package:Azunii_Health/views/auth/login/login_widgets.dart';
 import 'package:Azunii_Health/views/auth/sing_up/signup_view.dart';
+import 'package:Azunii_Health/views/widget/Common_widgets/overlayloader.dart';
 import 'package:Azunii_Health/views/widget/loading_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -36,7 +37,7 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => LoadingOverlay(
+    return Obx(() => OverlayLoader(
         isLoading: controller.isLoading.value,
         child: BaseScaffoldAuth(
           body: SingleChildScrollView(

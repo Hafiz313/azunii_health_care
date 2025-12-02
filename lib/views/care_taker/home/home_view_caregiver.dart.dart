@@ -154,7 +154,10 @@ class HomeView_caregiver extends StatelessWidget {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => AddVisitView()),
+                      MaterialPageRoute(
+                          builder: (context) => AddVisitView(
+                                isOndashboard: false,
+                              )),
                     );
                   },
                 ),
@@ -172,7 +175,9 @@ class HomeView_caregiver extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const AddMedicineView()),
+                          builder: (context) => const AddMedicineView(
+                                isOndashboard: false,
+                              )),
                     );
                   },
                 ),
@@ -192,7 +197,6 @@ class HomeView_caregiver extends StatelessWidget {
                   title: Lang.viewTimeline,
                 ),
               ),
-              const SizedBox(width: 12),
             ],
           ),
         ],

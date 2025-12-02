@@ -1,5 +1,6 @@
 import 'package:Azunii_Health/views/widget/Common_widgets/customAppBar.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/custom_dropdown.dart';
+import 'package:Azunii_Health/views/widget/Common_widgets/overlayloader.dart';
 import 'package:Azunii_Health/views/widget/text_fields.dart';
 import 'package:Azunii_Health/views/widget/loading_overlay.dart';
 import 'package:flutter/material.dart';
@@ -51,7 +52,8 @@ class VisitsView extends StatelessWidget {
 }
 
 class AddVisitView extends StatelessWidget {
-  AddVisitView({super.key});
+  final bool? isOndashboard;
+  AddVisitView({super.key, this.isOndashboard});
 
   final VisitsController controller = Get.put(VisitsController());
 
@@ -59,7 +61,7 @@ class AddVisitView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => LoadingOverlay(
+    return Obx(() => OverlayLoader(
         isLoading: controller.isLoading.value,
         child: Scaffold(
           backgroundColor: AppColors.white,
@@ -67,6 +69,7 @@ class AddVisitView extends StatelessWidget {
             child: Column(
               children: [
                 CustomAppBar(
+                  isOndashboard: isOndashboard ?? true,
                   title: Lang.addVisit,
                 ),
                 Expanded(

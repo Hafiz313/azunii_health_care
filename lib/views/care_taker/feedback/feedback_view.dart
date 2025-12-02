@@ -47,10 +47,10 @@ class FeedbackView extends StatelessWidget {
           Center(
             child: Column(
               children: [
-                headline3(
+                headline5(
                   'Help Us to Improve',
                   color: AppColors.headingTextColor,
-                  textAlign: TextAlign.center,
+                  //  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 40),
 
@@ -62,8 +62,8 @@ class FeedbackView extends StatelessWidget {
                 // Your Note Section
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: subText2(
-                    'Your Note',
+                  child: subText4(
+                    ' Your Note',
                     color: AppColors.headingTextColor,
                     align: TextAlign.start,
                     fontWeight: FontWeight.w500,
@@ -105,7 +105,7 @@ class FeedbackView extends StatelessWidget {
                   index < controller.selectedRating.value
                       ? Icons.star
                       : Icons.star_border,
-                  size: 40,
+                  size: 30,
                   color: index < controller.selectedRating.value
                       ? AppColors.yellow
                       : AppColors.textColor,
@@ -132,14 +132,14 @@ class FeedbackView extends StatelessWidget {
         textAlignVertical: TextAlignVertical.top,
         style: const TextStyle(
           color: AppColors.blackColor,
-          fontSize: 16,
+          fontSize: 14,
           fontFamily: 'Satoshi',
         ),
         decoration: InputDecoration(
           hintText: 'Write your Note',
           hintStyle: TextStyle(
             color: AppColors.textColor,
-            fontSize: 16,
+            fontSize: 14,
             fontFamily: 'Satoshi',
           ),
           border: InputBorder.none,

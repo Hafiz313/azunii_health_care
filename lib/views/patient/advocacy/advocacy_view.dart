@@ -290,6 +290,7 @@ class _AdvocacyViewState extends State<AdvocacyView> {
       ),
       child: subText5(
         permission,
+        fontSize: 11,
         color: AppColors.textColor,
         align: TextAlign.center,
       ),

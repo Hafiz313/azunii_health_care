@@ -1,3 +1,4 @@
+import 'package:Azunii_Health/views/widget/buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../consts/lang.dart';
@@ -89,6 +90,7 @@ class NotesController extends GetxController {
   void viewNoteDetails(Map<String, dynamic> note) {
     Get.dialog(
       AlertDialog(
+        backgroundColor: Colors.white,
         title: Text(note['category']),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -98,13 +100,22 @@ class NotesController extends GetxController {
             const SizedBox(height: 8),
             Text('Note: ${note['note']}'),
             const SizedBox(height: 8),
-            Text('Added by: ${note['addedBy']}'),
+            Text(
+              'Added by: ${note['addedBy']}',
+              style:
+                  TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
+            ),
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Close'),
+          SizedBox(
+            width: 100,
+            height: 35,
+            child: AppElevatedButton(
+              onPressed: () => Get.back(),
+              title: 'Close',
+              backgroundColor: AppColors.primary,
+            ),
           ),
         ],
       ),

@@ -1,39 +1,39 @@
-import 'package:flutter/material.dart';
-import '../../consts/colors.dart';
+// import 'package:flutter/material.dart';
+// import '../../consts/colors.dart';
 
-class LoadingOverlay extends StatelessWidget {
-  final bool isLoading;
-  final Widget child;
+// class LoadingOverlay extends StatelessWidget {
+//   final bool isLoading;
+//   final Widget child;
 
-  const LoadingOverlay({
-    super.key,
-    required this.isLoading,
-    required this.child,
-  });
+//   const LoadingOverlay({
+//     super.key,
+//     required this.isLoading,
+//     required this.child,
+//   });
 
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        child,
-        if (isLoading)
-          Container(
-            color: Colors.black.withOpacity(0.3),
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: CircularProgressIndicator(
-                  color: AppColors.primary,
-                  strokeWidth: 3,
-                ),
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Stack(
+//       children: [
+//         child,
+//         if (isLoading)
+//           Container(
+//             color: Colors.black.withOpacity(0.3),
+//             child: Center(
+//               child: Container(
+//                 padding: const EdgeInsets.all(20),
+//                 decoration: BoxDecoration(
+//                   color: AppColors.white,
+//                   borderRadius: BorderRadius.circular(12),
+//                 ),
+//                 child: CircularProgressIndicator(
+//                   color: AppColors.primary,
+//                   strokeWidth: 3,
+//                 ),
+//               ),
+//             ),
+//           ),
+//       ],
+//     );
+//   }
+// }

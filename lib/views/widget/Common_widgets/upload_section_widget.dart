@@ -28,9 +28,9 @@ class UploadSectionWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppColors.cardsColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
+          color: AppColors.cardsColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.lightBlueAccent, width: 0.2)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -38,8 +38,8 @@ class UploadSectionWidget extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 30,
-                height: 30,
+                width: 35,
+                height: 35,
                 decoration: BoxDecoration(
                   color: AppColors.primary,
                   borderRadius: BorderRadius.circular(8),
@@ -58,15 +58,15 @@ class UploadSectionWidget extends StatelessWidget {
                     subText5(
                       title,
                       color: AppColors.headingTextColor,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
                       align: TextAlign.start,
                     ),
                     const SizedBox(height: 4),
-                    subText5(
+                    subText6(
                       subtitle,
                       color: AppColors.textColor,
-                      fontSize: 13,
+                      //  fontSize: 12,
                       align: TextAlign.start,
                     ),
                   ],

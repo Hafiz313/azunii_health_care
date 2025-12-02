@@ -21,8 +21,8 @@ class CareTakerDashboard extends StatelessWidget {
 
     final List<Widget> pages = [
       const HomeView_caregiver(),
-      const Notesview(),
       const Medication_caretaker(),
+      const Notesview(),
       const FeedbackView(),
       const FAQsView(),
       const Settingsview(),

@@ -8,12 +8,13 @@ import '../../care_taker/settings/notification/notification_view.dart';
 
 class CustomAppBar extends StatelessWidget {
   final String title;
-
+  final bool isOndashboard;
   final VoidCallback? onIconTap;
 
   const CustomAppBar({
     Key? key,
     required this.title,
+    this.isOndashboard = true,
     this.onIconTap,
   }) : super(key: key);
 
@@ -23,20 +24,23 @@ class CustomAppBar extends StatelessWidget {
     //   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
     //child:
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
       decoration: BoxDecoration(
-          border: Border.all(color: AppColors.textColor, width: 0.02)),
+        border: Border.all(color: AppColors.textColor, width: 0.09),
+      ),
       child: Row(
         children: [
           // Back button
-          IconButton(
-            icon: const Icon(
-              Icons.arrow_back,
-              color: AppColors.blackColor,
-              size: 24,
-            ),
-            onPressed: () => Navigator.pop(context),
-          ),
+          isOndashboard
+              ? SizedBox()
+              : IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back,
+                    color: AppColors.blackColor,
+                    size: 24,
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                ),
 
           // Title in center
           Expanded(

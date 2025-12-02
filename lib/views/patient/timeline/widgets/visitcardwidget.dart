@@ -66,7 +66,9 @@ class VisitCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    subText4(
+                    subText5(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
                       '${visit.doctorName} (${visit.specialty})',
                       color: AppColors.headingTextColor,
                     ),
@@ -156,11 +158,15 @@ class VisitCard extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          width: 80,
-          child: subText5(
-            detail.label,
-            color: AppColors.textColor,
+        Expanded(
+          child: SizedBox(
+            width: 80,
+            child: Text(
+              detail.label,
+              style: TextStyle(
+                color: AppColors.textColor,
+              ),
+            ),
           ),
         ),
         Expanded(
