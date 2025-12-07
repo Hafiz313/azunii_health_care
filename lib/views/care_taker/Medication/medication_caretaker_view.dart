@@ -166,36 +166,46 @@ class Medication_caretaker extends StatelessWidget {
                 align: TextAlign.start,
               ),
               SizedBox(height: context.screenWidth * 0.01),
-              Row(
+              Wrap(
+                spacing: context.screenWidth * 0.03,
                 children: [
-                  subText5(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    '${Lang.startDate}: ',
-                    color: AppColors.textColor,
-                    align: TextAlign.start,
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      subText5(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        '${Lang.startDate}: ',
+                        color: AppColors.textColor,
+                        align: TextAlign.start,
+                      ),
+                      subText5(
+                        fontSize: 13,
+                        fontWeight: FontWeight.normal,
+                        '${medication['startDate']}',
+                        color: AppColors.textColor,
+                        align: TextAlign.start,
+                      ),
+                    ],
                   ),
-                  subText5(
-                    fontSize: 13,
-                    fontWeight: FontWeight.normal,
-                    '${medication['startDate']}',
-                    color: AppColors.textColor,
-                    align: TextAlign.start,
-                  ),
-                  SizedBox(width: context.screenWidth * 0.03),
-                  subText5(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    '${Lang.endDate} ',
-                    color: AppColors.textColor,
-                    align: TextAlign.start,
-                  ),
-                  subText5(
-                    fontSize: 13,
-                    fontWeight: FontWeight.normal,
-                    '${medication['endDate']}',
-                    color: AppColors.textColor,
-                    align: TextAlign.start,
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      subText5(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        '${Lang.endDate} ',
+                        color: AppColors.textColor,
+                        align: TextAlign.start,
+                      ),
+                      subText5(
+                        fontSize: 13,
+                        fontWeight: FontWeight.normal,
+                        '${medication['endDate']}',
+                        color: AppColors.textColor,
+                        align: TextAlign.start,
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -237,7 +247,7 @@ class Medication_caretaker extends StatelessWidget {
                         align: TextAlign.start,
                       ),
                       SizedBox(height: context.screenWidth * 0.005),
-                      Row(
+                      Wrap(
                         children: [
                           subText5(
                             fontSize: 12,

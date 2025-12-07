@@ -49,11 +49,11 @@ class LoginController extends BaseController {
       // SnackbarHelper.showSuccess('Login successful');
 
       // Navigate based on user role from API
-      if (userRole == 'patient') {
-        Get.offAllNamed(PatientDashboard.routeName);
-      } else {
-        Get.offAllNamed(CareTakerDashboard.routeName);
-      }
+      // if (userRole == 'patient') {
+      //  Get.offAllNamed(PatientDashboard.routeName);
+      //} else {
+      Get.offAllNamed(CareTakerDashboard.routeName);
+      //}
     } else {
       Get.offAllNamed(CareTakerDashboard.routeName);
       print('Api call failed on login section');

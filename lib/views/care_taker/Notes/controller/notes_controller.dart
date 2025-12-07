@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../consts/lang.dart';
 import '../../../../consts/colors.dart';
+import '../../../../core/controllers/base_controller.dart';
+import '../../../../core/models/notes_model.dart';
+import '../../../../core/repositories/notes_repo.dart';
 import '../../../widget/Common_widgets/custom_snackbar.dart';
 
-class NotesController extends GetxController {
+class NotesController extends BaseController {
   final TextEditingController noteController = TextEditingController();
   final RxString selectedCategory = ''.obs;
 
@@ -36,7 +39,9 @@ class NotesController extends GetxController {
     selectedCategory.value = category ?? '';
   }
 
-  void saveNote() {
+  final NotesRepository _notesRepository = NotesRepository();
+
+  Future<void> saveNote() async {
     if (selectedCategory.value.isEmpty) {
       CustomSnackbar.show('Please select a category', isSuccess: false);
       return;
@@ -47,17 +52,27 @@ class NotesController extends GetxController {
       return;
     }
 
-    previousNotes.insert(0, {
-      'category': selectedCategory.value,
-      'date': DateTime.now().toString().substring(0, 10),
-      'note': noteController.text,
-      'addedBy': 'Added by Current User',
-    });
+    final note = NotesModel(
+      patientId: 1, // TODO: Replace with actual patient ID
+      category: selectedCategory.value,
+      note: noteController.text.trim(),
+    );
 
-    noteController.clear();
-    selectedCategory.value = '';
+    final result = await safeApiCall(() => _notesRepository.storeNote(note));
 
-    CustomSnackbar.show('Note saved successfully!', isSuccess: true);
+    if (result != null) {
+      previousNotes.insert(0, {
+        'category': selectedCategory.value,
+        'date': DateTime.now().toString().substring(0, 10),
+        'note': noteController.text,
+        'addedBy': 'Added by Current User',
+      });
+
+      noteController.clear();
+      selectedCategory.value = '';
+
+      CustomSnackbar.show('Note saved successfully!', isSuccess: true);
+    }
   }
 
   void viewAllNotes() {

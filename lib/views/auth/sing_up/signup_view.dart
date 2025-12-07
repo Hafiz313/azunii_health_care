@@ -1,9 +1,10 @@
 import 'package:Azunii_Health/consts/lang.dart';
 
 import 'package:Azunii_Health/utils/percentage_size_ext.dart';
+import 'package:Azunii_Health/views/widget/Common_widgets/custom_dropdown.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/logo_widget.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/overlayloader.dart';
-import 'package:Azunii_Health/views/widget/loading_overlay.dart';
+
 import 'package:Azunii_Health/views/widget/text.dart';
 import 'package:flutter/material.dart';
 
@@ -160,6 +161,18 @@ class SignUpView extends StatelessWidget {
                     },
                   ),
                   SizedBox(
+                    height: context.screenHeight * 0.005,
+                  ),
+                  Obx(() => CustomDropdown(
+                        hintText: 'Select Role',
+                        label: 'Role',
+                        //   hintTxt: 'Select Role',
+                        prefixIcon: Icon(Icons.person_outline),
+                        selectedValue: controller.selectedRole.value,
+                        items: controller.roles,
+                        onChanged: controller.setRole,
+                      )),
+                  SizedBox(
                     height: context.percentHeight * 2.0,
                   ),
                   SizedBox(
@@ -172,7 +185,8 @@ class SignUpView extends StatelessWidget {
                           AppElevatedButton(
                               backgroundColor: AppColors.secondary,
                               onPressed: () {
-                                SignUpWidgets.showUserTypeDialog(context, true);
+                                controller
+                                    .signup(controller.selectedRole.value);
                               },
                               title: Lang.signUp),
                           SizedBox(

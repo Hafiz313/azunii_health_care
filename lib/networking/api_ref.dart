@@ -40,4 +40,7 @@ class Apis {
   static const String getCaregivers = '/patient/caregiver/index';
   static const String caregiversDetail = '/patient/caregiver/show';
   static const String caregiversDestroy = '/patient/caregiver/destroy';
+  //notes caregivers
+  static const String notesCaregiver = '/caregiver/notes/store';
+  static const String listCaregiver = '/caregiver/notes/index';
 }

@@ -79,11 +79,11 @@ class Notesview extends StatelessWidget {
             textEditingController: controller.noteController,
             hintTxt: Lang.writeYourNote,
             maxLines: 6,
-            prefixIcon: const Icon(
-              Icons.note_outlined,
-              color: AppColors.textColor,
-              size: 20,
-            ),
+            // prefixIcon: const Icon(
+            //   Icons.note_outlined,
+            //   color: AppColors.textColor,
+            //   size: 20,
+            // ),
           ),
           SizedBox(height: context.screenWidth * 0.06),
           SizedBox(

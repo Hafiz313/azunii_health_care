@@ -21,8 +21,15 @@ class SignUpController extends BaseController {
   final RxBool isPasswordVisible = false.obs;
   final RxBool isConformPasswordVisible = false.obs;
   final RxBool acceptTermsAndConditions = false.obs;
+  final RxString selectedRole = Appconsts.patient.obs;
 
   final AuthRepository _authRepository = AuthRepository();
+  
+  final List<String> roles = [Appconsts.patient, Appconsts.caregiver];
+  
+  void setRole(String? role) {
+    if (role != null) selectedRole.value = role;
+  }
 
   Future<void> signup(String userType) async {
     if (!formKey.currentState!.validate()) return;
