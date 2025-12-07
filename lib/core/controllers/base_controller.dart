@@ -20,7 +20,12 @@ abstract class BaseController extends GetxController {
       setLoading(false);
       return result;
     } catch (e) {
-      handleError(e as Exception);
+      setLoading(false);
+      if (e is Exception) {
+        handleError(e);
+      } else {
+        print('Error in safeApiCall: $e');
+      }
       return null;
     } finally {
       setLoading(false);

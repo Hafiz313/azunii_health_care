@@ -8,6 +8,8 @@ class TodayTaskCard extends StatelessWidget {
   final Widget icon;
   final String title;
   final bool isCompleted;
+  final String? status;
+  final VoidCallback? onTap;
 
   const TodayTaskCard({
     super.key,
@@ -15,53 +17,46 @@ class TodayTaskCard extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.isCompleted,
+    this.status,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: backgroundColor.withValues(alpha: 1.2),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            backgroundColor: backgroundColor,
-            radius: 18,
-            child: Center(child: icon),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: subText5(
-              fontSize: 12,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: backgroundColor.withValues(alpha: 1.2),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: backgroundColor,
+              radius: 18,
+              child: Center(child: icon),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: subText5(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                title,
+                color: AppColors.headingTextColor,
+                align: TextAlign.start,
+              ),
+            ),
+            subText5(
               fontWeight: FontWeight.w500,
-              title,
-              color: AppColors.headingTextColor,
+              status ?? (isCompleted ? Lang.completed : 'Active'),
+              fontSize: 12,
+              color: isCompleted ? AppColors.green : AppColors.primary,
               align: TextAlign.start,
             ),
-          ),
-          if (isCompleted)
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.check_circle,
-                  color: AppColors.green,
-                  size: 20,
-                ),
-                const SizedBox(width: 6),
-                subText5(
-                  fontWeight: FontWeight.w500,
-                  Lang.completed,
-                  fontSize: 12,
-                  color: AppColors.green,
-                  align: TextAlign.start,
-                ),
-              ],
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

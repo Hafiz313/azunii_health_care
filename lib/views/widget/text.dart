@@ -1,113 +1,145 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../consts/colors.dart';
-import '../../consts/fonts.dart';
 
 ///Fontsize 28 bold heading
-Text headingText1(String title, {Color color = AppColors.headingTextColor}) =>
+Text headingText1(
+  String title, {
+  Color color = AppColors.headingTextColor,
+  double fontSize = 28.0,
+  FontWeight fontWeight = FontWeight.bold,
+}) =>
     Text(
       title,
-      style: TextStyle(
-        fontSize: 28.0,
-        fontWeight: FontWeight.bold,
-        fontFamily: FontFamily.satoshi,
+      style: GoogleFonts.manrope(
+        fontSize: fontSize,
+        fontWeight: fontWeight,
         color: color,
       ),
     );
 
 ///Fontsize 24 bold
-Text headline1(String title, {Color color = AppColors.textColor}) => Text(
+Text headline1(
+  String title, {
+  Color color = AppColors.textColor,
+  double fontSize = 24.0,
+  FontWeight fontWeight = FontWeight.bold,
+}) =>
+    Text(
       title,
-      style: TextStyle(
-        fontSize: 24.0,
-        fontWeight: FontWeight.bold,
-        fontFamily: FontFamily.satoshi,
+      style: GoogleFonts.manrope(
+        fontSize: fontSize,
+        fontWeight: fontWeight,
         color: color,
       ),
     );
 //fontsize 30
-Text headline0(String title,
-        {Color color = AppColors.textColor,
-        TextAlign? textAlign,
-        FontWeight fontWeight = FontWeight.normal}) =>
+Text headline0(
+  String title, {
+  Color color = AppColors.textColor,
+  TextAlign? textAlign,
+  FontWeight fontWeight = FontWeight.normal,
+  double fontSize = 28.0,
+}) =>
     Text(
       title,
       textAlign: textAlign ?? TextAlign.start,
-      style: TextStyle(
-        fontSize: 28.0,
+      style: GoogleFonts.manrope(
+        fontSize: fontSize,
         fontWeight: fontWeight,
-        fontFamily: FontFamily.satoshi,
         color: color,
       ),
     );
 
 ///Fontsize 24
-Text headline2(String title,
-        {Color color = AppColors.headingTxtColor,
-        TextAlign? textAlign,
-        FontWeight fontWeight = FontWeight.normal}) =>
+Text headline2(
+  String title, {
+  Color color = AppColors.headingTxtColor,
+  TextAlign? textAlign,
+  FontWeight fontWeight = FontWeight.normal,
+  double fontSize = 24.0,
+}) =>
     Text(
       title,
       textAlign: textAlign ?? TextAlign.start,
-      style: TextStyle(
-        fontSize: 24.0,
+      style: GoogleFonts.manrope(
+        fontSize: fontSize,
         fontWeight: fontWeight,
-        fontFamily: FontFamily.satoshi,
         color: color,
       ),
     );
 
 ///Fontsize 22 bold
-Text headline3(String title,
-        {Color color = AppColors.headingTxtColor, TextAlign? textAlign}) =>
+Text headline3(
+  String title, {
+  Color color = AppColors.headingTxtColor,
+  TextAlign? textAlign,
+  double fontSize = 22.0,
+  FontWeight fontWeight = FontWeight.bold,
+}) =>
     Text(
       title,
       textAlign: textAlign ?? TextAlign.start,
-      style: TextStyle(
-        fontSize: 22.0,
-        fontWeight: FontWeight.bold,
-        fontFamily: FontFamily.satoshi,
+      style: GoogleFonts.manrope(
+        fontSize: fontSize,
+        fontWeight: fontWeight,
         color: color,
       ),
     );
 
 ///Fontsize 22
-Text headline4(String title, {Color color = AppColors.headingTxtColor}) => Text(
+Text headline4(
+  String title, {
+  Color color = AppColors.headingTxtColor,
+  double fontSize = 22.0,
+  FontWeight fontWeight = FontWeight.normal,
+}) =>
+    Text(
       title,
-      style: TextStyle(
-          fontSize: 22.0, fontFamily: FontFamily.satoshi, color: color),
+      style: GoogleFonts.manrope(
+        fontSize: fontSize,
+        fontWeight: fontWeight,
+        color: color,
+      ),
     );
 
 ///Fontsize 20
-Text headline5(String title,
-        {TextAlign? align,
-        Color? color = AppColors.headingTxtColor,
-        TextDecoration? txtDecoration,
-        FontWeight? fontWeight}) =>
+Text headline5(
+  String title, {
+  TextAlign? align,
+  Color? color = AppColors.headingTxtColor,
+  TextDecoration? txtDecoration,
+  FontWeight? fontWeight,
+  double fontSize = 16.0,
+}) =>
     Text(
       title,
       textAlign: align ?? TextAlign.center,
-      style: TextStyle(
-          decoration: txtDecoration ?? TextDecoration.none,
-          fontWeight: fontWeight ?? FontWeight.bold,
-          fontSize: 16.0,
-          fontFamily: FontFamily.satoshi,
-          color: color),
+      style: GoogleFonts.manrope(
+        decoration: txtDecoration ?? TextDecoration.none,
+        fontWeight: fontWeight ?? FontWeight.bold,
+        fontSize: fontSize,
+        color: color,
+      ),
     );
-Text headline6(String title,
-        {TextAlign? align,
-        Color? color = AppColors.headingTxtColor,
-        TextDecoration? txtDecoration,
-        FontWeight? fontWeight}) =>
+Text headline6(
+  String title, {
+  TextAlign? align,
+  Color? color = AppColors.headingTxtColor,
+  TextDecoration? txtDecoration,
+  FontWeight? fontWeight,
+  double fontSize = 15.0,
+}) =>
     Text(
       title,
       textAlign: align ?? TextAlign.center,
-      style: TextStyle(
-          decoration: txtDecoration ?? TextDecoration.none,
-          fontWeight: fontWeight ?? FontWeight.bold,
-          fontSize: 15.0,
-          fontFamily: FontFamily.satoshi,
-          color: color),
+      style: GoogleFonts.manrope(
+        decoration: txtDecoration ?? TextDecoration.none,
+        fontWeight: fontWeight ?? FontWeight.bold,
+        fontSize: fontSize,
+        color: color,
+      ),
     );
 
 ///Fontsize 18 grey
@@ -121,9 +153,8 @@ Text subText1(
     Text(
       title,
       textAlign: align ?? TextAlign.center,
-      style: TextStyle(
+      style: GoogleFonts.manrope(
         fontSize: fontSize ?? 16.0,
-        fontFamily: FontFamily.satoshi,
         color: color,
         fontWeight: fontWeight ?? FontWeight.normal,
       ),
@@ -135,13 +166,13 @@ Text subText2(
   TextAlign? align,
   Color color = AppColors.textColor,
   FontWeight? fontWeight,
+  double fontSize = 18.0,
 }) =>
     Text(
       title,
       textAlign: align ?? TextAlign.center,
-      style: TextStyle(
-        fontSize: 18.0,
-        fontFamily: FontFamily.satoshi,
+      style: GoogleFonts.manrope(
+        fontSize: fontSize,
         color: color,
         fontWeight: fontWeight ?? FontWeight.bold,
       ),
@@ -154,17 +185,14 @@ Text subText5(
   double? fontSize,
   TextDecoration? decoration,
   FontWeight? fontWeight,
-  TextOverflow? textOverflow,
 }) =>
     Text(
       title,
       textAlign: align ?? TextAlign.center,
-      style: TextStyle(
+      style: GoogleFonts.manrope(
         fontSize: fontSize ?? 12.0,
-        fontFamily: FontFamily.satoshi,
         decoration: decoration ?? TextDecoration.none,
         color: color,
-        overflow: textOverflow,
         fontWeight: fontWeight ?? FontWeight.bold,
       ),
     );
@@ -176,13 +204,13 @@ Text subText4(
   FontWeight? fontWeight,
   TextDecoration? decoration,
   Color? decorationColor,
+  double fontSize = 14.0,
 }) =>
     Text(
       title,
       textAlign: align ?? TextAlign.center,
-      style: TextStyle(
-        fontSize: 14.0,
-        fontFamily: FontFamily.satoshi,
+      style: GoogleFonts.manrope(
+        fontSize: fontSize,
         color: color,
         decoration: decoration ?? TextDecoration.none,
         decorationColor: decorationColor ?? AppColors.white,
@@ -197,14 +225,14 @@ Text subText3(
   Color color = AppColors.textColor,
   FontWeight? fontWeight,
   TextOverflow? textOverflow,
+  double fontSize = 14.0,
 }) =>
     Text(
       title,
       textAlign: align ?? TextAlign.center,
-      style: TextStyle(
-        fontSize: 14.0,
-        overflow: textOverflow,
-        fontFamily: FontFamily.satoshi,
+      overflow: textOverflow ?? TextOverflow.ellipsis,
+      style: GoogleFonts.manrope(
+        fontSize: fontSize,
         color: color,
         fontWeight: fontWeight ?? FontWeight.normal,
       ),
@@ -215,13 +243,13 @@ Text subText6(
   TextAlign? align,
   FontWeight? fontWeight,
   Color color = Colors.black45,
+  double fontSize = 10.0,
 }) =>
     Text(
       title,
       textAlign: align ?? TextAlign.center,
-      style: TextStyle(
-        fontSize: 10.0,
-        fontFamily: FontFamily.satoshi,
+      style: GoogleFonts.manrope(
+        fontSize: fontSize,
         fontWeight: fontWeight ?? FontWeight.normal,
         color: color,
       ),

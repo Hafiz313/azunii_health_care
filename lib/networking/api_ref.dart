@@ -3,9 +3,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 class Apis {
   static String get baseUrl =>
       dotenv.env['BASE_API_URL'] ?? 'https://fallback-url.com/api';
-  static String get token =>
-      dotenv.env['Token'] ??
-      '8|3oKnnOhB8cG8nBZJaEzieXZtzAiC3N8wvbOL8uO86fcb9c06';
 
   // Auth endpoints
   static const String register = '/register';
@@ -26,13 +23,21 @@ class Apis {
   static const String updatePatientVisit = '/patient/visits/update';
 
   // Patient summaries endpoints
-  static const String getPatientSummary = '/patient/summary';
+  static const String getPatientSummary = '/patient/summary/index';
   static const String storePatientSummary = '/patient/summary/store';
   static const String updatePatientSummary = '/patient/summary/update';
 
   // Patient medicines endpoints
-  static const String getPatientMedicines = '/patient/medicine';
+  static const String getPatientMedicines = '/patient/medicine/index';
   static const String storePatientMedicine = '/patient/medicine/store';
   static const String getMedicineDetails = '/patient/medicine/show';
   static const String updatePatientMedicine = '/patient/medicine/update';
+  //feedback
+  static const String storeFeedback = '/patient/feedback/store';
+  //caregivers
+  static const String caregiversNotes = '/caregiver/notes/store';
+  static const String storeCaregivers = '/patient/caregiver/store';
+  static const String getCaregivers = '/patient/caregiver/index';
+  static const String caregiversDetail = '/patient/caregiver/show';
+  static const String caregiversDestroy = '/patient/caregiver/destroy';
 }

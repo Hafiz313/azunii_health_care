@@ -1,5 +1,7 @@
 import 'package:Azunii_Health/utils/percentage_size_ext.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/customAppBar.dart';
+import 'package:Azunii_Health/views/widget/Common_widgets/overlayloader.dart';
+import 'package:Azunii_Health/views/widget/text_fields.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -10,39 +12,38 @@ import '../../../consts/assets.dart';
 import '../../../consts/lang.dart';
 import '../../widget/text.dart';
 import '../../widget/buttons.dart';
-import 'feedback_view.dart';
+import 'controller/summary_controller.dart';
+import '../feedback/feedback_view.dart';
 
-class SummaryView extends StatefulWidget {
+class SummaryView extends StatelessWidget {
   const SummaryView({super.key});
 
   @override
-  State<SummaryView> createState() => _SummaryViewState();
-}
-
-class _SummaryViewState extends State<SummaryView> {
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            CustomAppBar(
-              title: Lang.plainLanguageSummary,
+    final controller = Get.put(SummaryController());
+    return Obx(() => OverlayLoader(
+        isLoading: controller.isLoading.value,
+        child: Scaffold(
+          backgroundColor: AppColors.white,
+          body: SafeArea(
+            child: Column(
+              children: [
+                CustomAppBar(
+                  title: Lang.plainLanguageSummary,
+                ),
+                Expanded(
+                  child: _buildPlainLanguageSummary(context),
+                ),
+              ],
             ),
-            Expanded(
-              child: _buildPlainLanguageSummary(),
-            ),
-          ],
-        ),
-      ),
-    );
+          ),
+        )));
   }
 
   /// App Bar with back button, title, and feedback button
 
   /// Plain Language Summary View
-  Widget _buildPlainLanguageSummary() {
+  Widget _buildPlainLanguageSummary(BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
@@ -73,14 +74,12 @@ class _SummaryViewState extends State<SummaryView> {
           // Example Summary Section
 
           SizedBox(height: context.screenHeight * 0.01),
-          _buildExampleSummaryCard(),
-
-          SizedBox(height: context.screenHeight * 0.04),
+          _buildExampleSummaryCard(context),
 
           // Your Medical Instructions Section
 
           SizedBox(height: context.screenHeight * 0.02),
-          _buildInstructionsForm(),
+          _buildInstructionsForm(context),
 
           SizedBox(height: context.screenHeight * 0.04),
 
@@ -90,9 +89,9 @@ class _SummaryViewState extends State<SummaryView> {
               Expanded(
                 child: AppElevatedButton(
                   onPressed: () {
-                    // Handle cancel
+                    Get.toNamed('/view-summaries');
                   },
-                  title: 'Cancel',
+                  title: 'View Summaries',
                   textColor: AppColors.borderColor,
                   backgroundColor: AppColors.cardGray,
                 ),
@@ -100,13 +99,16 @@ class _SummaryViewState extends State<SummaryView> {
               SizedBox(width: context.screenWidth * 0.04),
               Expanded(
                 child: AppElevatedButton(
-                  onPressed: () {
-                    // Navigate to feedback screen after saving summary
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const FeedbackView()),
-                    );
+                  onPressed: () async {
+                    final controller = Get.find<SummaryController>();
+                    await controller.saveSummary();
+                    // if (!controller.isLoading.value) {
+                    //   Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //         builder: (context) => const FeedbackView()),
+                    //   );
+                    // }
                   },
                   title: 'Save Summary',
                   fontSize: 14,
@@ -122,7 +124,7 @@ class _SummaryViewState extends State<SummaryView> {
     );
   }
 
-  Widget _buildExampleSummaryCard() {
+  Widget _buildExampleSummaryCard(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(context.screenWidth * 0.04),
       decoration: BoxDecoration(
@@ -152,9 +154,10 @@ class _SummaryViewState extends State<SummaryView> {
     );
   }
 
-  Widget _buildInstructionsForm() {
+  Widget _buildInstructionsForm(BuildContext context) {
+    final controller = Get.find<SummaryController>();
     return Container(
-      padding: EdgeInsets.all(context.screenWidth * 0.04),
+      padding: EdgeInsets.all(context.screenWidth * 0.02),
       decoration: BoxDecoration(
         color: AppColors.cardsColor,
         borderRadius: BorderRadius.circular(12),
@@ -162,46 +165,19 @@ class _SummaryViewState extends State<SummaryView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          subText5('Your Medical Instructions in Plain Language',
+          subText5('Summmary Instructions',
               color: AppColors.headingTextColor,
               align: TextAlign.start,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
               fontSize: 14),
-          SizedBox(
-            height: 5,
-          ),
-          subText5(
-              'Write your instructions here in simple, everyday language...',
-              color: AppColors.textColor,
-              align: TextAlign.start,
-              fontWeight: FontWeight.w500,
-              fontSize: 12),
-          SizedBox(height: context.screenHeight * 0.025),
-
-          // Question prompts
-          _buildQuestionPrompt('When do I take my medicine?'),
-          _buildQuestionPrompt('What side effects should I watch for?'),
-          _buildQuestionPrompt('When should I call my doctor?'),
-          _buildQuestionPrompt('What activities should I avoid?'),
-          _buildQuestionPrompt('When is my next appointment?'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildQuestionPrompt(String question) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: context.screenHeight * 0.015),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          subText5('• ', color: AppColors.textColor),
-          Expanded(
-            child: subText5(
-              question,
-              color: AppColors.textColor,
-              align: TextAlign.start,
-            ),
+          SizedBox(height: context.screenHeight * 0.02),
+          CustomTxtField(
+            textEditingController: controller.instructionsController,
+            hintTxt:
+                'Write your instructions here in simple, everyday language...',
+            maxLines: 6,
+            contentPadding:
+                const EdgeInsets.symmetric(vertical: 12.0, horizontal: 12.0),
           ),
         ],
       ),

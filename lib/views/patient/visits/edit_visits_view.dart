@@ -16,57 +16,34 @@ import '../../widget/Common_widgets/custom_date_picker.dart';
 import '../../widget/Common_widgets/upload_section_widget.dart';
 import 'controller/visits_controller.dart';
 
-class VisitsView extends StatelessWidget {
-  const VisitsView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.homeBG,
-      body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              FaIcon(
-                FontAwesomeIcons.userDoctor,
-                size: 80,
-                color: AppColors.primary,
-              ),
-              const SizedBox(height: 20),
-              headingText1(
-                'Visits',
-                color: AppColors.headingTextColor,
-              ),
-              const SizedBox(height: 10),
-              subText3(
-                'Manage your doctor visits',
-                color: AppColors.textColor,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class AddVisitView extends StatefulWidget {
+class EditVisitsView extends StatefulWidget {
   final bool? isOndashboard;
-  AddVisitView({super.key, this.isOndashboard});
+  final int? visitId;
+  EditVisitsView({super.key, this.isOndashboard, this.visitId});
 
-  static const String routeName = '/add-visit';
+  static const String routeName = '/edit-visits';
 
   @override
-  State<AddVisitView> createState() => _AddVisitViewState();
+  State<EditVisitsView> createState() => _EditVisitsViewState();
 }
 
-class _AddVisitViewState extends State<AddVisitView> {
+class _EditVisitsViewState extends State<EditVisitsView> {
   final VisitsController controller = Get.put(VisitsController());
+  int? visitId;
 
   @override
   void initState() {
     super.initState();
+    visitId = widget.visitId;
+    final arguments = Get.arguments as Map<String, dynamic>?;
+    if (arguments != null && arguments['visit'] != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        controller.loadVisitData(arguments['visit']);
+        final visit = arguments['visit'];
+        visitId = visit.id is int ? visit.id : int.tryParse(visit.id.toString());
+        print('Visit ID type: ${visitId.runtimeType}, value: $visitId');
+      });
+    }
   }
 
   @override
@@ -79,8 +56,8 @@ class _AddVisitViewState extends State<AddVisitView> {
             child: Column(
               children: [
                 CustomAppBar(
-                  isOndashboard: widget.isOndashboard ?? true,
-                  title: Lang.addVisit,
+                  isOndashboard: false,
+                  title: 'Edit visit',
                 ),
                 Expanded(
                   child: SingleChildScrollView(
@@ -154,8 +131,14 @@ class _AddVisitViewState extends State<AddVisitView> {
                         const SizedBox(height: 24),
                         // Save Button
                         AppElevatedButton(
-                          onPressed: controller.saveVisit,
-                          title: Lang.save,
+                          onPressed: () {
+                            if (visitId != null) {
+                              controller.updateVisit(visitId!);
+                            } else {
+                              //  controller.saveVisit();
+                            }
+                          },
+                          title: 'Update Visit',
                           backgroundColor: AppColors.primary,
                           width: double.infinity,
                         ),

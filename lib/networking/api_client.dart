@@ -12,6 +12,9 @@ class ApiClient {
   // Helper method to get authorization headers
   static Future<Map<String, String>> _getAuthHeaders() async {
     final token = await LocalStorageService.getToken();
+    print('\n🔑 TOKEN DEBUG 🔑');
+    print('📌 Token from LocalStorage: $token');
+    print('🔚 End Token Debug\n');
     return {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',
@@ -39,6 +42,8 @@ class ApiClient {
     try {
       final url = Uri.parse('${Apis.baseUrl}$endpoint');
       final headers = await _getAuthHeaders();
+      print('🚀 API Request Hit: GET $endpoint');
+      print('🔐 Authorization Header: ${headers['Authorization']}');
       headers['Content-Type'] = 'multipart/form-data';
       final response = await http.get(url, headers: headers).timeout(_timeout);
       return _handleResponse(response, '👤 PROFILE INFO');
@@ -84,10 +89,13 @@ class ApiClient {
       {Map<String, dynamic>? body}) async {
     try {
       final url = Uri.parse('${Apis.baseUrl}$endpoint');
+      final headers = await _getAuthHeaders();
+      print('🚀 API Request Hit: POST $endpoint');
+      print('🔐 Authorization Header: ${headers['Authorization']}');
       final response = await http
           .post(
             url,
-            headers: await _getAuthHeaders(),
+            headers: headers,
             body: body != null ? jsonEncode(body) : null,
           )
           .timeout(_timeout);
@@ -112,6 +120,11 @@ class ApiClient {
 
       // Add authorization header
       final token = await LocalStorageService.getToken();
+      print('\n🔑 TOKEN DEBUG (Multipart) 🔑');
+      print('📌 Token from LocalStorage: $token');
+      print('🚀 API Request Hit: POST $endpoint');
+      print('🔐 Authorization Header: Bearer $token');
+      print('🔚 End Token Debug\n');
       request.headers['Authorization'] = 'Bearer $token';
 
       // Add text fields
@@ -188,9 +201,11 @@ class ApiClient {
   static Future<Map<String, dynamic>> deleteWithAuth(String endpoint) async {
     try {
       final url = Uri.parse('${Apis.baseUrl}$endpoint');
-      final response = await http
-          .delete(url, headers: await _getAuthHeaders())
-          .timeout(_timeout);
+      final headers = await _getAuthHeaders();
+      print('🚀 API Request Hit: DELETE $endpoint');
+      print('🔐 Authorization Header: ${headers['Authorization']}');
+      final response =
+          await http.delete(url, headers: headers).timeout(_timeout);
       return _handleResponse(response);
     } on SocketException {
       throw NetworkException('No internet connection');
@@ -205,9 +220,10 @@ class ApiClient {
   static Future<Map<String, dynamic>> logout() async {
     try {
       final url = Uri.parse('${Apis.baseUrl}${Apis.logout}');
-      final response = await http
-          .get(url, headers: await _getAuthHeaders())
-          .timeout(_timeout);
+      final headers = await _getAuthHeaders();
+      print('🚀 API Request Hit: GET ${Apis.logout}');
+      print('🔐 Authorization Header: ${headers['Authorization']}');
+      final response = await http.get(url, headers: headers).timeout(_timeout);
       return _handleResponse(response, '🚪 LOGOUT');
     } on SocketException {
       throw NetworkException('No internet connection');
@@ -246,7 +262,7 @@ class ApiClient {
       case 400:
         final responseBody = jsonDecode(response.body);
         String errorMessage = 'Invalid request';
-        
+
         // Handle nested error structure
         if (responseBody['message'] != null) {
           errorMessage = responseBody['message'];
@@ -259,7 +275,7 @@ class ApiClient {
             }
           }
         }
-        
+
         throw ValidationException(errorMessage);
       case 401:
         throw UnauthorizedException();

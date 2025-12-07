@@ -6,6 +6,7 @@ import 'package:permission_handler/permission_handler.dart';
 import '../../../../core/controllers/base_controller.dart';
 import '../../../../core/models/Medicine_model.dart';
 import '../../../../core/repositories/Medicine_repo.dart';
+import '../../../widget/Common_widgets/custom_snackbar.dart';
 
 class MedicineFrequencyInput {
   final RxString frequency = RxString('');
@@ -25,6 +26,8 @@ class MedicineController extends BaseController {
   final RxString selectedDosage = RxString('');
   final RxString selectedStatus = RxString('active');
   final Rx<File?> selectedImage = Rx<File?>(null);
+  final RxInt editingMedicineId = RxInt(0);
+  final RxBool isEditMode = RxBool(false);
 
   // Frequency management
   final RxList<MedicineFrequencyInput> frequencyRows =
@@ -48,7 +51,9 @@ class MedicineController extends BaseController {
   @override
   void onInit() {
     super.onInit();
-    addFrequencyRow(); // Start with one row
+    if (frequencyRows.isEmpty) {
+      addFrequencyRow(); // Start with one row
+    }
   }
 
   // Setter functions
@@ -70,33 +75,6 @@ class MedicineController extends BaseController {
     if (index >= 0 && index < frequencyRows.length) {
       frequencyRows[index].amPm.value = value ?? 'AM';
     }
-  }
-
-  String _convertTo24HourFormat(String time, String amPm) {
-    if (time.isEmpty) return time;
-    
-    String processedTime = time.trim();
-    
-    // Handle single digit or number without colon (e.g., "10" -> "10:00")
-    if (!processedTime.contains(':')) {
-      int hour = int.tryParse(processedTime) ?? 0;
-      processedTime = '${hour.toString().padLeft(2, '0')}:00';
-    }
-    
-    final parts = processedTime.split(':');
-    if (parts.length != 2) return processedTime;
-    
-    int hour = int.tryParse(parts[0]) ?? 0;
-    String minute = parts[1].padLeft(2, '0');
-    
-    // Convert to 24-hour format based on AM/PM
-    if (amPm == 'PM' && hour != 12) {
-      hour += 12;
-    } else if (amPm == 'AM' && hour == 12) {
-      hour = 0;
-    }
-    
-    return '${hour.toString().padLeft(2, '0')}:$minute';
   }
 
   void addFrequencyRow() {
@@ -147,13 +125,13 @@ class MedicineController extends BaseController {
       if (source == ImageSource.camera) {
         final cameraStatus = await Permission.camera.request();
         if (!cameraStatus.isGranted) {
-          Get.snackbar('Permission Denied', 'Camera permission is required');
+          CustomSnackbar.show('Camera permission is required', isSuccess: false);
           return;
         }
       } else {
         final storageStatus = await Permission.storage.request();
         if (!storageStatus.isGranted) {
-          Get.snackbar('Permission Denied', 'Storage permission is required');
+          CustomSnackbar.show('Storage permission is required', isSuccess: false);
           return;
         }
       }
@@ -163,7 +141,7 @@ class MedicineController extends BaseController {
         selectedImage.value = File(image.path);
       }
     } catch (e) {
-      Get.snackbar('Error', 'Failed to pick image: $e');
+      CustomSnackbar.show('Failed to pick image: $e', isSuccess: false);
     }
   }
 
@@ -171,7 +149,40 @@ class MedicineController extends BaseController {
     selectedImage.value = null;
   }
 
-  // Store Medicine
+  // Load medicine data for editing
+  void loadMedicineData(Medicine medicine) {
+    isEditMode.value = true;
+    editingMedicineId.value = medicine.id;
+
+    // Populate form fields
+    medNameController.text = medicine.medicineName;
+    selectedDosage.value = medicine.dosage;
+    selectedStatus.value = medicine.status;
+
+    // Clear existing frequency rows
+    for (var row in frequencyRows) {
+      row.timeController.dispose();
+    }
+    frequencyRows.clear();
+
+    // Load frequencies
+    for (var freq in medicine.frequencies) {
+      final row = MedicineFrequencyInput();
+      row.frequency.value = freq.frequency;
+      // Strip seconds from time (19:05:00 -> 19:05)
+      final time = freq.time.split(':');
+      row.timeController.text =
+          time.length >= 2 ? '${time[0]}:${time[1]}' : freq.time;
+      frequencyRows.add(row);
+    }
+
+    // Ensure at least one row
+    if (frequencyRows.isEmpty) {
+      addFrequencyRow();
+    }
+  }
+
+  // Store or Update Medicine
   Future<void> storeMedicine() async {
     // Validation
     if (medNameController.text.trim().isEmpty) {
@@ -205,8 +216,7 @@ class MedicineController extends BaseController {
     final frequencies = frequencyRows
         .map((row) => MedicineFrequency(
               frequency: row.frequency.value,
-              time: _convertTo24HourFormat(
-                  row.timeController.text.trim(), row.amPm.value),
+              time: row.timeController.text.trim(),
             ))
         .toList();
 
@@ -237,12 +247,37 @@ class MedicineController extends BaseController {
     setLoading(true);
 
     try {
-      // Call API
-      final result = await safeApiCall(
+      final result;
+      // if (isEditMode.value) {
+      //   print('🔄 UPDATE MODE DETECTED');
+      //   print('🆔 Editing Medicine ID: ${editingMedicineId.value}');
+      //   // Update existing medicine
+      //   final updateRequest = UpdateMedicineRequest(
+      //     id: editingMedicineId.value,
+      //     medicineName: medicineRequest.medicineName,
+      //     dosage: medicineRequest.dosage,
+      //     status: medicineRequest.status,
+      //     attachment: medicineRequest.attachment,
+      //     frequencies: medicineRequest.frequencies,
+      //   );
+      //   print('📤 Calling updateMedicine API...');
+      //   result = await safeApiCall(() => _medicineRepository.updateMedicine(
+      //       updateRequest, editingMedicineId.value));
+      //   print('📥 Update API Response: $result');
+      // }
+      //else {
+      // Create new medicine
+      result = await safeApiCall(
           () => _medicineRepository.storeMedicine(medicineRequest));
+      // }
 
       if (result != null) {
-        // _showBottomSnackBar('Medicine added successfully!', isSuccess: true);
+        _showBottomSnackBar(
+            // isEditMode.value
+            //     ? 'Medicine updated successfully!'
+            //:
+            'Medicine added successfully!',
+            isSuccess: true);
         _clearAllFields();
         Future.delayed(const Duration(seconds: 1), () {
           Get.back();
@@ -299,8 +334,7 @@ class MedicineController extends BaseController {
     final frequencies = frequencyRows
         .map((row) => MedicineFrequency(
               frequency: row.frequency.value,
-              time: _convertTo24HourFormat(
-                  row.timeController.text.trim(), row.amPm.value),
+              time: row.timeController.text.trim(),
             ))
         .toList();
 
@@ -313,6 +347,7 @@ class MedicineController extends BaseController {
       attachment: selectedImage.value,
       frequencies: frequencies,
     );
+    print('update request is ${updateRequest.toJson()}');
 
     // Show loading
     setLoading(true);
@@ -320,7 +355,7 @@ class MedicineController extends BaseController {
     try {
       // Call API
       final result = await safeApiCall(
-          () => _medicineRepository.updateMedicine(updateRequest));
+          () => _medicineRepository.updateMedicine(updateRequest, medicineId));
 
       if (result != null) {
         _showBottomSnackBar('Medicine updated successfully!', isSuccess: true);
@@ -397,6 +432,8 @@ class MedicineController extends BaseController {
     dosageController.clear();
     selectedDosage.value = '';
     selectedStatus.value = 'active';
+    isEditMode.value = false;
+    editingMedicineId.value = 0;
     // Clear frequency rows
     for (var row in frequencyRows) {
       row.timeController.dispose();

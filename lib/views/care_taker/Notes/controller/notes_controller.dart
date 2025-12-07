@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../consts/lang.dart';
 import '../../../../consts/colors.dart';
+import '../../../widget/Common_widgets/custom_snackbar.dart';
 
 class NotesController extends GetxController {
   final TextEditingController noteController = TextEditingController();
@@ -37,24 +38,12 @@ class NotesController extends GetxController {
 
   void saveNote() {
     if (selectedCategory.value.isEmpty) {
-      Get.snackbar(
-        'Error',
-        'Please select a category',
-        backgroundColor: AppColors.redColor,
-        colorText: AppColors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      CustomSnackbar.show('Please select a category', isSuccess: false);
       return;
     }
 
     if (noteController.text.trim().isEmpty) {
-      Get.snackbar(
-        'Error',
-        'Please write a note',
-        backgroundColor: AppColors.redColor,
-        colorText: AppColors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      CustomSnackbar.show('Please write a note', isSuccess: false);
       return;
     }
 
@@ -68,23 +57,11 @@ class NotesController extends GetxController {
     noteController.clear();
     selectedCategory.value = '';
 
-    Get.snackbar(
-      'Success',
-      'Note saved successfully!',
-      backgroundColor: AppColors.green,
-      colorText: AppColors.white,
-      snackPosition: SnackPosition.TOP,
-    );
+    CustomSnackbar.show('Note saved successfully!', isSuccess: true);
   }
 
   void viewAllNotes() {
-    Get.snackbar(
-      'Info',
-      'Showing all ${previousNotes.length} notes',
-      backgroundColor: AppColors.primary,
-      colorText: AppColors.white,
-      snackPosition: SnackPosition.TOP,
-    );
+    CustomSnackbar.show('Showing all ${previousNotes.length} notes', isSuccess: true);
   }
 
   void viewNoteDetails(Map<String, dynamic> note) {

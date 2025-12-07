@@ -1,4 +1,5 @@
 import 'package:Azunii_Health/views/widget/Common_widgets/customAppBar.dart';
+import 'package:Azunii_Health/views/widget/Common_widgets/overlayloader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -6,38 +7,34 @@ import '../../../consts/colors.dart';
 import '../../../consts/assets.dart';
 import '../../widget/text.dart';
 import '../../widget/buttons.dart';
+import 'feedback_controller.dart';
 
-class FeedbackView extends StatefulWidget {
+class FeedbackView extends StatelessWidget {
   const FeedbackView({super.key});
 
   static const String routeName = '/feedback';
 
   @override
-  State<FeedbackView> createState() => _FeedbackViewState();
-}
-
-class _FeedbackViewState extends State<FeedbackView> {
-  int _selectedRating = 1; // Default to 1 star as shown in Figma
-  final TextEditingController _noteController = TextEditingController();
-
-  @override
-  void dispose() {
-    _noteController.dispose();
-    super.dispose();
+  Widget build(BuildContext context) {
+    final controller = Get.put(FeedbackController());
+    return Obx(() => OverlayLoader(
+          isLoading: controller.isLoading.value,
+          child: _buildScaffold(context, controller),
+        ));
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildScaffold(BuildContext context, FeedbackController controller) {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
         child: Column(
           children: [
             CustomAppBar(
+              isOndashboard: false,
               title: 'User Feedback',
             ),
             Expanded(
-              child: _buildFeedbackContent(),
+              child: _buildFeedbackContent(context, controller),
             ),
           ],
         ),
@@ -46,7 +43,8 @@ class _FeedbackViewState extends State<FeedbackView> {
   }
 
   /// Feedback Content
-  Widget _buildFeedbackContent() {
+  Widget _buildFeedbackContent(
+      BuildContext context, FeedbackController controller) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -66,7 +64,7 @@ class _FeedbackViewState extends State<FeedbackView> {
                 const SizedBox(height: 40),
 
                 // Star Rating
-                _buildStarRating(),
+                _buildStarRating(controller),
 
                 const SizedBox(height: 50),
 
@@ -83,15 +81,13 @@ class _FeedbackViewState extends State<FeedbackView> {
                 const SizedBox(height: 12),
 
                 // Note Input Field
-                _buildNoteInputField(),
+                _buildNoteInputField(controller),
 
                 const SizedBox(height: 50),
 
                 // Submit Button
                 AppElevatedButton(
-                  onPressed: () {
-                    _handleSubmitFeedback();
-                  },
+                  onPressed: () => controller.submitFeedback(context),
                   title: 'Submit',
                   backgroundColor: AppColors.primary,
                   width: double.infinity,
@@ -106,32 +102,30 @@ class _FeedbackViewState extends State<FeedbackView> {
     );
   }
 
-  Widget _buildStarRating() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(5, (index) {
-        return GestureDetector(
-          onTap: () {
-            setState(() {
-              _selectedRating = index + 1;
-            });
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Icon(
-              index < _selectedRating ? Icons.star : Icons.star_border,
-              size: 40,
-              color: index < _selectedRating
-                  ? AppColors.yellow
-                  : AppColors.textColor,
-            ),
-          ),
-        );
-      }),
-    );
+  Widget _buildStarRating(FeedbackController controller) {
+    return Obx(() => Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(5, (index) {
+            return GestureDetector(
+              onTap: () => controller.setRating(index + 1),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Icon(
+                  index < controller.selectedRating.value
+                      ? Icons.star
+                      : Icons.star_border,
+                  size: 40,
+                  color: index < controller.selectedRating.value
+                      ? AppColors.yellow
+                      : AppColors.textColor,
+                ),
+              ),
+            );
+          }),
+        ));
   }
 
-  Widget _buildNoteInputField() {
+  Widget _buildNoteInputField(FeedbackController controller) {
     return Container(
       height: 120,
       padding: const EdgeInsets.all(16),
@@ -141,7 +135,7 @@ class _FeedbackViewState extends State<FeedbackView> {
         border: Border.all(color: AppColors.dividerGray, width: 1),
       ),
       child: TextField(
-        controller: _noteController,
+        controller: controller.noteController,
         maxLines: null,
         expands: true,
         textAlignVertical: TextAlignVertical.top,
@@ -162,25 +156,5 @@ class _FeedbackViewState extends State<FeedbackView> {
         ),
       ),
     );
-  }
-
-  void _handleSubmitFeedback() {
-    // Handle feedback submission
-    print('Rating: $_selectedRating');
-    print('Note: ${_noteController.text}');
-
-    // Show success message and go back
-    Get.snackbar(
-      'Success',
-      'Thank you for your feedback!',
-      backgroundColor: AppColors.green,
-      colorText: AppColors.white,
-      snackPosition: SnackPosition.TOP,
-    );
-
-    // Go back after a short delay
-    Future.delayed(const Duration(seconds: 1), () {
-      Get.back();
-    });
   }
 }

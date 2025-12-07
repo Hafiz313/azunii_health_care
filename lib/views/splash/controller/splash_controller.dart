@@ -23,7 +23,7 @@ class SplashController extends GetxController {
           final profileResult = await _authRepository.getProfileInfo();
           if (profileResult.status) {
             Staticdata.userModel = profileResult.user;
-            print('✅ Profile info loaded from splash');
+            print('✅ Profile info loaded from splash${Staticdata.userModel}');
           }
         } catch (e) {
           print('⚠️ Failed to fetch profile info on splash: $e');
@@ -32,7 +32,7 @@ class SplashController extends GetxController {
         // Get user type and navigate to appropriate dashboard
         final userType = await LocalStorageService.getUserType();
 
-        if (userType == Appconsts.patient) {
+        if (userType == 'patient') {
           Navigator.of(context)
               .pushReplacementNamed(PatientDashboard.routeName);
         } else if (userType == Appconsts.caregiver) {

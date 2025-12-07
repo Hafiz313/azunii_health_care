@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 import '../../../../core/controllers/base_controller.dart';
 import '../../../../core/models/static_user_model.dart';
 import '../../../../core/repositories/auth_repository.dart';
-import '../../../../utils/snackbar_helper.dart';
+import '../../../widget/Common_widgets/custom_snackbar.dart';
 import '../../../patient/dashboard/patient_dashboard.dart';
 
 class LoginController extends BaseController {
@@ -49,11 +49,11 @@ class LoginController extends BaseController {
       // SnackbarHelper.showSuccess('Login successful');
 
       // Navigate based on user role from API
-      //   if (userRole == 'patient') {
-      // Get.offAllNamed(PatientDashboard.routeName);
-      //} else {
-      Get.offAllNamed(CareTakerDashboard.routeName);
-      //}
+      if (userRole == 'patient') {
+        Get.offAllNamed(PatientDashboard.routeName);
+      } else {
+        Get.offAllNamed(CareTakerDashboard.routeName);
+      }
     } else {
       Get.offAllNamed(CareTakerDashboard.routeName);
       print('Api call failed on login section');
@@ -92,7 +92,7 @@ class LoginController extends BaseController {
       Staticdata.userModel = result.user;
       print('✅ User data stored from Google login response');
 
-      SnackbarHelper.showSuccess('Google signin successful!');
+      CustomSnackbar.show('Google signin successful!', isSuccess: true);
 
       // Navigate based on user role from API
       if (userRole == 'patient') {

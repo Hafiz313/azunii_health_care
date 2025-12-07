@@ -188,7 +188,7 @@ class LoginWidgets {
           child: SocialButton(
               text: Lang.google,
               iconPath: AppAssets.googleIcon,
-              onPressed: () => controller.login()),
+              onPressed: () => controller.googleLogin()),
         ),
         SizedBox(width: context.percentWidth * 4.0),
         Expanded(

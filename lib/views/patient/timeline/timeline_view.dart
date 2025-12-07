@@ -131,7 +131,7 @@ class TimelineView extends StatelessWidget {
     required String time,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(12),
@@ -158,8 +158,9 @@ class TimelineView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                subText4(
+                subText5(
                   title,
+                  fontSize: 13,
                   fontWeight: FontWeight.w500,
                   color: AppColors.headingTextColor,
                   align: TextAlign.start,

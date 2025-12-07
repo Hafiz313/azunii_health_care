@@ -1,16 +1,11 @@
-import 'package:Azunii_Health/views/auth/login/login_view.dart';
-import 'package:Azunii_Health/views/care_taker/dashboard/dashboard.dart';
-import 'package:Azunii_Health/views/patient/dashboard/patient_dashboard.dart';
-import 'package:Azunii_Health/views/widget/Common_widgets/logo_widget.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'dart:async';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:flutter/material.dart';
+import 'package:Azunii_Health/views/splash/controller/splash_controller.dart';
+import 'package:Azunii_Health/views/widget/Common_widgets/logo_widget.dart';
 import '../base_view/base_scaffold_auth.dart';
 
 class SplashView extends StatefulWidget {
-  SplashView({super.key});
+  const SplashView({super.key});
   static const String routeName = '/SplashView';
 
   @override
@@ -19,17 +14,18 @@ class SplashView extends StatefulWidget {
 
 class _SplashViewState extends State<SplashView>
     with SingleTickerProviderStateMixin {
+  late final SplashController _splashController;
   Timer? _timer;
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-  late Animation<double> _scaleAnimation;
-
-  static const String _isLoggedInKey = 'isLoggedIn';
-  static const String _userTypeKey = 'userType';
+  late final AnimationController _animationController;
+  late final Animation<double> _fadeAnimation;
+  late final Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
+
+    // Initialize controller
+    _splashController = SplashController();
 
     // Initialize animation controller
     _animationController = AnimationController(
@@ -38,38 +34,20 @@ class _SplashViewState extends State<SplashView>
     );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-        CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    );
 
     _scaleAnimation = Tween<double>(begin: 0.1, end: 1.0).animate(
-        CurvedAnimation(
-            parent: _animationController, curve: Curves.easeOutBack));
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
+    );
 
+    // Start animations
     _animationController.forward();
 
-    // Check login status and navigate accordingly after 3s splash
-    _timer = Timer(const Duration(seconds: 3), () {
-      checkLoginAndNavigate();
+    // Navigate after delay
+    _timer = Timer(const Duration(seconds: 1), () {
+      _splashController.checkLoginAndNavigate(context);
     });
-  }
-
-  Future<void> checkLoginAndNavigate() async {
-    final prefs = await SharedPreferences.getInstance();
-    final isLoggedIn = prefs.getBool(_isLoggedInKey) ?? false;
-    final userType = prefs.getString(_userTypeKey);
-
-    if (isLoggedIn) {
-      // Navigate based on userType
-      if (userType == 'patient') {
-        Navigator.pushReplacementNamed(context, PatientDashboard.routeName);
-      } else if (userType == 'caregiver') {
-        Navigator.pushReplacementNamed(context, CareTakerDashboard.routeName);
-      } else {
-        Navigator.pushReplacementNamed(context, LoginView.routeName);
-      }
-    } else {
-      // Not logged in
-      Navigator.pushReplacementNamed(context, LoginView.routeName);
-    }
   }
 
   @override
@@ -88,8 +66,10 @@ class _SplashViewState extends State<SplashView>
           builder: (context, child) {
             return Transform.scale(
               scale: _scaleAnimation.value,
-              child:
-                  Opacity(opacity: _fadeAnimation.value, child: LogoWidget()),
+              child: Opacity(
+                opacity: _fadeAnimation.value,
+                child: const LogoWidget(),
+              ),
             );
           },
         ),

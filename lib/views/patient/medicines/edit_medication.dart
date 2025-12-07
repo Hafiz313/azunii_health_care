@@ -1,83 +1,51 @@
+import 'dart:ffi';
+
+import 'package:Azunii_Health/consts/colors.dart';
+import 'package:Azunii_Health/consts/lang.dart';
+import 'package:Azunii_Health/views/patient/medicines/controller/medicineController.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/customAppBar.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/custom_dropdown.dart';
+import 'package:Azunii_Health/views/widget/Common_widgets/custom_time_picker.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/overlayloader.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/upload_section_widget.dart';
-import 'package:Azunii_Health/views/widget/Common_widgets/custom_time_picker.dart';
-import 'package:Azunii_Health/views/widget/loading_overlay.dart';
+import 'package:Azunii_Health/views/widget/buttons.dart';
 import 'package:Azunii_Health/views/widget/text_fields.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import '../../../consts/colors.dart';
-import '../../../consts/assets.dart';
-import '../../../consts/lang.dart';
-import '../../widget/text.dart';
-import '../../widget/buttons.dart';
-import 'controller/medicineController.dart';
+import 'package:get/get_core/src/get_main.dart';
 
-// class MedicinesView extends StatelessWidget {
-//   const MedicinesView({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: AppColors.white,
-//       body: SafeArea(
-//         child: Column(
-//           children: [
-//             CustomAppBar(title: Lang.medication),
-//             Expanded(
-//               child: Padding(
-//                 padding: const EdgeInsets.symmetric(horizontal: 20),
-//                 child: Column(
-//                   children: [
-//                     const SizedBox(height: 20),
-//                     _buildAddMedicationButton(context),
-//                     const Spacer(),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-
-//   Widget _buildAddMedicationButton(BuildContext context) {
-//     return SizedBox(
-//       width: double.infinity,
-//       child: AppElevatedButton(
-//         onPressed: () {
-//           Navigator.push(
-//             context,
-//             MaterialPageRoute(builder: (context) => const AddMedicineView()),
-//           );
-//         },
-//         title: Lang.addMedication,
-//       ),
-//     );
-//   }
-// }
-
-class AddMedicineView extends StatefulWidget {
+class EditMedicineView extends StatefulWidget {
   final bool? isOndashboard;
-  const AddMedicineView({super.key, this.isOndashboard});
+  final int? medicineId;
+  const EditMedicineView({super.key, this.isOndashboard, this.medicineId});
 
-  static const String routeName = '/add-medicine';
+  static const String routeName = '/edit-medicine';
 
   @override
-  State<AddMedicineView> createState() => _AddMedicineViewState();
+  State<EditMedicineView> createState() => _EditMedicineViewState();
 }
 
-class _AddMedicineViewState extends State<AddMedicineView> {
+class _EditMedicineViewState extends State<EditMedicineView> {
   late final MedicineController controller;
+  int? medicineId;
 
   @override
   void initState() {
     super.initState();
     controller = Get.put(MedicineController());
+    medicineId = widget.medicineId;
+    final arguments = Get.arguments as Map<String, dynamic>?;
+    if (arguments != null) {
+      if (arguments['medicineId'] != null) {
+        medicineId = arguments['medicineId'] as int;
+      } else if (arguments['medicine'] != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          controller.loadMedicineData(arguments['medicine']);
+          medicineId = arguments['medicine'].id;
+        });
+      }
+    }
   }
 
   @override
@@ -99,8 +67,8 @@ class _AddMedicineViewState extends State<AddMedicineView> {
                 child: Column(
                   children: [
                     CustomAppBar(
-                      title: Lang.medication,
-                      isOndashboard: widget.isOndashboard ?? true,
+                      title: 'Edit Medication',
+                      isOndashboard: false,
                       onIconTap: () {},
                     ),
                     Expanded(
@@ -322,8 +290,12 @@ class _AddMedicineViewState extends State<AddMedicineView> {
 
   Widget _buildSaveButton() {
     return AppElevatedButton(
-      onPressed: controller.storeMedicine,
-      title: Lang.save,
+      onPressed: () {
+        if (medicineId != null) {
+          controller.updateMedicine(medicineId!);
+        }
+      },
+      title: 'Update Medicine',
       backgroundColor: AppColors.primary,
       width: double.infinity,
     );

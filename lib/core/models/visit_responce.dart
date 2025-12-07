@@ -39,6 +39,9 @@ class VisitResponse {
       data: VisitPaginationData.fromJson(json['data']),
     );
   }
+
+  // Convenience getter to access visits directly
+  List<VisitModel> get visits => data.visits;
 }
 
 class VisitPaginationData {

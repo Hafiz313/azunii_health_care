@@ -1,5 +1,7 @@
 import 'package:Azunii_Health/consts/assets.dart';
+import 'package:Azunii_Health/core/models/static_user_model.dart';
 import 'package:Azunii_Health/utils/percentage_size_ext.dart';
+import 'package:Azunii_Health/views/care_taker/feedback/feedback_view.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -13,8 +15,10 @@ import '../../widget/Common_widgets/medication_alert_card.dart';
 import '../../widget/Common_widgets/today_task_card.dart';
 import '../../widget/Common_widgets/date_picker_button.dart';
 import '../../widget/Common_widgets/appointment_card.dart';
+import '../../widget/Common_widgets/overlayloader.dart';
 import '../visits/visits_view.dart';
 import '../medicines/medicines_view.dart';
+import 'profile_view.dart';
 import 'controller/home_controller.dart';
 import '../../auth/login/login_view.dart';
 
@@ -28,44 +32,37 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(HomeController());
-    return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: AppColors.white,
-      drawer: _buildDrawer(context),
-      body: Stack(
-        children: [
-          SafeArea(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(context),
-                  _buildQuickActions(context),
-                  const SizedBox(height: 13),
-                  _buildMedicationAlert(context),
-                  const SizedBox(height: 13),
-                  _buildAsOfTodaySection(context),
-                  const SizedBox(height: 13),
-                  _buildFutureAppointmentsSection(context),
-                  const SizedBox(height: 20),
-                ],
+    return Obx(() => OverlayLoader(
+          isLoading: controller.isLoading.value,
+          child: Scaffold(
+            key: _scaffoldKey,
+            backgroundColor: AppColors.white,
+            drawer: _buildDrawer(context),
+            body: SafeArea(
+              child: RefreshIndicator(
+                onRefresh: () => controller.refreshData(),
+                color: AppColors.primary,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHeader(context),
+                      _buildQuickActions(context),
+                      const SizedBox(height: 13),
+                      _buildMedicationAlert(context),
+                      const SizedBox(height: 13),
+                      _buildAsOfTodaySection(context),
+                      const SizedBox(height: 13),
+                      _buildFutureAppointmentsSection(context),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
-          Obx(() => controller.isLoading.value
-              ? Container(
-                  color: Colors.black.withOpacity(0.3),
-                  child: const Center(
-                    child: CircularProgressIndicator(
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(AppColors.primary),
-                    ),
-                  ),
-                )
-              : const SizedBox.shrink()),
-        ],
-      ),
-    );
+        ));
   }
 
   /// Top Header with logo, welcome text, and profile picture
@@ -116,14 +113,14 @@ class HomeView extends StatelessWidget {
                     color: AppColors.textColor,
                     align: TextAlign.start,
                   ),
-                  Obx(() => subText4(
-                        controller.userName.value.isNotEmpty
-                            ? controller.userName.value
-                            : 'User',
-                        color: AppColors.headingTextColor,
-                        align: TextAlign.start,
-                        fontWeight: FontWeight.w500,
-                      )),
+                  subText4(
+                    Staticdata.userModel?.name?.isNotEmpty == true
+                        ? Staticdata.userModel!.name!
+                        : 'User',
+                    color: AppColors.headingTextColor,
+                    align: TextAlign.start,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ],
               ),
             ),
@@ -165,7 +162,10 @@ class HomeView extends StatelessWidget {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => AddVisitView()),
+                      MaterialPageRoute(
+                          builder: (context) => AddVisitView(
+                                isOndashboard: false,
+                              )),
                     );
                   },
                 ),
@@ -183,7 +183,9 @@ class HomeView extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const AddMedicineView()),
+                          builder: (context) => const AddMedicineView(
+                                isOndashboard: false,
+                              )),
                     );
                   },
                 ),
@@ -261,6 +263,22 @@ class HomeView extends StatelessWidget {
   /// As of Today Section
   Widget _buildAsOfTodaySection(BuildContext context) {
     final controller = Get.find<HomeController>();
+
+    // Medicine colors and icons
+    final medicineColors = [
+      const Color.fromARGB(255, 181, 218, 244),
+      AppColors.lightOrange,
+      AppColors.lightGreenCard,
+      AppColors.lightPurple,
+    ];
+
+    final medicineIcons = [
+      FaIcon(FontAwesomeIcons.pills, color: Colors.blue[600], size: 24),
+      FaIcon(FontAwesomeIcons.capsules, color: Colors.orange[600], size: 24),
+      FaIcon(FontAwesomeIcons.tablets, color: AppColors.green, size: 24),
+      FaIcon(FontAwesomeIcons.syringe, color: Colors.purple[600], size: 24),
+    ];
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -274,7 +292,6 @@ class HomeView extends StatelessWidget {
                 fontWeight: FontWeight.w500,
                 Lang.asOfToday,
                 color: AppColors.headingTextColor,
-//textAlign: TextAlign.start,
               ),
               DatePickerButton(
                 date: controller.selectedDate.value,
@@ -283,21 +300,66 @@ class HomeView extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: controller.todayTasks.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 12),
-            itemBuilder: (context, index) {
-              final task = controller.todayTasks[index];
-              return TodayTaskCard(
-                backgroundColor: task['backgroundColor'],
-                icon: task['icon'],
-                title: task['title'],
-                isCompleted: task['isCompleted'],
-              );
-            },
-          ),
+          Obx(() => controller.medicinesList.isEmpty
+              ? Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: AppColors.cardGray.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      FaIcon(
+                        FontAwesomeIcons.pills,
+                        color: AppColors.textColor.withOpacity(0.5),
+                        size: 32,
+                      ),
+                      const SizedBox(height: 8),
+                      subText4(
+                        'No medicines added yet',
+                        color: AppColors.textColor,
+                        align: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: controller.medicinesList.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    final medicine = controller.medicinesList[index];
+                    print('medicine id :${medicine.id}');
+                    final colorIndex = index % medicineColors.length;
+                    final iconIndex = index % medicineIcons.length;
+
+                    return TweenAnimationBuilder<double>(
+                      duration: Duration(milliseconds: 300 + (index * 50)),
+                      tween: Tween(begin: 0.0, end: 1.0),
+                      builder: (context, value, child) {
+                        return Transform.translate(
+                          offset: Offset(0, 20 * (1 - value)),
+                          child: Opacity(
+                            opacity: value,
+                            child: TodayTaskCard(
+                              backgroundColor: medicineColors[colorIndex],
+                              icon: medicineIcons[iconIndex],
+                              title: medicine.medicineName,
+                              isCompleted: medicine.status != 'active',
+                              status: medicine.status == 'active' ? 'Active' : 'Completed',
+                              onTap: () => controller.showMedicineDetails(medicine.id),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                )),
         ],
       ),
     );
@@ -331,21 +393,61 @@ class HomeView extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: controller.appointments.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 12),
-            itemBuilder: (context, index) {
-              final appointment = controller.appointments[index];
-              return AppointmentCard(
-                date: appointment['date']!,
-                doctor: appointment['doctor']!,
-                reason: appointment['reason']!,
-                specialty: appointment['specialty']!,
-              );
-            },
-          ),
+          Obx(() => controller.visitsList.isEmpty
+              ? Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: AppColors.cardGray.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      FaIcon(
+                        FontAwesomeIcons.calendarCheck,
+                        color: AppColors.textColor.withOpacity(0.5),
+                        size: 32,
+                      ),
+                      const SizedBox(height: 8),
+                      subText4(
+                        'No visits scheduled',
+                        color: AppColors.textColor,
+                        align: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: controller.visitsList.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    final visit = controller.visitsList[index];
+                    return TweenAnimationBuilder<double>(
+                      duration: Duration(milliseconds: 300 + (index * 50)),
+                      tween: Tween(begin: 0.0, end: 1.0),
+                      builder: (context, value, child) {
+                        return Transform.translate(
+                          offset: Offset(0, 20 * (1 - value)),
+                          child: Opacity(
+                            opacity: value,
+                            child: AppointmentCard(
+                              date: visit.visitDate,
+                              doctor: visit.providerName,
+                              reason: visit.notes,
+                              specialty: visit.specialty,
+                              onTap: () => controller.showVisitDetails(visit.id),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                )),
         ],
       ),
     );
@@ -375,7 +477,22 @@ class HomeView extends StatelessWidget {
                   context,
                   icon: Icons.person,
                   title: 'Profile',
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ProfileView()),
+                    );
+                  },
+                ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.feedback,
+                  title: 'Feedback',
+                  onTap: () =>
+                      //     Navigator.pop(context);
+                      Navigator.pushNamed(context, '/feedback'),
                 ),
                 _buildDrawerItem(
                   context,

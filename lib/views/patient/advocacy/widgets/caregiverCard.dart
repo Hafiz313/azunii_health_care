@@ -41,8 +41,15 @@ class CaregiverCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 24,
-                backgroundColor: AppColors.dividerGray,
-                backgroundImage: AssetImage(profileImage),
+                backgroundColor: AppColors.primary,
+                child: Text(
+                  name.isNotEmpty ? name[0].toUpperCase() : '?',
+                  style: const TextStyle(
+                    color: AppColors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                  ),
+                ),
               ),
               const SizedBox(width: 12),
 

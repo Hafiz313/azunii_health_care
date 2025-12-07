@@ -1,8 +1,9 @@
+import 'package:Azunii_Health/core/models/visit_responce.dart';
+
 import '../../networking/api_client.dart';
 import '../../networking/api_ref.dart';
 import '../models/visit_model.dart';
 import '../models/visit_responce.dart';
-import '../models/Auth_model.dart';
 
 class VisitsRepository {
   // Store Patient Visit
@@ -33,10 +34,21 @@ class VisitsRepository {
     try {
       print('\n📋 GET VISITS Request 📋');
       final response = await ApiClient.getWithAuth(Apis.getPatientVisits);
-      print('📄 Visits Response: ${response.length} visits retrieved\n');
+      print('📄 Visits Response: Retrieved patient visits\n');
       return VisitResponse.fromJson(response);
     } catch (e) {
       print('❌ Get Visits Error: $e');
+      rethrow;
+    }
+  }
+
+  // Get Visits List Only
+  Future<List<VisitModel>> getVisitsList() async {
+    try {
+      final visitResponse = await getVisits();
+      return visitResponse.visits;
+    } catch (e) {
+      print('❌ Get Visits List Error: $e');
       rethrow;
     }
   }
@@ -63,18 +75,16 @@ class VisitsRepository {
       print('🆔 Visit ID: ${request.id}');
       print('🏥 Provider: ${request.providerName}');
 
-      final jsonData = request.toJson();
       final fields = <String, String>{};
 
-      // Separate string fields from file
-      jsonData.forEach((key, value) {
-        if (value is String) {
-          fields[key] = value;
-        }
-      });
+      fields['id'] = request.id.toString();
+      fields['provider_name'] = request.providerName;
+      fields['specialty'] = request.specialty;
+      fields['visit_date'] = request.visitDate;
+      fields['notes'] = request.notes;
 
       final response = await ApiClient.postMultipartWithAuth(
-        '${Apis.updatePatientVisit}/${request.id}',
+        '${Apis.updatePatientVisit}',
         fields: fields,
         file: request.attachment,
         fileFieldName: 'attachment',

@@ -1,17 +1,29 @@
+import 'dart:convert';
 import '../../networking/api_client.dart';
 import '../../networking/api_ref.dart';
 import '../models/Medicine_model.dart';
 
 class MedicineRepository {
   // Get Patient Medicines
-  Future<Map<String, dynamic>> getMedicines() async {
+  Future<MedicineListResponse> getMedicines() async {
     try {
       print('\n💊 GET MEDICINES Request 💊');
       final response = await ApiClient.getWithAuth(Apis.getPatientMedicines);
       print('📄 Medicines Response: Retrieved patient medicines\n');
-      return response;
+      return MedicineListResponse.fromJson(response);
     } catch (e) {
       print('❌ Get Medicines Error: $e');
+      rethrow;
+    }
+  }
+
+  // Get Medicines List Only
+  Future<List<Medicine>> getMedicinesList() async {
+    try {
+      final medicineResponse = await getMedicines();
+      return medicineResponse.medicines;
+    } catch (e) {
+      print('❌ Get Medicines List Error: $e');
       rethrow;
     }
   }
@@ -24,22 +36,18 @@ class MedicineRepository {
       print('💊 Medicine: ${medicineRequest.medicineName}');
       print('📏 Dosage: ${medicineRequest.dosage}');
 
-      final jsonData = medicineRequest.toJson();
       final fields = <String, String>{};
-      List<Map<String, dynamic>>? frequenciesData;
 
-      // Separate string fields from file and complex objects
-      jsonData.forEach((key, value) {
-        if (value is String) {
-          fields[key] = value;
-        } else if (key == 'frequencies' && value is List) {
-          frequenciesData = List<Map<String, dynamic>>.from(value);
-        }
-      });
+      // Add basic fields
+      fields['medicine_name'] = medicineRequest.medicineName;
+      fields['dosage'] = medicineRequest.dosage;
+      fields['status'] = medicineRequest.status;
 
-      // Add frequencies as JSON string if present
-      if (frequenciesData != null) {
-        fields['frequencies'] = frequenciesData.toString();
+      // Add frequencies in the format: frequencies[0][frequency], frequencies[0][time]
+      for (int i = 0; i < medicineRequest.frequencies.length; i++) {
+        fields['frequencies[$i][frequency]'] =
+            medicineRequest.frequencies[i].frequency;
+        fields['frequencies[$i][time]'] = medicineRequest.frequencies[i].time;
       }
 
       final response = await ApiClient.postMultipartWithAuth(
@@ -75,38 +83,39 @@ class MedicineRepository {
 
   // Update Patient Medicine
   Future<Map<String, dynamic>> updateMedicine(
-      UpdateMedicineRequest medicineRequest) async {
+      UpdateMedicineRequest medicineRequest, int medicineId) async {
     try {
+      final updateUrl = '${Apis.updatePatientMedicine}';
       print('\n📝 UPDATE MEDICINE Request 📝');
-      print('🆔 Medicine ID: ${medicineRequest.id}');
+      print('🆔 Medicine ID: $medicineId');
+      print('🔗 Update URL: $updateUrl');
+      print('🔗 Full URL: ${Apis.baseUrl}$updateUrl');
       print('💊 Medicine: ${medicineRequest.medicineName}');
 
-      final jsonData = medicineRequest.toJson();
       final fields = <String, String>{};
-      List<Map<String, dynamic>>? frequenciesData;
 
-      // Separate string fields from file and complex objects
-      jsonData.forEach((key, value) {
-        if (value is String) {
-          fields[key] = value;
-        } else if (key == 'frequencies' && value is List) {
-          frequenciesData = List<Map<String, dynamic>>.from(value);
-        }
-      });
+      // Add method override for Laravel
 
-      // Add frequencies as JSON string if present
-      if (frequenciesData != null) {
-        fields['frequencies'] = frequenciesData.toString();
+      fields['id'] = medicineId.toString();
+      fields['medicine_name'] = medicineRequest.medicineName;
+      fields['dosage'] = medicineRequest.dosage;
+      fields['status'] = medicineRequest.status;
+
+      // Add frequencies in the format: frequencies[0][frequency], frequencies[0][time]
+      for (int i = 0; i < medicineRequest.frequencies.length; i++) {
+        fields['frequencies[$i][frequency]'] =
+            medicineRequest.frequencies[i].frequency;
+        fields['frequencies[$i][time]'] = medicineRequest.frequencies[i].time;
       }
 
       final response = await ApiClient.postMultipartWithAuth(
-        '${Apis.updatePatientMedicine}/${medicineRequest.id}',
+        updateUrl,
         fields: fields,
         file: medicineRequest.attachment,
         fileFieldName: 'attachment',
       );
 
-      print('✅ Medicine updated successfully for ID: ${medicineRequest.id}\n');
+      print('✅ Medicine updated successfully for ID: $medicineId\n');
       return response;
     } catch (e) {
       print('❌ Update Medicine Error: $e');

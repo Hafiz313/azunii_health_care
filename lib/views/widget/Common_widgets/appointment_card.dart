@@ -9,6 +9,7 @@ class AppointmentCard extends StatelessWidget {
   final String doctor;
   final String reason;
   final String specialty;
+  final VoidCallback? onTap;
 
   const AppointmentCard({
     super.key,
@@ -16,62 +17,66 @@ class AppointmentCard extends StatelessWidget {
     required this.doctor,
     required this.reason,
     required this.specialty,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.cardGray,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Date badge
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 232, 232, 232),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SvgPicture.asset(
-                  AppAssets.calander,
-                  width: 12,
-                  height: 12,
-                  colorFilter: const ColorFilter.mode(
-                    AppColors.textColor,
-                    BlendMode.srcIn,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.cardGray,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header with date
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 232, 232, 232),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SvgPicture.asset(
+                    AppAssets.calander,
+                    width: 12,
+                    height: 12,
+                    colorFilter: const ColorFilter.mode(
+                      AppColors.textColor,
+                      BlendMode.srcIn,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 4),
-                subText5(
-                  fontSize: 12,
-                  date,
-                  color: AppColors.headingTextColor,
-                  align: TextAlign.start,
-                ),
-              ],
+                  const SizedBox(width: 4),
+                  subText5(
+                    fontSize: 12,
+                    date,
+                    color: AppColors.headingTextColor,
+                    align: TextAlign.start,
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          // Doctor
-          _buildAppointmentRow('Doctor', doctor),
-          const SizedBox(height: 8),
-          const Divider(color: AppColors.dividerGray, height: 1),
-          const SizedBox(height: 8),
-          // Reason to Visit
-          _buildAppointmentRow('Reason to Visit', reason),
-          const SizedBox(height: 8),
-          const Divider(color: AppColors.dividerGray, height: 1),
-          const SizedBox(height: 8),
-          // Specialty
-          _buildAppointmentRow('Specialty', specialty),
-        ],
+            const SizedBox(height: 12),
+            // Doctor
+            _buildAppointmentRow('Doctor', doctor),
+            const SizedBox(height: 8),
+            const Divider(color: AppColors.dividerGray, height: 1),
+            const SizedBox(height: 8),
+            // Reason to Visit
+            _buildAppointmentRow('Reason to Visit', reason),
+            const SizedBox(height: 8),
+            const Divider(color: AppColors.dividerGray, height: 1),
+            const SizedBox(height: 8),
+            // Specialty
+            _buildAppointmentRow('Specialty', specialty),
+          ],
+        ),
       ),
     );
   }

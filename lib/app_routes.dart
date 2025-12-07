@@ -1,6 +1,3 @@
-import 'package:Azunii_Health/views/auth/Otp/otp_forget_view.dart';
-import 'package:Azunii_Health/views/auth/Otp/otp_signup_view.dart';
-import 'package:Azunii_Health/views/auth/Otp/otp_view.dart';
 import 'package:Azunii_Health/views/auth/forget/froget_view.dart';
 
 import 'package:Azunii_Health/views/auth/login/login_view.dart';
@@ -15,6 +12,11 @@ import 'package:Azunii_Health/views/care_taker/settings/settings_view.dart';
 import 'package:Azunii_Health/views/patient/advocacy/add_caregiver_view.dart';
 import 'package:Azunii_Health/views/patient/dashboard/patient_dashboard.dart';
 import 'package:Azunii_Health/views/patient/home/home_view.dart';
+import 'package:Azunii_Health/views/patient/medicines/edit_medication.dart';
+import 'package:Azunii_Health/views/patient/home/profile_view.dart';
+import 'package:Azunii_Health/views/patient/summary/view_summaries_view.dart';
+import 'package:Azunii_Health/views/patient/visits/all_visits_view.dart';
+import 'package:Azunii_Health/views/patient/visits/edit_visits_view.dart';
 import 'package:Azunii_Health/views/patient/visits/visits_view.dart';
 import 'package:Azunii_Health/views/splash/splash_view.dart';
 import 'package:get/get_navigation/src/routes/get_route.dart';
@@ -37,6 +39,11 @@ class AppRoutes {
   static const medicationCaregiver = Medication_caretaker.routeName;
   static const faqsCaregiver = FAQsView.routeName;
   static const settingsCaregiver = Settingsview.routeName;
+  static const editMedicineView = EditMedicineView.routeName;
+  static const editVisitsView = EditVisitsView.routeName;
+  static const profile = ProfileView.routeName;
+  static const allVisits = AllVisitsView.routeName;
+  static const viewSummaries = ViewSummariesView.routeName;
 
   static final List<GetPage> pages = [
     GetPage(name: splash, page: () => SplashView()),
@@ -55,5 +62,10 @@ class AppRoutes {
         name: medicationCaregiver, page: () => const Medication_caretaker()),
     GetPage(name: faqsCaregiver, page: () => const FAQsView()),
     GetPage(name: settingsCaregiver, page: () => const Settingsview()),
+    GetPage(name: editMedicineView, page: () => const EditMedicineView()),
+    GetPage(name: editVisitsView, page: () => EditVisitsView()),
+    GetPage(name: profile, page: () => const ProfileView()),
+    GetPage(name: allVisits, page: () => const AllVisitsView()),
+    GetPage(name: viewSummaries, page: () => const ViewSummariesView()),
   ];
 }

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:Azunii_Health/views/widget/Common_widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -17,6 +18,8 @@ class VisitsController extends BaseController {
   final RxString selectedSpecialty = RxString('');
   final Rx<DateTime?> selectedDate = Rx<DateTime?>(null);
   final Rx<File?> selectedImage = Rx<File?>(null);
+  final RxInt editingVisitId = RxInt(0);
+  final RxBool isEditMode = RxBool(false);
 
   final ImagePicker _picker = ImagePicker();
 
@@ -85,6 +88,24 @@ class VisitsController extends BaseController {
 
   void clearImage() {
     selectedImage.value = null;
+  }
+
+  // Load visit data for editing
+  void loadVisitData(VisitModel visit) {
+    isEditMode.value = true;
+    editingVisitId.value = visit.id;
+
+    // Populate form fields
+    providerNameController.text = visit.providerName;
+    selectedSpecialty.value = visit.specialty;
+    notesController.text = visit.notes;
+
+    // Parse visit date
+    try {
+      selectedDate.value = DateTime.parse(visit.visitDate);
+    } catch (e) {
+      selectedDate.value = null;
+    }
   }
 
   Future<void> updateVisit(int visitId) async {
@@ -183,15 +204,7 @@ class VisitsController extends BaseController {
   }
 
   void _showBottomSnackBar(String message, {bool isSuccess = false}) {
-    final snackBar = SnackBar(
-      content: Text(message),
-      backgroundColor: isSuccess ? Colors.green : Colors.red,
-      duration: const Duration(seconds: 2),
-      behavior: SnackBarBehavior.floating,
-      margin: const EdgeInsets.all(16),
-    );
-
-    ScaffoldMessenger.of(Get.context!).showSnackBar(snackBar);
+    CustomSnackbar.show(message, isSuccess: isSuccess);
   }
 
   void _clearAllFields() {
@@ -200,6 +213,8 @@ class VisitsController extends BaseController {
     selectedSpecialty.value = '';
     selectedDate.value = null;
     selectedImage.value = null;
+    isEditMode.value = false;
+    editingVisitId.value = 0;
   }
 
   @override

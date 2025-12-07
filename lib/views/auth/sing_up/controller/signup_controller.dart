@@ -6,7 +6,7 @@ import '../../../../core/controllers/base_controller.dart';
 import '../../../../core/repositories/auth_repository.dart';
 import '../../../../core/services/google_auth_service.dart';
 import '../../../../core/services/local_storage_service.dart';
-import '../../../../utils/snackbar_helper.dart';
+import '../../../widget/Common_widgets/custom_snackbar.dart';
 import '../../../patient/dashboard/patient_dashboard.dart';
 import '../../../care_taker/dashboard/dashboard.dart';
 import '../../Otp/otp_signup_view.dart';
@@ -28,7 +28,7 @@ class SignUpController extends BaseController {
     if (!formKey.currentState!.validate()) return;
 
     if (passwordTxtField.text != confirmPasswordTxtField.text) {
-      SnackbarHelper.showError("Password not match");
+      CustomSnackbar.show("Password not match", isSuccess: false);
       return;
     }
 
@@ -40,7 +40,7 @@ class SignUpController extends BaseController {
           "password_confirmation": confirmPasswordTxtField.text,
         }));
     if (result != null) {
-      SnackbarHelper.showSuccess('Signup successful! Please login.');
+      CustomSnackbar.show('Signup successful! Please login.', isSuccess: true);
       Get.offAllNamed(LoginView.routeName);
     } else {
       print('signup Api failed');
@@ -69,7 +69,7 @@ class SignUpController extends BaseController {
     });
     if (result != null) {
       await LocalStorageService.setLoginStatus(true, userType: userType);
-      SnackbarHelper.showSuccess('Google signin successful!');
+      CustomSnackbar.show('Google signin successful!', isSuccess: true);
 
       if (userType == Appconsts.patient) {
         Get.offAllNamed(PatientDashboard.routeName);

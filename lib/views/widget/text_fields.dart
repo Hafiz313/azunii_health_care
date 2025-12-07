@@ -20,6 +20,7 @@ class CustomTxtField extends StatelessWidget {
   int? maxLines;
   List<TextInputFormatter>? inputFormatters;
   final String? Function(String?)? validator;
+  final EdgeInsetsGeometry? contentPadding;
 
   final TextEditingController? textEditingController;
 
@@ -40,7 +41,8 @@ class CustomTxtField extends StatelessWidget {
       this.isRequired = false,
       this.hintStyle,
       this.fillColor,
-      this.maxLines = 1})
+      this.maxLines = 1,
+      this.contentPadding})
       : super(key: key);
 
   @override
@@ -123,7 +125,7 @@ class CustomTxtField extends StatelessWidget {
                   fontFamily: FontFamily.satoshi,
                   fontSize: 13,
                   fontWeight: FontWeight.w200),
-              contentPadding:
+              contentPadding: contentPadding ??
                   const EdgeInsets.symmetric(vertical: 1.0, horizontal: 12.0),
             ),
           ),

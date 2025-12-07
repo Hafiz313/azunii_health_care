@@ -46,7 +46,7 @@ class UpdateVisitRequest {
 
   Map<String, dynamic> toJson() {
     return {
-      '_method': 'PUT', // For Laravel to treat POST as PUT
+      'id': id,
       'provider_name': providerName,
       'specialty': specialty,
       'visit_date': visitDate,
@@ -97,7 +97,8 @@ class VisitModel {
       createdBy: json['created_by'] != null
           ? UserModel.fromJson(json['created_by'])
           : null,
-      updatedBy: json['updated_by'] != null
+      updatedBy: json['updated_by'] != null &&
+              json['updated_by'] is Map<String, dynamic>
           ? UserModel.fromJson(json['updated_by'])
           : null,
       createdAt: json['created_at'] ?? '',

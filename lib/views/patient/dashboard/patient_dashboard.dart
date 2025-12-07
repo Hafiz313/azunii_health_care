@@ -22,7 +22,7 @@ class PatientDashboard extends StatelessWidget {
 
     final List<Widget> pages = [
       const HomeView(),
-      const MedicinesView(),
+      const AddMedicineView(),
       AddVisitView(),
       const SummaryView(),
       const TimelineView(),

@@ -1,6 +1,7 @@
 import 'package:Azunii_Health/utils/percentage_size_ext.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/customAppBar.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/custom_dropdown.dart';
+import 'package:Azunii_Health/views/widget/Common_widgets/overlayloader.dart';
 import 'package:Azunii_Health/views/widget/text_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -18,21 +19,25 @@ class AddCaregiverView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(AdvocacyController());
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            CustomAppBar(
-              title: 'Add Caregiver',
+    return Obx(() => OverlayLoader(
+          isLoading: controller.isLoading.value,
+          child: Scaffold(
+            backgroundColor: AppColors.white,
+            body: SafeArea(
+              child: Column(
+                children: [
+                  CustomAppBar(
+                    isOndashboard: false,
+                    title: 'Add Caregiver',
+                  ),
+                  Expanded(
+                    child: _buildAddCaregiverContent(controller),
+                  ),
+                ],
+              ),
             ),
-            Expanded(
-              child: _buildAddCaregiverContent(controller),
-            ),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 
   /// Add Caregiver Content
