@@ -28,6 +28,7 @@ class _NotificationViewState extends State<NotificationView> {
         child: Column(
           children: [
             CustomAppBar(
+              isOndashboard: false,
               title: Lang.notifications,
             ),
             Expanded(

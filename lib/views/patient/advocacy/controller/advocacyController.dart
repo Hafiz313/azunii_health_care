@@ -34,59 +34,51 @@ class AdvocacyController extends BaseController {
   }
 
   Future<void> fetchCaregivers() async {
-    setLoading(true);
-    try {
-      final result =
-          await safeApiCall(() => _caregiversRepository.getCaregivers());
-      if (result != null) {
-        caregivers.value = result;
-      }
-    } finally {
-      setLoading(false);
+    final result =
+        await safeApiCall(() => _caregiversRepository.getCaregivers());
+    if (result != null) {
+      caregivers.value = result.caregivers;
     }
   }
 
   Future<void> deleteCaregiver(int id) async {
-    setLoading(true);
-    try {
-      await safeApiCall(() => _caregiversRepository.destroyCaregiver(id));
-      await fetchCaregivers();
+    final result =
+        await safeApiCall(() => _caregiversRepository.destroyCaregiver(id));
+    await fetchCaregivers();
+    if (result != null) {
       CustomSnackbar.show('Caregiver removed successfully', isSuccess: true);
-    } finally {
-      setLoading(false);
     }
   }
 
   Future<void> showCaregiverDetails(int id) async {
-    setLoading(true);
-    try {
-      final result =
-          await safeApiCall(() => _caregiversRepository.getCaregiverDetail(id));
-      if (result != null) {
-        final caregiver = Caregiver.fromJson(result['data']);
-        _showCaregiverDetailsDialog(caregiver);
-      }
-    } finally {
-      setLoading(false);
+    final result =
+        await safeApiCall(() => _caregiversRepository.getCaregiverDetail(id));
+    if (result != null) {
+      _showCaregiverDetailsDialog(result.caregiver);
     }
   }
 
-  void _showCaregiverDetailsDialog(Caregiver caregiver) {
+  void _showCaregiverDetailsDialog(CaregiverDetail caregiver) {
     Get.dialog(
       DetailDialog(
         title: 'Caregiver Details',
         details: [
-          DetailRow(label: 'Full Name', value: caregiver.fullName),
+          DetailRow(label: 'Full Name', value: caregiver.name),
           DetailRow(label: 'Email', value: caregiver.email),
+          if (caregiver.phone != null)
+            DetailRow(label: 'Phone', value: caregiver.phone!),
+          if (caregiver.gender != null)
+            DetailRow(label: 'Gender', value: caregiver.gender!),
           DetailRow(label: 'Relationship', value: caregiver.relationship),
           DetailRow(
-              label: 'Can View', value: caregiver.canView == 1 ? 'Yes' : 'No'),
+              label: 'Can View',
+              value: caregiver.canView == '1' ? 'Yes' : 'No'),
           DetailRow(
               label: 'Can Add Notes',
-              value: caregiver.canAddNotes == 1 ? 'Yes' : 'No'),
-          if (caregiver.addedDate != null)
-            DetailRow(
-                label: 'Added Date', value: caregiver.addedDate!.split('T')[0]),
+              value: caregiver.canAddNotes == '1' ? 'Yes' : 'No'),
+          DetailRow(label: 'Status', value: caregiver.status),
+          DetailRow(
+              label: 'Added Date', value: caregiver.createdAt.split('T')[0]),
         ],
       ),
     );
@@ -108,37 +100,23 @@ class AdvocacyController extends BaseController {
     if (emailController.text.isEmpty ||
         fullNameController.text.isEmpty ||
         selectedRelationship.value.isEmpty) {
-      CustomSnackbar.show('Please fill in all required fields', isSuccess: false);
+      CustomSnackbar.show('Please fill in all required fields',
+          isSuccess: false);
       return;
     }
 
-    final caregiver = Caregiver(
-      email: emailController.text.trim(),
-      fullName: fullNameController.text.trim(),
-      relationship: selectedRelationship.value,
-      canView: viewPermission.value ? 1 : 0,
-      canAddNotes: addNotesPermission.value ? 1 : 0,
-    );
+    final caregiverData = {
+      'email': emailController.text.trim(),
+      'full_name': fullNameController.text.trim(),
+      'relationship': selectedRelationship.value,
+      'can_view': viewPermission.value ? 1 : 0,
+      'can_add_notes': addNotesPermission.value ? 1 : 0,
+    };
 
-    setLoading(true);
-    try {
-      await safeApiCall(() => _caregiversRepository.storeCaregivers(caregiver));
-      Get.back();
-      // Get.snackbar(
-      //   'Success',
-      //   'Invitation sent successfully!',
-      //   backgroundColor: AppColors.green,
-      //   colorText: AppColors.white,
-      //   snackPosition: SnackPosition.TOP,
-      // );
-
-      await fetchCaregivers();
-      Future.delayed(const Duration(seconds: 1), () {
-        Get.back();
-      });
-    } finally {
-      setLoading(false);
-    }
+    await safeApiCall(
+        () => _caregiversRepository.storeCaregivers(caregiverData));
+    Get.back();
+    await fetchCaregivers();
   }
 
   @override

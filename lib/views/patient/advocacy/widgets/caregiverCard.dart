@@ -40,7 +40,7 @@ class CaregiverCard extends StatelessWidget {
           Row(
             children: [
               CircleAvatar(
-                radius: 24,
+                radius: 20,
                 backgroundColor: AppColors.primary,
                 child: Text(
                   name.isNotEmpty ? name[0].toUpperCase() : '?',
@@ -67,7 +67,7 @@ class CaregiverCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     subText5(
-                      fontSize: 13,
+                      fontSize: 12,
                       role,
                       color: AppColors.textColor,
                       align: TextAlign.start,
@@ -104,18 +104,18 @@ class CaregiverCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               subText5(
-                fontSize: 13,
+                fontSize: 12,
                 'Email: $email',
                 color: AppColors.textColor,
                 align: TextAlign.start,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w400,
               ),
               const SizedBox(height: 4),
               Row(
                 children: [
                   subText5(
-                    fontSize: 13,
-                    'Added on',
+                    fontSize: 12,
+                    'Added on: ',
                     color: AppColors.textColor,
                     align: TextAlign.start,
                     fontWeight: FontWeight.w500,
@@ -128,11 +128,11 @@ class CaregiverCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   subText5(
-                    fontSize: 13,
+                    fontSize: 12,
                     addedDate,
                     color: AppColors.textColor,
                     align: TextAlign.start,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w400,
                   ),
                 ],
               ),
@@ -141,17 +141,30 @@ class CaregiverCard extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          // Permissions (Scrollable)
-          SizedBox(
-            height: 40,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
-              itemCount: permissions.length,
-              itemBuilder: (context, index) {
-                return _PermissionChip(permission: permissions[index]);
-              },
-            ),
+          // Permissions
+          Row(
+            children: [
+              subText5(
+                fontSize: 12,
+                'Permissions: ',
+                color: AppColors.blackColor,
+                align: TextAlign.start,
+                fontWeight: FontWeight.w500,
+              ),
+              Expanded(
+                child: SizedBox(
+                  height: 28,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    separatorBuilder: (_, __) => const SizedBox(width: 6),
+                    itemCount: permissions.length,
+                    itemBuilder: (context, index) {
+                      return _PermissionChip(permission: permissions[index]);
+                    },
+                  ),
+                ),
+              ),
+            ],
           ),
 
           const SizedBox(height: 16),
@@ -191,14 +204,14 @@ class _PermissionChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(6),
         border: Border.all(color: AppColors.dividerGray, width: 1),
       ),
       child: subText5(
-        fontSize: 13,
+        fontSize: 11,
         permission,
         color: AppColors.textColor,
         align: TextAlign.center,

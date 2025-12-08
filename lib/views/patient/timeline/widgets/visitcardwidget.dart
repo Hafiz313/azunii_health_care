@@ -4,42 +4,18 @@ import 'package:Azunii_Health/views/widget/buttons.dart';
 import 'package:Azunii_Health/views/widget/text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/models/timeline_model.dart';
 
-// Model for Visit Detail Row
-class VisitDetail {
-  final String label;
-  final String value;
-
-  VisitDetail({required this.label, required this.value});
-}
-
-// Model for Visit
-class Visit {
-  final String doctorName;
-  final String specialty;
-  final String date;
-  final List<VisitDetail> details; // List of reason, findings, plan, etc.
-  final bool isActive;
-  final VoidCallback? onDetailsPressed;
-
-  Visit({
-    required this.doctorName,
-    required this.specialty,
-    required this.date,
-    required this.details,
-    this.isActive = true,
-    this.onDetailsPressed,
-  });
-}
-
-// Reusable VisitCard Widget
 class VisitCard extends StatelessWidget {
-  final Visit visit;
+  final TimelineEvent event;
 
-  const VisitCard({super.key, required this.visit});
+  const VisitCard({super.key, required this.event});
 
   @override
   Widget build(BuildContext context) {
+    final isActive = event.status.toLowerCase() == 'active';
+    final formattedDate = _formatTimestamp(event.timestamp);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -53,7 +29,6 @@ class VisitCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top row with doctor info and date
           Row(
             children: [
               CircleAvatar(
@@ -65,12 +40,16 @@ class VisitCard extends StatelessWidget {
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    subText5(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      '${visit.doctorName} (${visit.specialty})',
-                      color: AppColors.headingTextColor,
+                    Text(
+                      '${_capitalize(event.title)}${event.subtitle != null ? ' (${event.subtitle})' : ''}',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.headingTextColor,
+                      ),
                     ),
                   ],
                 ),
@@ -96,7 +75,7 @@ class VisitCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                     subText5(
-                      visit.date,
+                      formattedDate,
                       fontSize: 12,
                       color: AppColors.headingTextColor,
                     ),
@@ -105,20 +84,36 @@ class VisitCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          // Dynamic details rows
-          ...visit.details.map(
-            (detail) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: _buildVisitDetailRow(detail),
+          if (event.notes != null) ...[
+            const SizedBox(height: 16),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(
+                  width: 60,
+                  child: Text(
+                    'Notes:',
+                    style: TextStyle(color: AppColors.textColor),
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    event.notes!,
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                        color: AppColors.headingTextColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ],
             ),
-          ),
+          ],
           const SizedBox(height: 16),
-          // Bottom row with Active status and Details button
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              if (visit.isActive)
+              if (isActive)
                 Row(
                   children: [
                     Container(
@@ -137,16 +132,6 @@ class VisitCard extends StatelessWidget {
                     ),
                   ],
                 ),
-              SizedBox(
-                height: 36,
-                child: AppElevatedButton(
-                  onPressed: visit.onDetailsPressed,
-                  title: 'Details',
-                  backgroundColor: AppColors.primary,
-                  width: 100,
-                  height: 36,
-                ),
-              ),
             ],
           ),
         ],
@@ -154,28 +139,17 @@ class VisitCard extends StatelessWidget {
     );
   }
 
-  Widget _buildVisitDetailRow(VisitDetail detail) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: SizedBox(
-            width: 80,
-            child: Text(
-              detail.label,
-              style: TextStyle(
-                color: AppColors.textColor,
-              ),
-            ),
-          ),
-        ),
-        Expanded(
-          child: subText5(
-            detail.value,
-            color: AppColors.headingTextColor,
-          ),
-        ),
-      ],
-    );
+  String _capitalize(String text) {
+    if (text.isEmpty) return text;
+    return text[0].toUpperCase() + text.substring(1);
+  }
+
+  String _formatTimestamp(String timestamp) {
+    try {
+      final dt = DateTime.parse(timestamp);
+      return '${dt.day.toString().padLeft(2, '0')}-${dt.month.toString().padLeft(2, '0')}-${dt.year}';
+    } catch (e) {
+      return timestamp;
+    }
   }
 }

@@ -204,8 +204,7 @@ class ApiClient {
       final headers = await _getAuthHeaders();
       print('🚀 API Request Hit: DELETE $endpoint');
       print('🔐 Authorization Header: ${headers['Authorization']}');
-      final response =
-          await http.delete(url, headers: headers).timeout(_timeout);
+      final response = await http.get(url, headers: headers).timeout(_timeout);
       return _handleResponse(response);
     } on SocketException {
       throw NetworkException('No internet connection');

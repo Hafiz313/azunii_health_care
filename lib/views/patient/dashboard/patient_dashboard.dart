@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../consts/colors.dart';
 import '../advocacy/advocacy_view.dart';
+import '../advocacy/controller/advocacyController.dart';
 
 import '../medicines/medicines_view.dart';
 import '../summary/summary_view.dart';
 import '../timeline/timeline_view.dart';
+import '../timeline/controller/timelineController.dart';
 import '../visits/visits_view.dart';
 
 class PatientDashboard extends StatelessWidget {
@@ -19,6 +21,8 @@ class PatientDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(PatientHomeController());
+    Get.put(TimelineController());
+    Get.put(AdvocacyController());
 
     final List<Widget> pages = [
       const HomeView(),

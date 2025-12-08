@@ -4,12 +4,12 @@ import '../models/care_givermodel.dart';
 
 class CaregiversRepository {
   // Store Caregiver
-  Future<Map<String, dynamic>> storeCaregivers(Caregiver caregiver) async {
+  Future<Map<String, dynamic>> storeCaregivers(Map<String, dynamic> caregiverData) async {
     try {
       print('\n💾 STORE CAREGIVER Request 💾');
-      print('📧 Email: ${caregiver.email}');
-      print('👤 Full Name: ${caregiver.fullName}');
-      final response = await ApiClient.postWithAuth(Apis.storeCaregivers, body: caregiver.toJson());
+      print('📧 Email: ${caregiverData['email']}');
+      print('👤 Full Name: ${caregiverData['full_name']}');
+      final response = await ApiClient.postWithAuth(Apis.storeCaregivers, body: caregiverData);
       print('✅ Caregiver stored successfully\n');
       return response;
     } catch (e) {
@@ -19,13 +19,12 @@ class CaregiversRepository {
   }
 
   // Get Caregivers
-  Future<List<Caregiver>> getCaregivers() async {
+  Future<CaregiverListResponse> getCaregivers() async {
     try {
       print('\n📋 GET CAREGIVERS Request 📋');
       final response = await ApiClient.getWithAuth(Apis.getCaregivers);
       print('📄 Caregivers Response: Retrieved caregivers list\n');
-      final caregiverResponse = CaregiverListResponse.fromJson(response);
-      return caregiverResponse.caregivers;
+      return CaregiverListResponse.fromJson(response);
     } catch (e) {
       print('❌ Get Caregivers Error: $e');
       rethrow;
@@ -33,13 +32,13 @@ class CaregiversRepository {
   }
 
   // Get Caregiver Detail
-  Future<Map<String, dynamic>> getCaregiverDetail(int id) async {
+  Future<CaregiverDetailResponse> getCaregiverDetail(int id) async {
     try {
       print('\n📋 GET CAREGIVER DETAIL Request 📋');
       print('🆔 Caregiver ID: $id');
       final response = await ApiClient.getWithAuth('${Apis.caregiversDetail}/$id');
       print('📄 Caregiver Detail Response: Retrieved details for caregiver $id\n');
-      return response;
+      return CaregiverDetailResponse.fromJson(response);
     } catch (e) {
       print('❌ Get Caregiver Detail Error: $e');
       rethrow;

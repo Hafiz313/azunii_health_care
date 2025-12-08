@@ -14,12 +14,11 @@ import '../../widget/buttons.dart';
 import 'add_caregiver_view.dart';
 import 'controller/advocacyController.dart';
 
-class AdvocacyView extends StatelessWidget {
+class AdvocacyView extends GetView<AdvocacyController> {
   const AdvocacyView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(AdvocacyController());
     return Obx(() => OverlayLoader(
           isLoading: controller.isLoading.value,
           child: Scaffold(
@@ -143,22 +142,19 @@ class AdvocacyView extends StatelessWidget {
       AdvocacyController controller, Caregiver caregiver) {
     return Builder(builder: (context) {
       final permissions = <String>[];
-      if (caregiver.canView == 1) permissions.add('View Records');
-      if (caregiver.canAddNotes == 1) permissions.add('Add Notes');
+      if (caregiver.canView == '1') permissions.add('View Records');
+      if (caregiver.canAddNotes == '1') permissions.add('Add Notes');
 
       return CaregiverCard(
-        profileImage: '',
-        name: caregiver.fullName,
+        profileImage: caregiver.caregiver.avatar ?? '',
+        name: caregiver.caregiver.name,
         role: caregiver.relationship,
-        email: caregiver.email,
-        addedDate: caregiver.addedDate?.split('T')[0] ?? 'N/A',
+        email: caregiver.caregiver.email,
+        addedDate: caregiver.createdAt.split('T')[0],
         permissions: permissions,
         onDelete: () => _showDeleteDialog(context, controller, caregiver),
-        onDetails: () {
-          if (caregiver.id != null) {
-            controller.showCaregiverDetails(caregiver.id!);
-          }
-        },
+        onDetails: () =>
+            controller.showCaregiverDetails(caregiver.caregiver.id),
       );
     });
   }
@@ -171,7 +167,7 @@ class AdvocacyView extends StatelessWidget {
         return AlertDialog(
           title: const Text('Delete Caregiver'),
           content: Text(
-              'Are you sure you want to remove ${caregiver.fullName} as a caregiver?'),
+              'Are you sure you want to remove ${caregiver.caregiver.name} as a caregiver?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -180,9 +176,7 @@ class AdvocacyView extends StatelessWidget {
             TextButton(
               onPressed: () async {
                 Navigator.of(context).pop();
-                if (caregiver.id != null) {
-                  await controller.deleteCaregiver(caregiver.id!);
-                }
+                await controller.deleteCaregiver(caregiver.caregiver.id);
               },
               child: const Text('Delete',
                   style: TextStyle(color: AppColors.redColor)),
