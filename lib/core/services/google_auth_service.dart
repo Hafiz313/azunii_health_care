@@ -10,9 +10,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 
 class GoogleAuthService {
   static final GoogleSignIn _googleSignIn = GoogleSignIn();
-//  static final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  /// import 'package:google_sign_in/google_sign_in.dart';
   Future<Map<String, dynamic>> signInWithGoogle() async {
     try {
       final String? clientId = dotenv.env['GOOGLE_CLIENT_ID'];
@@ -25,9 +23,8 @@ class GoogleAuthService {
       );
 
       final GoogleSignInAccount? account = await googleSignIn.signIn();
-      if (account == null) return {}; // user canceled
+      if (account == null) return {};
 
-      // Optionally: get server auth code if needed
       final String serverAuthCode = account.serverAuthCode ?? "";
 
       final email = account.email;
@@ -42,30 +39,10 @@ class GoogleAuthService {
         "device_token": deviceToken,
         "server_auth_code": serverAuthCode,
       };
-    } catch (e, stackTrace) {
-      // Log the error if needed
-      print("Google sign-in error: $e");
-      print(stackTrace);
-
-      // Return empty map or some error info
+    } catch (e) {
       return {
-        "error": e.toString(),
+        "error": "Google sign-in failed",
       };
     }
   }
-
-  // /// Check if user is signed in
-  // static Future<bool> isSignedIn() async {
-  //   return await LocalStorageService.getLoginStatus();
-  // }
-
-  // /// Get available Google accounts
-  // static Future<List<GoogleSignInAccount>> getAvailableAccounts() async {
-  //   try {
-  //     await _googleSignIn.signOut();
-  //     return [];
-  //   } catch (e) {
-  //     return [];
-  //   }
-  // }
 }

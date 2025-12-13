@@ -1,7 +1,6 @@
-import 'dart:ffi';
-
 import 'package:Azunii_Health/consts/colors.dart';
 import 'package:Azunii_Health/consts/lang.dart';
+import 'package:Azunii_Health/utils/percentage_size_ext.dart';
 import 'package:Azunii_Health/views/patient/medicines/controller/medicineController.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/customAppBar.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/custom_dropdown.dart';
@@ -84,7 +83,7 @@ class _EditMedicineViewState extends State<EditMedicineView> {
                             const SizedBox(height: 20),
                             _buildStatusDropdown(),
                             const SizedBox(height: 24),
-                            _buildFrequencySection(),
+                            _buildFrequencySection(context),
                             const SizedBox(height: 24),
                             _buildUploadSection(),
                             const SizedBox(height: 24),
@@ -149,17 +148,17 @@ class _EditMedicineViewState extends State<EditMedicineView> {
         ));
   }
 
-  Widget _buildFrequencySection() {
+  Widget _buildFrequencySection(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Frequency Schedule',
           style: TextStyle(
             color: AppColors.headingTextColor,
             fontFamily: 'Satoshi',
             fontWeight: FontWeight.w600,
-            fontSize: 16,
+            fontSize: context.percentWidth * 4,
           ),
         ),
         const SizedBox(height: 16),
@@ -167,7 +166,7 @@ class _EditMedicineViewState extends State<EditMedicineView> {
               children: [
                 if (controller.frequencyRows.isNotEmpty) _buildFrequencyRow(0),
                 const SizedBox(height: 12),
-                _buildAddFrequencyButton(),
+                _buildAddFrequencyButton(context),
                 if (controller.frequencyRows.length > 1)
                   ...controller.frequencyRows
                       .asMap()
@@ -248,7 +247,7 @@ class _EditMedicineViewState extends State<EditMedicineView> {
     );
   }
 
-  Widget _buildAddFrequencyButton() {
+  Widget _buildAddFrequencyButton(BuildContext context) {
     return InkWell(
       onTap: controller.addFrequencyRow,
       child: Container(
@@ -258,10 +257,10 @@ class _EditMedicineViewState extends State<EditMedicineView> {
           border: Border.all(color: AppColors.primary),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.add, color: AppColors.primary, size: 20),
+            Icon(Icons.add, color: AppColors.primary, size: context.percentWidth * 5),
             SizedBox(width: 8),
             Text(
               'Add Another Frequency',
@@ -269,7 +268,7 @@ class _EditMedicineViewState extends State<EditMedicineView> {
                 color: AppColors.primary,
                 fontFamily: 'Satoshi',
                 fontWeight: FontWeight.w500,
-                fontSize: 14,
+                fontSize: context.percentWidth * 3.5,
               ),
             ),
           ],

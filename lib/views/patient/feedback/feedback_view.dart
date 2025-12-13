@@ -34,7 +34,10 @@ class FeedbackView extends StatelessWidget {
               title: 'User Feedback',
             ),
             Expanded(
-              child: _buildFeedbackContent(context, controller),
+              child: GestureDetector(
+                onTap: () => FocusScope.of(context).unfocus(),
+                child: _buildFeedbackContent(context, controller),
+              ),
             ),
           ],
         ),

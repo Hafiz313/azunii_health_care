@@ -32,7 +32,6 @@ class _LoginViewState extends State<LoginView> {
   @override
   void initState() {
     super.initState();
-    //  _checkBiometrics();
   }
 
   @override
@@ -79,7 +78,7 @@ class _LoginViewState extends State<LoginView> {
           Text(
             Lang.welcomeBack,
             style: GoogleFonts.michroma(
-              fontSize: context.percentHeight * 2.5,
+              fontSize: context.percentWidth * 6.25,
               fontWeight: FontWeight.w500,
               color: AppColors.blackColor,
             ),
@@ -110,6 +109,7 @@ class _LoginViewState extends State<LoginView> {
                         Lang.donntHaveAnAccount,
                         color: AppColors.blackColor,
                         fontWeight: FontWeight.w400,
+                        context: context,
                       ),
                       SizedBox(width: context.percentWidth * 5),
                       InkWell(
@@ -121,6 +121,7 @@ class _LoginViewState extends State<LoginView> {
                             Lang.signUp,
                             color: AppColors.primary,
                             fontWeight: FontWeight.w400,
+                            context: context,
                           )),
                     ],
                   ),

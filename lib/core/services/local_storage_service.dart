@@ -1,4 +1,4 @@
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
 
@@ -8,6 +8,8 @@ class LocalStorageService {
   static const String _userIdKey = 'userId';
   static const String _userTypeKey = 'userType';
   static const String _tokenKey = 'authToken';
+  
+  static const _secureStorage = FlutterSecureStorage();
 
   /// Initialize Hive
 
@@ -31,12 +33,12 @@ class LocalStorageService {
       }
 
       if (token != null) {
-        await prefs.setString(_tokenKey, token);
+        await _secureStorage.write(key: _tokenKey, value: token);
       } else {
-        await prefs.remove(_tokenKey);
+        await _secureStorage.delete(key: _tokenKey);
       }
     } catch (e) {
-      throw Exception('Failed to set login status: $e');
+      throw Exception('Failed to set login status');
     }
   }
 
@@ -50,11 +52,10 @@ class LocalStorageService {
     }
   }
 
-  /// Get auth token
+  /// Get auth token from secure storage
   static Future<String?> getToken() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      return prefs.getString(_tokenKey);
+      return await _secureStorage.read(key: _tokenKey);
     } catch (e) {
       return null;
     }
@@ -75,8 +76,9 @@ class LocalStorageService {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
+      await _secureStorage.deleteAll();
     } catch (e) {
-      throw Exception('Failed to clear local data: $e');
+      throw Exception('Failed to clear local data');
     }
   }
 
@@ -89,9 +91,11 @@ class LocalStorageService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_isLoggedInKey);
       await prefs.remove(_userTypeKey);
-      await prefs.remove(_tokenKey);
+      
+      // Clear secure storage
+      await _secureStorage.delete(key: _tokenKey);
     } catch (e) {
-      throw Exception('Failed to logout: $e');
+      throw Exception('Failed to logout');
     }
   }
 }

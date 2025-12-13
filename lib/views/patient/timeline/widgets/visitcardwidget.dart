@@ -4,6 +4,7 @@ import 'package:Azunii_Health/views/widget/buttons.dart';
 import 'package:Azunii_Health/views/widget/text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/models/timeline_model.dart';
 
 class VisitCard extends StatelessWidget {
@@ -19,7 +20,7 @@ class VisitCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: const Color.fromARGB(255, 240, 240, 240),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: AppColors.dividerGray,
@@ -46,7 +47,7 @@ class VisitCard extends StatelessWidget {
                       '${_capitalize(event.title)}${event.subtitle != null ? ' (${event.subtitle})' : ''}',
                       textAlign: TextAlign.left,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 11,
                         fontWeight: FontWeight.w500,
                         color: AppColors.headingTextColor,
                       ),
@@ -66,8 +67,8 @@ class VisitCard extends StatelessWidget {
                   children: [
                     SvgPicture.asset(
                       AppAssets.calander,
-                      width: 14,
-                      height: 14,
+                      width: 12,
+                      height: 12,
                       colorFilter: const ColorFilter.mode(
                         AppColors.textColor,
                         BlendMode.srcIn,
@@ -76,7 +77,8 @@ class VisitCard extends StatelessWidget {
                     const SizedBox(width: 6),
                     subText5(
                       formattedDate,
-                      fontSize: 12,
+                      fontSize: 11,
+                      fontWeight: FontWeight.normal,
                       color: AppColors.headingTextColor,
                     ),
                   ],
@@ -84,26 +86,30 @@ class VisitCard extends StatelessWidget {
               ),
             ],
           ),
+          Divider(
+            thickness: 0.5,
+          ),
           if (event.notes != null) ...[
             const SizedBox(height: 16),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(
+                SizedBox(
                   width: 60,
-                  child: Text(
-                    'Notes:',
-                    style: TextStyle(color: AppColors.textColor),
-                  ),
+                  child: Text('Notes:',
+                      style: GoogleFonts.manrope(
+                          color: AppColors.headingTextColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400)),
                 ),
                 Expanded(
                   child: Text(
                     event.notes!,
                     textAlign: TextAlign.left,
-                    style: TextStyle(
+                    style: GoogleFonts.manrope(
                         color: AppColors.headingTextColor,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w400),
                   ),
                 ),
               ],
@@ -117,8 +123,8 @@ class VisitCard extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      width: 12,
-                      height: 12,
+                      width: 10,
+                      height: 10,
                       decoration: const BoxDecoration(
                         color: AppColors.green,
                         shape: BoxShape.circle,
@@ -126,7 +132,7 @@ class VisitCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                     subText5(
-                      fontSize: 13,
+                      fontSize: 11,
                       'Active',
                       color: AppColors.green,
                     ),

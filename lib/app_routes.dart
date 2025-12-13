@@ -14,6 +14,8 @@ import 'package:Azunii_Health/views/patient/dashboard/patient_dashboard.dart';
 import 'package:Azunii_Health/views/patient/home/home_view.dart';
 import 'package:Azunii_Health/views/patient/medicines/edit_medication.dart';
 import 'package:Azunii_Health/views/patient/home/profile_view.dart';
+import 'package:Azunii_Health/views/patient/privacy/privacy_policy_view.dart';
+import 'package:Azunii_Health/views/patient/support/help_support_view.dart';
 import 'package:Azunii_Health/views/patient/summary/view_summaries_view.dart';
 import 'package:Azunii_Health/views/patient/visits/all_visits_view.dart';
 import 'package:Azunii_Health/views/patient/visits/edit_visits_view.dart';
@@ -42,6 +44,8 @@ class AppRoutes {
   static const editMedicineView = EditMedicineView.routeName;
   static const editVisitsView = EditVisitsView.routeName;
   static const profile = ProfileView.routeName;
+  static const privacyPolicy = PrivacyPolicyView.routeName;
+  static const helpSupport = HelpSupportView.routeName;
   static const allVisits = AllVisitsView.routeName;
   static const viewSummaries = ViewSummariesView.routeName;
 
@@ -65,6 +69,8 @@ class AppRoutes {
     GetPage(name: editMedicineView, page: () => const EditMedicineView()),
     GetPage(name: editVisitsView, page: () => EditVisitsView()),
     GetPage(name: profile, page: () => const ProfileView()),
+    GetPage(name: privacyPolicy, page: () => const PrivacyPolicyView()),
+    GetPage(name: helpSupport, page: () => const HelpSupportView()),
     GetPage(name: allVisits, page: () => const AllVisitsView()),
     GetPage(name: viewSummaries, page: () => const ViewSummariesView()),
   ];

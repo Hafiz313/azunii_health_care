@@ -1,4 +1,5 @@
 import 'package:Azunii_Health/consts/colors.dart';
+import 'package:Azunii_Health/utils/percentage_size_ext.dart';
 import 'package:Azunii_Health/views/patient/home/controller/home_controller.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/appointment_card.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/customAppBar.dart';
@@ -48,6 +49,7 @@ class _AllVisitsViewState extends State<AllVisitsView> {
                     'All Visits',
                     color: AppColors.headingTextColor,
                     fontWeight: FontWeight.w500,
+                    context: context,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -58,6 +60,7 @@ class _AllVisitsViewState extends State<AllVisitsView> {
                           child: subText4(
                             'No visits found',
                             color: AppColors.textColor,
+                            context: context,
                           ),
                         ),
                       )

@@ -1,3 +1,4 @@
+import 'package:Azunii_Health/utils/percentage_size_ext.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/customAppBar.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/custom_dropdown.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/overlayloader.dart';
@@ -66,9 +67,8 @@ class _EditVisitsViewState extends State<EditVisitsView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 10),
-                        _buildHeading(),
+                        _buildHeading(context),
                         const SizedBox(height: 10),
-                        // Provider name
                         CustomTxtField(
                           title: Lang.ProviderName,
                           textEditingController:
@@ -81,7 +81,6 @@ class _EditVisitsViewState extends State<EditVisitsView> {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        // Specialty dropdown
                         Obx(() => CustomDropdown(
                               label: Lang.specialty,
                               hintText: Lang.selectSpecialty,
@@ -104,7 +103,6 @@ class _EditVisitsViewState extends State<EditVisitsView> {
                               ),
                             )),
                         const SizedBox(height: 20),
-                        // Date picker
                         Obx(() => CustomDatePicker(
                               label: Lang.date,
                               hintText: Lang.selectDate,
@@ -112,7 +110,6 @@ class _EditVisitsViewState extends State<EditVisitsView> {
                               onChanged: controller.setDate,
                             )),
                         const SizedBox(height: 20),
-                        // Notes
                         CustomTxtField(
                           title: Lang.notes,
                           textEditingController: controller.notesController,
@@ -120,7 +117,6 @@ class _EditVisitsViewState extends State<EditVisitsView> {
                           maxLines: 4,
                         ),
                         const SizedBox(height: 24),
-                        // Upload Section
                         UploadSectionWidget(
                           headerIcon: Icons.upload,
                           title: Lang.photoDocumentUpload,
@@ -129,13 +125,10 @@ class _EditVisitsViewState extends State<EditVisitsView> {
                           selectedImage: controller.selectedImage,
                         ),
                         const SizedBox(height: 24),
-                        // Save Button
                         AppElevatedButton(
                           onPressed: () {
                             if (visitId != null) {
                               controller.updateVisit(visitId!);
-                            } else {
-                              //  controller.saveVisit();
                             }
                           },
                           title: 'Update Visit',
@@ -155,12 +148,12 @@ class _EditVisitsViewState extends State<EditVisitsView> {
         )));
   }
 
-  Widget _buildHeading() {
+  Widget _buildHeading(BuildContext context) {
     return subText5(
       Lang.prepareForNewVisit,
-      fontSize: 15,
       color: AppColors.headingTextColor,
       fontWeight: FontWeight.w500,
+      context: context,
     );
   }
 }

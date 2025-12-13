@@ -52,7 +52,7 @@ class SignUpView extends StatelessWidget {
                   Text(
                     Lang.welcomeyou,
                     style: GoogleFonts.michroma(
-                      fontSize: context.percentHeight * 2.5,
+                      fontSize: context.percentWidth * 6.25,
                       fontWeight: FontWeight.w500,
                       color: AppColors.blackColor,
                     ),
@@ -166,7 +166,6 @@ class SignUpView extends StatelessWidget {
                   Obx(() => CustomDropdown(
                         hintText: 'Select Role',
                         label: 'Role',
-                        //   hintTxt: 'Select Role',
                         prefixIcon: Icon(Icons.person_outline),
                         selectedValue: controller.selectedRole.value,
                         items: controller.roles,
@@ -201,7 +200,6 @@ class SignUpView extends StatelessWidget {
                           ),
                           Column(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            //git  crossAxigitsAlignment: CrossAxisAlignment.center,
                             children: [
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
@@ -211,6 +209,7 @@ class SignUpView extends StatelessWidget {
                                     Lang.alreadyText,
                                     color: AppColors.blackColor,
                                     fontWeight: FontWeight.w400,
+                                    context: context,
                                   ),
                                   SizedBox(width: context.percentWidth * 1),
                                   InkWell(
@@ -222,6 +221,7 @@ class SignUpView extends StatelessWidget {
                                         Lang.signIn,
                                         fontWeight: FontWeight.w400,
                                         color: AppColors.primary,
+                                        context: context,
                                       )),
                                 ],
                               ),
@@ -229,16 +229,6 @@ class SignUpView extends StatelessWidget {
                           ),
                         ],
                       ),
-                      // Obx(() => mainLoading.value
-                      //     ? Positioned.fill(
-                      //         child: Container(
-                      //           color: Colors.black.withOpacity(0.3),
-                      //           child: const Center(
-                      //             child: MyLoader(),
-                      //           ),
-                      //         ),
-                      //       )
-                      //     : const SizedBox.shrink()),
                     ],
                   ),
                 ],

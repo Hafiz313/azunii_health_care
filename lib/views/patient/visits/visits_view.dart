@@ -1,3 +1,4 @@
+import 'package:Azunii_Health/utils/percentage_size_ext.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/customAppBar.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/custom_dropdown.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/overlayloader.dart';
@@ -30,18 +31,20 @@ class VisitsView extends StatelessWidget {
             children: [
               FaIcon(
                 FontAwesomeIcons.userDoctor,
-                size: 80,
+                size: context.percentWidth * 20,
                 color: AppColors.primary,
               ),
               const SizedBox(height: 20),
               headingText1(
                 'Visits',
                 color: AppColors.headingTextColor,
+                context: context,
               ),
               const SizedBox(height: 10),
               subText3(
                 'Manage your doctor visits',
                 color: AppColors.textColor,
+                context: context,
               ),
             ],
           ),
@@ -89,9 +92,8 @@ class _AddVisitViewState extends State<AddVisitView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 10),
-                        _buildHeading(),
+                        _buildHeading(context),
                         const SizedBox(height: 10),
-                        // Provider name
                         CustomTxtField(
                           title: Lang.ProviderName,
                           textEditingController:
@@ -104,7 +106,6 @@ class _AddVisitViewState extends State<AddVisitView> {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        // Specialty dropdown
                         Obx(() => CustomDropdown(
                               label: Lang.specialty,
                               hintText: Lang.selectSpecialty,
@@ -127,7 +128,6 @@ class _AddVisitViewState extends State<AddVisitView> {
                               ),
                             )),
                         const SizedBox(height: 20),
-                        // Date picker
                         Obx(() => CustomDatePicker(
                               label: Lang.date,
                               hintText: Lang.selectDate,
@@ -135,7 +135,6 @@ class _AddVisitViewState extends State<AddVisitView> {
                               onChanged: controller.setDate,
                             )),
                         const SizedBox(height: 20),
-                        // Notes
                         CustomTxtField(
                           title: Lang.notes,
                           textEditingController: controller.notesController,
@@ -143,7 +142,6 @@ class _AddVisitViewState extends State<AddVisitView> {
                           maxLines: 4,
                         ),
                         const SizedBox(height: 24),
-                        // Upload Section
                         UploadSectionWidget(
                           headerIcon: Icons.upload,
                           title: Lang.photoDocumentUpload,
@@ -152,7 +150,6 @@ class _AddVisitViewState extends State<AddVisitView> {
                           selectedImage: controller.selectedImage,
                         ),
                         const SizedBox(height: 24),
-                        // Save Button
                         AppElevatedButton(
                           onPressed: controller.saveVisit,
                           title: Lang.save,
@@ -172,12 +169,12 @@ class _AddVisitViewState extends State<AddVisitView> {
         )));
   }
 
-  Widget _buildHeading() {
+  Widget _buildHeading(BuildContext context) {
     return subText5(
       Lang.prepareForNewVisit,
-      fontSize: 15,
       color: AppColors.headingTextColor,
       fontWeight: FontWeight.w500,
+      context: context,
     );
   }
 }

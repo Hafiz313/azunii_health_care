@@ -2,6 +2,9 @@ import 'package:Azunii_Health/consts/assets.dart';
 import 'package:Azunii_Health/core/models/static_user_model.dart';
 import 'package:Azunii_Health/utils/percentage_size_ext.dart';
 import 'package:Azunii_Health/views/care_taker/feedback/feedback_view.dart';
+import 'package:Azunii_Health/views/patient/privacy/privacy_policy_view.dart';
+import 'package:Azunii_Health/views/patient/support/help_support_view.dart';
+import 'package:Azunii_Health/views/patient/timeline/timeline_view.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -90,12 +93,12 @@ class HomeView extends StatelessWidget {
                 color: AppColors.valueTextColor,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Center(
+              child: Center(
                 child: Text(
                   'R',
                   style: TextStyle(
                     color: AppColors.white,
-                    fontSize: 18,
+                    fontSize: context.percentWidth * 4.5,
                     fontWeight: FontWeight.normal,
                   ),
                 ),
@@ -112,6 +115,7 @@ class HomeView extends StatelessWidget {
                     Lang.welcome,
                     color: AppColors.textColor,
                     align: TextAlign.start,
+                    context: context,
                   ),
                   subText4(
                     Staticdata.userModel?.name?.isNotEmpty == true
@@ -120,6 +124,7 @@ class HomeView extends StatelessWidget {
                     color: AppColors.headingTextColor,
                     align: TextAlign.start,
                     fontWeight: FontWeight.w500,
+                    context: context,
                   ),
                 ],
               ),
@@ -156,7 +161,7 @@ class HomeView extends StatelessWidget {
                   icon: FaIcon(
                     FontAwesomeIcons.house,
                     color: Colors.pink[300],
-                    size: 18,
+                    size: context.percentWidth * 4.5,
                   ),
                   title: Lang.addVisit,
                   onTap: () {
@@ -176,7 +181,7 @@ class HomeView extends StatelessWidget {
                   icon: FaIcon(
                     FontAwesomeIcons.pills,
                     color: Colors.blue[400],
-                    size: 17,
+                    size: context.percentWidth * 4.25,
                   ),
                   title: Lang.addMedication,
                   onTap: () {
@@ -197,14 +202,20 @@ class HomeView extends StatelessWidget {
             children: [
               Expanded(
                 child: QuickActionCard(
-                  icon: FaIcon(
-                    FontAwesomeIcons.timeline,
-                    color: Colors.orange[400],
-                    size: 18,
-                  ),
-                  title: Lang.viewTimeline,
-                  onTap: () => Get.find<HomeController>().onViewTimelineTap(),
-                ),
+                    icon: FaIcon(
+                      FontAwesomeIcons.timeline,
+                      color: Colors.orange[400],
+                      size: context.percentWidth * 4.5,
+                    ),
+                    title: Lang.viewTimeline,
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const TimelineView(
+                                    isOndashboard: false,
+                                  )));
+                    }),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -215,14 +226,14 @@ class HomeView extends StatelessWidget {
                       FaIcon(
                         FontAwesomeIcons.clipboardList,
                         color: Colors.blue[400],
-                        size: 18,
+                        size: context.percentWidth * 4.5,
                       ),
                       Positioned(
                         bottom: 0,
                         child: FaIcon(
                           FontAwesomeIcons.stethoscope,
                           color: Colors.blue[600],
-                          size: 12,
+                          size: context.percentWidth * 3,
                         ),
                       ),
                     ],
@@ -249,7 +260,7 @@ class HomeView extends StatelessWidget {
             Lang.medicationAlert,
             color: AppColors.headingTextColor,
             fontWeight: FontWeight.w500,
-            //   textAlign: TextAlign.start,
+            context: context,
           ),
           const SizedBox(height: 8),
           MedicationAlertCard(
@@ -273,10 +284,10 @@ class HomeView extends StatelessWidget {
     ];
 
     final medicineIcons = [
-      FaIcon(FontAwesomeIcons.pills, color: Colors.blue[600], size: 24),
-      FaIcon(FontAwesomeIcons.capsules, color: Colors.orange[600], size: 24),
-      FaIcon(FontAwesomeIcons.tablets, color: AppColors.green, size: 24),
-      FaIcon(FontAwesomeIcons.syringe, color: Colors.purple[600], size: 24),
+      FaIcon(FontAwesomeIcons.pills, color: Colors.blue[600], size: context.percentWidth * 6),
+      FaIcon(FontAwesomeIcons.capsules, color: Colors.orange[600], size: context.percentWidth * 6),
+      FaIcon(FontAwesomeIcons.tablets, color: AppColors.green, size: context.percentWidth * 6),
+      FaIcon(FontAwesomeIcons.syringe, color: Colors.purple[600], size: context.percentWidth * 6),
     ];
 
     return Padding(
@@ -292,6 +303,7 @@ class HomeView extends StatelessWidget {
                 fontWeight: FontWeight.w500,
                 Lang.asOfToday,
                 color: AppColors.headingTextColor,
+                context: context,
               ),
               DatePickerButton(
                 date: controller.selectedDate.value,
@@ -315,13 +327,14 @@ class HomeView extends StatelessWidget {
                       FaIcon(
                         FontAwesomeIcons.pills,
                         color: AppColors.textColor.withOpacity(0.5),
-                        size: 32,
+                        size: context.percentWidth * 8,
                       ),
                       const SizedBox(height: 8),
                       subText4(
                         'No medicines added yet',
                         color: AppColors.textColor,
                         align: TextAlign.center,
+                        context: context,
                       ),
                     ],
                   ),
@@ -351,8 +364,11 @@ class HomeView extends StatelessWidget {
                               icon: medicineIcons[iconIndex],
                               title: medicine.medicineName,
                               isCompleted: medicine.status != 'active',
-                              status: medicine.status == 'active' ? 'Active' : 'Completed',
-                              onTap: () => controller.showMedicineDetails(medicine.id),
+                              status: medicine.status == 'active'
+                                  ? 'Active'
+                                  : 'Completed',
+                              onTap: () =>
+                                  controller.showMedicineDetails(medicine.id),
                             ),
                           ),
                         );
@@ -380,14 +396,15 @@ class HomeView extends StatelessWidget {
             children: [
               headline5(Lang.futureAppointments,
                   color: AppColors.headingTextColor,
-                  fontWeight: FontWeight.w500),
+                  fontWeight: FontWeight.w500,
+                  context: context),
               InkWell(
                 onTap: controller.onViewAllTap,
                 child: subText5(
-                  fontSize: 12,
                   Lang.viewAll,
                   color: AppColors.borderColor,
                   align: TextAlign.start,
+                  context: context,
                 ),
               ),
             ],
@@ -408,13 +425,14 @@ class HomeView extends StatelessWidget {
                       FaIcon(
                         FontAwesomeIcons.calendarCheck,
                         color: AppColors.textColor.withOpacity(0.5),
-                        size: 32,
+                        size: context.percentWidth * 8,
                       ),
                       const SizedBox(height: 8),
                       subText4(
                         'No visits scheduled',
                         color: AppColors.textColor,
                         align: TextAlign.center,
+                        context: context,
                       ),
                     ],
                   ),
@@ -440,7 +458,8 @@ class HomeView extends StatelessWidget {
                               doctor: visit.providerName,
                               reason: visit.notes,
                               specialty: visit.specialty,
-                              onTap: () => controller.showVisitDetails(visit.id),
+                              onTap: () =>
+                                  controller.showVisitDetails(visit.id),
                             ),
                           ),
                         );
@@ -482,7 +501,9 @@ class HomeView extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const ProfileView()),
+                          builder: (context) => const ProfileView(
+                                isOndashboard: false,
+                              )),
                     );
                   },
                 ),
@@ -491,7 +512,6 @@ class HomeView extends StatelessWidget {
                   icon: Icons.feedback,
                   title: 'Feedback',
                   onTap: () =>
-                      //     Navigator.pop(context);
                       Navigator.pushNamed(context, '/feedback'),
                 ),
                 _buildDrawerItem(
@@ -504,13 +524,25 @@ class HomeView extends StatelessWidget {
                   context,
                   icon: Icons.privacy_tip,
                   title: 'Privacy Policy',
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const PrivacyPolicyView()),
+                    );
+                  },
                 ),
                 _buildDrawerItem(
                   context,
                   icon: Icons.help,
                   title: 'Help & Support',
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const HelpSupportView()),
+                    );
+                  },
                 ),
               ],
             ),
@@ -522,7 +554,7 @@ class HomeView extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(context); // Close drawer first
+                  Navigator.pop(context);
                   _showLogoutDialog(context);
                 },
                 style: ElevatedButton.styleFrom(
@@ -536,6 +568,7 @@ class HomeView extends StatelessWidget {
                   'Logout',
                   color: AppColors.white,
                   fontWeight: FontWeight.w500,
+                  context: context,
                 ),
               ),
             ),
@@ -560,6 +593,7 @@ class HomeView extends StatelessWidget {
         title,
         color: AppColors.headingTextColor,
         align: TextAlign.start,
+        context: context,
       ),
       onTap: onTap,
     );
@@ -575,10 +609,12 @@ class HomeView extends StatelessWidget {
             'Logout',
             color: AppColors.headingTextColor,
             fontWeight: FontWeight.w500,
+            context: context,
           ),
           content: subText5(
             'Are you sure you want to logout?',
             color: AppColors.textColor,
+            context: context,
           ),
           actions: [
             TextButton(
@@ -586,12 +622,12 @@ class HomeView extends StatelessWidget {
               child: subText5(
                 'Cancel',
                 color: AppColors.textColor,
+                context: context,
               ),
             ),
             ElevatedButton(
               onPressed: () async {
                 Navigator.pop(context);
-
                 await controller.logout();
               },
               style: ElevatedButton.styleFrom(
@@ -600,6 +636,7 @@ class HomeView extends StatelessWidget {
               child: subText5(
                 'Logout',
                 color: AppColors.white,
+                context: context,
               ),
             ),
           ],

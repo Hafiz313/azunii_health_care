@@ -1,5 +1,6 @@
+import 'package:Azunii_Health/views/care_taker/feedback/controller/feedback_controller.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/customAppBar.dart';
-
+import 'package:Azunii_Health/views/widget/Common_widgets/overlayloader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -7,7 +8,6 @@ import '../../../consts/colors.dart';
 import '../../../consts/assets.dart';
 import '../../widget/text.dart';
 import '../../widget/buttons.dart';
-import 'controller/feedback_controller.dart';
 
 class FeedbackView extends StatelessWidget {
   const FeedbackView({super.key});
@@ -17,16 +17,27 @@ class FeedbackView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(FeedbackController());
+    return Obx(() => OverlayLoader(
+          isLoading: controller.isLoading.value,
+          child: _buildScaffold(context, controller),
+        ));
+  }
+
+  Widget _buildScaffold(BuildContext context, FeedbackController controller) {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
         child: Column(
           children: [
             CustomAppBar(
+              isOndashboard: false,
               title: 'User Feedback',
             ),
             Expanded(
-              child: _buildFeedbackContent(controller),
+              child: GestureDetector(
+                onTap: () => FocusScope.of(context).unfocus(),
+                child: _buildFeedbackContent(context, controller),
+              ),
             ),
           ],
         ),
@@ -35,7 +46,8 @@ class FeedbackView extends StatelessWidget {
   }
 
   /// Feedback Content
-  Widget _buildFeedbackContent(FeedbackController controller) {
+  Widget _buildFeedbackContent(
+      BuildContext context, FeedbackController controller) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -47,10 +59,10 @@ class FeedbackView extends StatelessWidget {
           Center(
             child: Column(
               children: [
-                headline5(
+                headline3(
                   'Help Us to Improve',
                   color: AppColors.headingTextColor,
-                  //  textAlign: TextAlign.center,
+                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 40),
 
@@ -62,8 +74,8 @@ class FeedbackView extends StatelessWidget {
                 // Your Note Section
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: subText4(
-                    ' Your Note',
+                  child: subText2(
+                    'Your Note',
                     color: AppColors.headingTextColor,
                     align: TextAlign.start,
                     fontWeight: FontWeight.w500,
@@ -78,7 +90,7 @@ class FeedbackView extends StatelessWidget {
 
                 // Submit Button
                 AppElevatedButton(
-                  onPressed: controller.handleSubmitFeedback,
+                  onPressed: () => controller.submitFeedback(context),
                   title: 'Submit',
                   backgroundColor: AppColors.primary,
                   width: double.infinity,
@@ -105,7 +117,7 @@ class FeedbackView extends StatelessWidget {
                   index < controller.selectedRating.value
                       ? Icons.star
                       : Icons.star_border,
-                  size: 30,
+                  size: 40,
                   color: index < controller.selectedRating.value
                       ? AppColors.yellow
                       : AppColors.textColor,
@@ -132,14 +144,14 @@ class FeedbackView extends StatelessWidget {
         textAlignVertical: TextAlignVertical.top,
         style: const TextStyle(
           color: AppColors.blackColor,
-          fontSize: 14,
+          fontSize: 16,
           fontFamily: 'Satoshi',
         ),
         decoration: InputDecoration(
           hintText: 'Write your Note',
           hintStyle: TextStyle(
             color: AppColors.textColor,
-            fontSize: 14,
+            fontSize: 16,
             fontFamily: 'Satoshi',
           ),
           border: InputBorder.none,

@@ -8,11 +8,6 @@ class AuthRepository {
   // Register User
   Future<AuthResponse> register(Map<String, dynamic> userData) async {
     try {
-      print('\n📝 SIGNUP Request 📝');
-      print('📧 Email: ${userData['email']}');
-      print('👤 Name: ${userData['name']}');
-      print('🔐 Password: [HIDDEN]\n');
-
       final response = await ApiClient.post(Apis.register, body: userData);
       return AuthResponse.fromJson(response);
     } catch (e) {
@@ -23,10 +18,6 @@ class AuthRepository {
   // Login User
   Future<AuthResponse> login(String email, String password) async {
     try {
-      print('\n🔑 LOGIN Request 🔑');
-      print('📧 Email: $email');
-      print('🔐 Password: [HIDDEN]\n');
-
       final response = await ApiClient.post(Apis.login, body: {
         'email': email,
         'password': password,
@@ -57,12 +48,6 @@ class AuthRepository {
     required String deviceToken,
   }) async {
     try {
-      print('\n🚀 Google Auth Request 🚀');
-      print('📧 Email: $email');
-      print('👤 Name: $name');
-      print('🆔 Google ID: $googleId');
-      print('📱 Device Token: $deviceToken\n');
-
       final response = await ApiClient.post(Apis.googleLogin, body: {
         'google_id': googleId,
         'email': email,
@@ -110,12 +95,9 @@ class AuthRepository {
   // Get Profile Info
   Future<ProfileResponse> getProfileInfo() async {
     try {
-      print('\n👤 PROFILE INFO Request 👤');
       final response = await ApiClient.getWithAuth(Apis.profileInfo);
-      print('📄 Profile Response: $response\n');
       return ProfileResponse.fromJson(response);
     } catch (e) {
-      print('❌ Profile Info Error: $e');
       rethrow;
     }
   }

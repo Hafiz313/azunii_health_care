@@ -14,24 +14,25 @@ import 'widgets/visitcardwidget.dart';
 import 'controller/timelineController.dart';
 
 class TimelineView extends GetView<TimelineController> {
-  const TimelineView({super.key});
+  final bool? isOndashboard;
+  const TimelineView({super.key, this.isOndashboard = false});
 
   static final List<Color> _cardColors = [
-    Color(0xFFBBDEFB), // Blue
-    Color(0xFFFFF59D), // Yellow
-    Color(0xFFC8E6C9), // Green
-    Color(0xFFFFCDD2), // Red
-    Color(0xFFE1BEE7), // Purple
-    Color(0xFFB2DFDB), // Teal
-    Color(0xFFFFE0B2), // Orange
-    Color(0xFFF8BBD0), // Pink
-    Color(0xFFC5CAE9), // Indigo
-    Color(0xFFDCEDC8), // Lime
-    Color(0xFFD1C4E9), // Deep Purple
-    Color(0xFFB3E5FC), // Cyan
-    Color(0xFFFFCCBC), // Deep Orange
-    Color(0xFFF0F4C3), // Lime Yellow
-    Color(0xFFCFD8DC), // Blue Grey
+    Color(0xFFE8F5E8), // Mint Green
+    Color(0xFFFFF2E8), // Peach
+    Color(0xFFE8F0FF), // Soft Blue
+    Color(0xFFFFF0F5), // Rose
+    Color(0xFFF0E8FF), // Lavender
+    Color(0xFFE8FFF8), // Aqua
+    Color(0xFFFFF8E8), // Cream
+    Color(0xFFFFE8F0), // Blush
+    Color(0xFFE8E8FF), // Periwinkle
+    Color(0xFFF8FFE8), // Light Lime
+    Color(0xFFFFE8E8), // Light Coral
+    Color(0xFFE8FFFF), // Ice Blue
+    Color(0xFFF5F0FF), // Lilac
+    Color(0xFFE8FFF0), // Sage
+    Color(0xFFFFF5E8), // Vanilla
   ];
 
   static final List<IconData> _cardIcons = [
@@ -66,7 +67,10 @@ class TimelineView extends GetView<TimelineController> {
             child: SafeArea(
               child: Column(
                 children: [
-                  CustomAppBar(title: Lang.timeline),
+                  CustomAppBar(
+                    title: Lang.timeline,
+                    isOndashboard: isOndashboard ?? false,
+                  ),
                   Expanded(
                     child: RefreshIndicator(
                       onRefresh: () => controller.fetchTimeline(1),
@@ -75,7 +79,7 @@ class TimelineView extends GetView<TimelineController> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 10),
                             // Container(
                             //   decoration: BoxDecoration(
                             //     borderRadius:  BorderRadius.circular(12),
@@ -84,7 +88,7 @@ class TimelineView extends GetView<TimelineController> {
                             //   child: Column(
                             //     children: [
                             _buildDateFilterSection(context),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 8),
                             _buildTimelineContent(context),
                             //     ],
                             //   ),
@@ -188,26 +192,41 @@ class TimelineView extends GetView<TimelineController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (controller.scheduleList.isNotEmpty) ...[
-            subText5('Medicine Schedule',
-                color: AppColors.headingTextColor, fontSize: 14),
-            const SizedBox(height: 16),
-            ...controller.scheduleList.asMap().entries.map((entry) {
-              final random = Random(entry.value.medicineId);
-              final color = _cardColors[random.nextInt(_cardColors.length)];
-              final icon = _cardIcons[random.nextInt(_cardIcons.length)];
-              return AnimatedOpacity(
-                opacity: 1.0,
-                duration: Duration(milliseconds: 300 + (entry.key * 100)),
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: TimelineTaskCard(
-                    item: entry.value,
-                    bgColor: color,
-                    icon: icon,
-                  ),
-                ),
-              );
-            }),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 243, 245, 247),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                      color: const Color.fromARGB(255, 219, 217, 217),
+                      width: 0.5)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // subText5('Medicine Schedule',
+                  //     color: AppColors.headingTextColor, fontSize: 14),
+                  // const SizedBox(height: 16),
+                  ...controller.scheduleList.asMap().entries.map((entry) {
+                    final random = Random(entry.value.medicineId);
+                    final color =
+                        _cardColors[random.nextInt(_cardColors.length)];
+                    final icon = _cardIcons[random.nextInt(_cardIcons.length)];
+                    return AnimatedOpacity(
+                      opacity: 1.0,
+                      duration: Duration(milliseconds: 300 + (entry.key * 100)),
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: TimelineTaskCard(
+                          item: entry.value,
+                          bgColor: color,
+                          icon: icon,
+                        ),
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
             const SizedBox(height: 24),
           ],
           if (controller.eventsList

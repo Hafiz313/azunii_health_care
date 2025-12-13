@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../consts/colors.dart';
+import '../../utils/percentage_size_ext.dart';
 
 ///Fontsize 28 bold heading
 Text headingText1(
@@ -9,11 +10,12 @@ Text headingText1(
   Color color = AppColors.headingTextColor,
   double fontSize = 28.0,
   FontWeight fontWeight = FontWeight.bold,
+  BuildContext? context,
 }) =>
     Text(
       title,
       style: GoogleFonts.manrope(
-        fontSize: fontSize,
+        fontSize: context != null ? context.percentWidth * 7 : fontSize,
         fontWeight: fontWeight,
         color: color,
       ),
@@ -25,11 +27,12 @@ Text headline1(
   Color color = AppColors.textColor,
   double fontSize = 24.0,
   FontWeight fontWeight = FontWeight.bold,
+  BuildContext? context,
 }) =>
     Text(
       title,
       style: GoogleFonts.manrope(
-        fontSize: fontSize,
+        fontSize: context != null ? context.percentWidth * 6 : fontSize,
         fontWeight: fontWeight,
         color: color,
       ),
@@ -41,12 +44,13 @@ Text headline0(
   TextAlign? textAlign,
   FontWeight fontWeight = FontWeight.normal,
   double fontSize = 28.0,
+  BuildContext? context,
 }) =>
     Text(
       title,
       textAlign: textAlign ?? TextAlign.start,
       style: GoogleFonts.manrope(
-        fontSize: fontSize,
+        fontSize: context != null ? context.percentWidth * 7 : fontSize,
         fontWeight: fontWeight,
         color: color,
       ),
@@ -59,12 +63,13 @@ Text headline2(
   TextAlign? textAlign,
   FontWeight fontWeight = FontWeight.normal,
   double fontSize = 24.0,
+  BuildContext? context,
 }) =>
     Text(
       title,
       textAlign: textAlign ?? TextAlign.start,
       style: GoogleFonts.manrope(
-        fontSize: fontSize,
+        fontSize: context != null ? context.percentWidth * 6 : fontSize,
         fontWeight: fontWeight,
         color: color,
       ),
@@ -77,12 +82,13 @@ Text headline3(
   TextAlign? textAlign,
   double fontSize = 22.0,
   FontWeight fontWeight = FontWeight.bold,
+  BuildContext? context,
 }) =>
     Text(
       title,
       textAlign: textAlign ?? TextAlign.start,
       style: GoogleFonts.manrope(
-        fontSize: fontSize,
+        fontSize: context != null ? context.percentWidth * 5.5 : fontSize,
         fontWeight: fontWeight,
         color: color,
       ),
@@ -94,11 +100,12 @@ Text headline4(
   Color color = AppColors.headingTxtColor,
   double fontSize = 22.0,
   FontWeight fontWeight = FontWeight.normal,
+  BuildContext? context,
 }) =>
     Text(
       title,
       style: GoogleFonts.manrope(
-        fontSize: fontSize,
+        fontSize: context != null ? context.percentWidth * 5.5 : fontSize,
         fontWeight: fontWeight,
         color: color,
       ),
@@ -112,6 +119,7 @@ Text headline5(
   TextDecoration? txtDecoration,
   FontWeight? fontWeight,
   double fontSize = 16.0,
+  BuildContext? context,
 }) =>
     Text(
       title,
@@ -119,7 +127,7 @@ Text headline5(
       style: GoogleFonts.manrope(
         decoration: txtDecoration ?? TextDecoration.none,
         fontWeight: fontWeight ?? FontWeight.bold,
-        fontSize: fontSize,
+        fontSize: context != null ? context.percentWidth * 4 : fontSize,
         color: color,
       ),
     );
@@ -130,6 +138,7 @@ Text headline6(
   TextDecoration? txtDecoration,
   FontWeight? fontWeight,
   double fontSize = 15.0,
+  BuildContext? context,
 }) =>
     Text(
       title,
@@ -137,7 +146,7 @@ Text headline6(
       style: GoogleFonts.manrope(
         decoration: txtDecoration ?? TextDecoration.none,
         fontWeight: fontWeight ?? FontWeight.bold,
-        fontSize: fontSize,
+        fontSize: context != null ? context.percentWidth * 3.75 : fontSize,
         color: color,
       ),
     );
@@ -149,12 +158,13 @@ Text subText1(
   double? fontSize,
   FontWeight? fontWeight,
   Color color = AppColors.textColor,
+  BuildContext? context,
 }) =>
     Text(
       title,
       textAlign: align ?? TextAlign.center,
       style: GoogleFonts.manrope(
-        fontSize: fontSize ?? 16.0,
+        fontSize: context != null ? context.percentWidth * 4 : (fontSize ?? 16.0),
         color: color,
         fontWeight: fontWeight ?? FontWeight.normal,
       ),
@@ -167,12 +177,13 @@ Text subText2(
   Color color = AppColors.textColor,
   FontWeight? fontWeight,
   double fontSize = 18.0,
+  BuildContext? context,
 }) =>
     Text(
       title,
       textAlign: align ?? TextAlign.center,
       style: GoogleFonts.manrope(
-        fontSize: fontSize,
+        fontSize: context != null ? context.percentWidth * 4.5 : fontSize,
         color: color,
         fontWeight: fontWeight ?? FontWeight.bold,
       ),
@@ -185,12 +196,13 @@ Text subText5(
   double? fontSize,
   TextDecoration? decoration,
   FontWeight? fontWeight,
+  BuildContext? context,
 }) =>
     Text(
       title,
       textAlign: align ?? TextAlign.center,
       style: GoogleFonts.manrope(
-        fontSize: fontSize ?? 12.0,
+        fontSize: context != null ? context.percentWidth * 3 : (fontSize ?? 12.0),
         decoration: decoration ?? TextDecoration.none,
         color: color,
         fontWeight: fontWeight ?? FontWeight.bold,
@@ -205,12 +217,13 @@ Text subText4(
   TextDecoration? decoration,
   Color? decorationColor,
   double fontSize = 14.0,
+  BuildContext? context,
 }) =>
     Text(
       title,
       textAlign: align ?? TextAlign.center,
       style: GoogleFonts.manrope(
-        fontSize: fontSize,
+        fontSize: context != null ? context.percentWidth * 3.5 : fontSize,
         color: color,
         decoration: decoration ?? TextDecoration.none,
         decorationColor: decorationColor ?? AppColors.white,
@@ -226,13 +239,14 @@ Text subText3(
   FontWeight? fontWeight,
   TextOverflow? textOverflow,
   double fontSize = 14.0,
+  BuildContext? context,
 }) =>
     Text(
       title,
       textAlign: align ?? TextAlign.center,
       overflow: textOverflow ?? TextOverflow.ellipsis,
       style: GoogleFonts.manrope(
-        fontSize: fontSize,
+        fontSize: context != null ? context.percentWidth * 3.5 : fontSize,
         color: color,
         fontWeight: fontWeight ?? FontWeight.normal,
       ),
@@ -244,12 +258,13 @@ Text subText6(
   FontWeight? fontWeight,
   Color color = Colors.black45,
   double fontSize = 10.0,
+  BuildContext? context,
 }) =>
     Text(
       title,
       textAlign: align ?? TextAlign.center,
       style: GoogleFonts.manrope(
-        fontSize: fontSize,
+        fontSize: context != null ? context.percentWidth * 2.5 : fontSize,
         fontWeight: fontWeight ?? FontWeight.normal,
         color: color,
       ),

@@ -1,11 +1,13 @@
 import 'package:Azunii_Health/core/models/static_user_model.dart';
+import 'package:Azunii_Health/utils/percentage_size_ext.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/customAppBar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../consts/colors.dart';
 
 class ProfileView extends StatefulWidget {
-  const ProfileView({super.key});
+  final bool? isOndashboard;
+  const ProfileView({super.key, this.isOndashboard = false});
 
   static const String routeName = '/profile';
 
@@ -13,7 +15,8 @@ class ProfileView extends StatefulWidget {
   State<ProfileView> createState() => _ProfileViewState();
 }
 
-class _ProfileViewState extends State<ProfileView> with SingleTickerProviderStateMixin {
+class _ProfileViewState extends State<ProfileView>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
@@ -31,7 +34,8 @@ class _ProfileViewState extends State<ProfileView> with SingleTickerProviderStat
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOut));
+    ).animate(
+        CurvedAnimation(parent: _animationController, curve: Curves.easeOut));
     _animationController.forward();
   }
 
@@ -59,7 +63,10 @@ class _ProfileViewState extends State<ProfileView> with SingleTickerProviderStat
       body: SafeArea(
         child: Column(
           children: [
-            CustomAppBar(title: 'Profile'),
+            CustomAppBar(
+              title: 'Profile',
+              isOndashboard: widget.isOndashboard ?? false,
+            ),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
@@ -88,7 +95,7 @@ class _ProfileViewState extends State<ProfileView> with SingleTickerProviderStat
                             child: Text(
                               initial,
                               style: GoogleFonts.manrope(
-                                fontSize: 52,
+                                fontSize: context.percentWidth * 13,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.white,
                               ),
@@ -100,7 +107,7 @@ class _ProfileViewState extends State<ProfileView> with SingleTickerProviderStat
                         Text(
                           name,
                           style: GoogleFonts.manrope(
-                            fontSize: 28,
+                            fontSize: context.percentWidth * 7,
                             fontWeight: FontWeight.w700,
                             color: AppColors.headingTextColor,
                           ),
@@ -110,7 +117,7 @@ class _ProfileViewState extends State<ProfileView> with SingleTickerProviderStat
                         Text(
                           email,
                           style: GoogleFonts.manrope(
-                            fontSize: 15,
+                            fontSize: context.percentWidth * 3.75,
                             fontWeight: FontWeight.w500,
                             color: AppColors.textColor,
                           ),
@@ -121,7 +128,8 @@ class _ProfileViewState extends State<ProfileView> with SingleTickerProviderStat
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
-                            side: BorderSide(color: AppColors.primary.withOpacity(0.1)),
+                            side: BorderSide(
+                                color: AppColors.primary.withOpacity(0.1)),
                           ),
                           child: Container(
                             padding: const EdgeInsets.all(24),
@@ -140,25 +148,52 @@ class _ProfileViewState extends State<ProfileView> with SingleTickerProviderStat
                               children: [
                                 Row(
                                   children: [
-                                    Expanded(child: _buildInfoCard(Icons.badge_outlined, 'User ID', id)),
+                                    Expanded(
+                                        child: _buildInfoCard(
+                                            context,
+                                            Icons.badge_outlined,
+                                            'User ID',
+                                            id)),
                                     const SizedBox(width: 12),
-                                    Expanded(child: _buildInfoCard(Icons.person_outline, 'Role', role.toUpperCase())),
+                                    Expanded(
+                                        child: _buildInfoCard(
+                                            context,
+                                            Icons.person_outline,
+                                            'Role',
+                                            role.toUpperCase())),
                                   ],
                                 ),
                                 const SizedBox(height: 12),
                                 Row(
                                   children: [
-                                    Expanded(child: _buildInfoCard(Icons.check_circle_outline, 'Status', status.toUpperCase())),
+                                    Expanded(
+                                        child: _buildInfoCard(
+                                            context,
+                                            Icons.check_circle_outline,
+                                            'Status',
+                                            status.toUpperCase())),
                                     const SizedBox(width: 12),
-                                    Expanded(child: _buildInfoCard(Icons.phone_outlined, 'Phone', phone)),
+                                    Expanded(
+                                        child: _buildInfoCard(
+                                            context,
+                                            Icons.phone_outlined,
+                                            'Phone',
+                                            phone)),
                                   ],
                                 ),
                                 const SizedBox(height: 12),
                                 Row(
                                   children: [
-                                    Expanded(child: _buildInfoCard(Icons.wc_outlined, 'Gender', gender)),
+                                    Expanded(
+                                        child: _buildInfoCard(context,
+                                            Icons.wc_outlined, 'Gender', gender)),
                                     const SizedBox(width: 12),
-                                    Expanded(child: _buildInfoCard(Icons.cake_outlined, 'DOB', dob)),
+                                    Expanded(
+                                        child: _buildInfoCard(
+                                            context,
+                                            Icons.cake_outlined,
+                                            'DOB',
+                                            dob)),
                                   ],
                                 ),
                               ],
@@ -177,7 +212,7 @@ class _ProfileViewState extends State<ProfileView> with SingleTickerProviderStat
     );
   }
 
-  Widget _buildInfoCard(IconData icon, String label, String value) {
+  Widget _buildInfoCard(BuildContext context, IconData icon, String label, String value) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -188,12 +223,12 @@ class _ProfileViewState extends State<ProfileView> with SingleTickerProviderStat
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: AppColors.primary, size: 20),
+          Icon(icon, color: AppColors.primary, size: context.percentWidth * 5),
           const SizedBox(height: 12),
           Text(
             label,
             style: GoogleFonts.manrope(
-              fontSize: 11,
+              fontSize: context.percentWidth * 2.75,
               fontWeight: FontWeight.w500,
               color: AppColors.textColor.withOpacity(0.7),
             ),
@@ -202,7 +237,7 @@ class _ProfileViewState extends State<ProfileView> with SingleTickerProviderStat
           Text(
             value,
             style: GoogleFonts.manrope(
-              fontSize: 13,
+              fontSize: context.percentWidth * 3.25,
               fontWeight: FontWeight.w600,
               color: AppColors.headingTextColor,
             ),

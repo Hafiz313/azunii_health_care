@@ -1,3 +1,4 @@
+import 'package:Azunii_Health/utils/percentage_size_ext.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/customAppBar.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/custom_dropdown.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/overlayloader.dart';
@@ -15,51 +16,6 @@ import '../../../consts/lang.dart';
 import '../../widget/text.dart';
 import '../../widget/buttons.dart';
 import 'controller/medicineController.dart';
-
-// class MedicinesView extends StatelessWidget {
-//   const MedicinesView({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: AppColors.white,
-//       body: SafeArea(
-//         child: Column(
-//           children: [
-//             CustomAppBar(title: Lang.medication),
-//             Expanded(
-//               child: Padding(
-//                 padding: const EdgeInsets.symmetric(horizontal: 20),
-//                 child: Column(
-//                   children: [
-//                     const SizedBox(height: 20),
-//                     _buildAddMedicationButton(context),
-//                     const Spacer(),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-
-//   Widget _buildAddMedicationButton(BuildContext context) {
-//     return SizedBox(
-//       width: double.infinity,
-//       child: AppElevatedButton(
-//         onPressed: () {
-//           Navigator.push(
-//             context,
-//             MaterialPageRoute(builder: (context) => const AddMedicineView()),
-//           );
-//         },
-//         title: Lang.addMedication,
-//       ),
-//     );
-//   }
-// }
 
 class AddMedicineView extends StatefulWidget {
   final bool? isOndashboard;
@@ -116,7 +72,7 @@ class _AddMedicineViewState extends State<AddMedicineView> {
                             const SizedBox(height: 20),
                             _buildStatusDropdown(),
                             const SizedBox(height: 24),
-                            _buildFrequencySection(),
+                            _buildFrequencySection(context),
                             const SizedBox(height: 24),
                             _buildUploadSection(),
                             const SizedBox(height: 24),
@@ -181,17 +137,17 @@ class _AddMedicineViewState extends State<AddMedicineView> {
         ));
   }
 
-  Widget _buildFrequencySection() {
+  Widget _buildFrequencySection(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Frequency Schedule',
           style: TextStyle(
             color: AppColors.headingTextColor,
             fontFamily: 'Satoshi',
             fontWeight: FontWeight.w600,
-            fontSize: 16,
+            fontSize: context.percentWidth * 4,
           ),
         ),
         const SizedBox(height: 16),
@@ -199,7 +155,7 @@ class _AddMedicineViewState extends State<AddMedicineView> {
               children: [
                 if (controller.frequencyRows.isNotEmpty) _buildFrequencyRow(0),
                 const SizedBox(height: 12),
-                _buildAddFrequencyButton(),
+                _buildAddFrequencyButton(context),
                 if (controller.frequencyRows.length > 1)
                   ...controller.frequencyRows
                       .asMap()
@@ -257,16 +213,17 @@ class _AddMedicineViewState extends State<AddMedicineView> {
   }
 
   Widget _buildTimePicker(int index) {
-    return Obx(() => CustomTimePicker(
-          label: 'Time',
-          selectedTime:
-              controller.frequencyRows[index].timeController.text.isEmpty
-                  ? null
-                  : controller.frequencyRows[index].timeController.text,
-          onTimeSelected: (time) {
-            controller.frequencyRows[index].timeController.text = time;
-          },
-        ));
+    return Obx(() {
+      final timeText = controller.frequencyRows[index].timeController.text;
+      return CustomTimePicker(
+        label: 'Time',
+        selectedTime: timeText.isEmpty ? null : timeText,
+        onTimeSelected: (time) {
+          controller.frequencyRows[index].timeController.text = time;
+          controller.frequencyRows.refresh();
+        },
+      );
+    });
   }
 
   Widget _buildRemoveButton(int index) {
@@ -280,7 +237,7 @@ class _AddMedicineViewState extends State<AddMedicineView> {
     );
   }
 
-  Widget _buildAddFrequencyButton() {
+  Widget _buildAddFrequencyButton(BuildContext context) {
     return InkWell(
       onTap: controller.addFrequencyRow,
       child: Container(
@@ -290,10 +247,10 @@ class _AddMedicineViewState extends State<AddMedicineView> {
           border: Border.all(color: AppColors.primary),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.add, color: AppColors.primary, size: 20),
+            Icon(Icons.add, color: AppColors.primary, size: context.percentWidth * 5),
             SizedBox(width: 8),
             Text(
               'Add Another Frequency',
@@ -301,7 +258,7 @@ class _AddMedicineViewState extends State<AddMedicineView> {
                 color: AppColors.primary,
                 fontFamily: 'Satoshi',
                 fontWeight: FontWeight.w500,
-                fontSize: 14,
+                fontSize: context.percentWidth * 3.5,
               ),
             ),
           ],

@@ -1,38 +1,44 @@
+import 'package:Azunii_Health/core/controllers/base_controller.dart';
+import 'package:Azunii_Health/core/repositories/summaries_repo.dart';
+import 'package:Azunii_Health/views/widget/Common_widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../../consts/colors.dart';
 
-class FeedbackController extends GetxController {
+class FeedbackController extends BaseController {
+  final SummariesRepository _summariesRepository = SummariesRepository();
   final TextEditingController noteController = TextEditingController();
-  final RxInt selectedRating = 1.obs;
+  final RxInt selectedRating = RxInt(1);
 
   void setRating(int rating) {
     selectedRating.value = rating;
   }
 
-  void handleSubmitFeedback() {
+  Future<void> submitFeedback(BuildContext context) async {
     if (noteController.text.trim().isEmpty) {
-      Get.snackbar(
-        'Error',
-        'Please write a note before submitting',
-        backgroundColor: AppColors.redColor,
-        colorText: AppColors.white,
-        snackPosition: SnackPosition.TOP,
-      );
+      CustomSnackbar.show('Please write a note', isSuccess: false);
       return;
     }
 
-    Get.snackbar(
-      'Success',
-      'Thank you for your feedback!',
-      backgroundColor: AppColors.green,
-      colorText: AppColors.white,
-      snackPosition: SnackPosition.TOP,
-    );
+    print('🚀 Submitting feedback...');
+    print('Rating: ${selectedRating.value}');
+    print('Note: ${noteController.text.trim()}');
 
-    Future.delayed(const Duration(seconds: 1), () {
-      Get.back();
-    });
+    final result = await safeApiCall(() => _summariesRepository.storeFeedback(
+          selectedRating.value,
+          noteController.text.trim(),
+        ));
+
+    print('📥 Result: $result');
+
+    if (result != null) {
+      print('✅ Feedback submitted successfully');
+      CustomSnackbar.show('Thank you for your feedback!', isSuccess: true);
+      Future.delayed(const Duration(seconds: 1), () {
+        Navigator.pop(context);
+      });
+    } else {
+      print('❌ Feedback submission failed');
+    }
   }
 
   @override

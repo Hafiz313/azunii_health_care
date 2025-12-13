@@ -12,9 +12,6 @@ class ApiClient {
   // Helper method to get authorization headers
   static Future<Map<String, String>> _getAuthHeaders() async {
     final token = await LocalStorageService.getToken();
-    print('\n🔑 TOKEN DEBUG 🔑');
-    print('📌 Token from LocalStorage: $token');
-    print('🔚 End Token Debug\n');
     return {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',
@@ -33,7 +30,7 @@ class ApiClient {
     } on HttpException {
       throw NetworkException('Network error occurred');
     } catch (e) {
-      throw ServerException('Something went wrong: ${e.toString()}');
+      throw ServerException('Something went wrong');
     }
   }
 
@@ -42,17 +39,14 @@ class ApiClient {
     try {
       final url = Uri.parse('${Apis.baseUrl}$endpoint');
       final headers = await _getAuthHeaders();
-      print('🚀 API Request Hit: GET $endpoint');
-      print('🔐 Authorization Header: ${headers['Authorization']}');
-      headers['Content-Type'] = 'multipart/form-data';
       final response = await http.get(url, headers: headers).timeout(_timeout);
-      return _handleResponse(response, '👤 PROFILE INFO');
+      return _handleResponse(response);
     } on SocketException {
       throw NetworkException('No internet connection');
     } on HttpException {
       throw NetworkException('Network error occurred');
     } catch (e) {
-      throw ServerException('Something went wrong: ${e.toString()}');
+      throw ServerException('Something went wrong');
     }
   }
 
@@ -69,18 +63,13 @@ class ApiClient {
           )
           .timeout(_timeout);
 
-      String apiName = '🔐 LOGIN/SIGNUP';
-      if (endpoint.contains('login')) apiName = '🔑 LOGIN';
-      if (endpoint.contains('register')) apiName = '📝 SIGNUP';
-      if (endpoint.contains('google')) apiName = '🔍 GOOGLE SIGNIN';
-
-      return _handleResponse(response, apiName);
+      return _handleResponse(response);
     } on SocketException {
       throw NetworkException('No internet connection');
     } on HttpException {
       throw NetworkException('Network error occurred');
     } catch (e) {
-      throw ServerException('Something went wrong: ${e.toString()}');
+      throw ServerException('Something went wrong');
     }
   }
 
@@ -90,8 +79,6 @@ class ApiClient {
     try {
       final url = Uri.parse('${Apis.baseUrl}$endpoint');
       final headers = await _getAuthHeaders();
-      print('🚀 API Request Hit: POST $endpoint');
-      print('🔐 Authorization Header: ${headers['Authorization']}');
       final response = await http
           .post(
             url,
@@ -105,7 +92,7 @@ class ApiClient {
     } on HttpException {
       throw NetworkException('Network error occurred');
     } catch (e) {
-      throw ServerException('Something went wrong: ${e.toString()}');
+      throw ServerException('Something went wrong');
     }
   }
 
@@ -117,44 +104,32 @@ class ApiClient {
     try {
       final url = Uri.parse('${Apis.baseUrl}$endpoint');
       final request = http.MultipartRequest('POST', url);
+      final headers = await _getAuthHeaders();
 
-      // Add authorization header
-      final token = await LocalStorageService.getToken();
-      print('\n🔑 TOKEN DEBUG (Multipart) 🔑');
-      print('📌 Token from LocalStorage: $token');
-      print('🚀 API Request Hit: POST $endpoint');
-      print('🔐 Authorization Header: Bearer $token');
-      print('🔚 End Token Debug\n');
-      request.headers['Authorization'] = 'Bearer $token';
+      request.headers.addAll(headers);
 
-      // Add text fields
       fields.forEach((key, value) {
         request.fields[key] = value;
       });
 
-      // Add file if provided
       if (file != null && fileFieldName != null) {
-        final fileStream = http.ByteStream(file.openRead());
-        final fileLength = await file.length();
-        final multipartFile = http.MultipartFile(
+        request.files.add(await http.MultipartFile.fromPath(
           fileFieldName,
-          fileStream,
-          fileLength,
-          filename: file.path.split('/').last,
-        );
-        request.files.add(multipartFile);
+          file.path,
+        ));
       }
 
-      final streamedResponse = await request.send().timeout(_timeout);
-      final response = await http.Response.fromStream(streamedResponse);
+      final response = await http.Response.fromStream(
+        await request.send().timeout(_timeout),
+      );
 
-      return _handleResponse(response, '📎 STORE VISIT');
+      return _handleResponse(response);
     } on SocketException {
       throw NetworkException('No internet connection');
     } on HttpException {
       throw NetworkException('Network error occurred');
     } catch (e) {
-      throw ServerException('Something went wrong: ${e.toString()}');
+      throw ServerException('Something went wrong');
     }
   }
 
@@ -176,7 +151,7 @@ class ApiClient {
     } on HttpException {
       throw NetworkException('Network error occurred');
     } catch (e) {
-      throw ServerException('Something went wrong: ${e.toString()}');
+      throw ServerException('Something went wrong');
     }
   }
 
@@ -193,7 +168,7 @@ class ApiClient {
     } on HttpException {
       throw NetworkException('Network error occurred');
     } catch (e) {
-      throw ServerException('Something went wrong: ${e.toString()}');
+      throw ServerException('Something went wrong');
     }
   }
 
@@ -202,16 +177,14 @@ class ApiClient {
     try {
       final url = Uri.parse('${Apis.baseUrl}$endpoint');
       final headers = await _getAuthHeaders();
-      print('🚀 API Request Hit: DELETE $endpoint');
-      print('🔐 Authorization Header: ${headers['Authorization']}');
-      final response = await http.get(url, headers: headers).timeout(_timeout);
+      final response = await http.delete(url, headers: headers).timeout(_timeout);
       return _handleResponse(response);
     } on SocketException {
       throw NetworkException('No internet connection');
     } on HttpException {
       throw NetworkException('Network error occurred');
     } catch (e) {
-      throw ServerException('Something went wrong: ${e.toString()}');
+      throw ServerException('Something went wrong');
     }
   }
 
@@ -220,16 +193,14 @@ class ApiClient {
     try {
       final url = Uri.parse('${Apis.baseUrl}${Apis.logout}');
       final headers = await _getAuthHeaders();
-      print('🚀 API Request Hit: GET ${Apis.logout}');
-      print('🔐 Authorization Header: ${headers['Authorization']}');
       final response = await http.get(url, headers: headers).timeout(_timeout);
-      return _handleResponse(response, '🚪 LOGOUT');
+      return _handleResponse(response);
     } on SocketException {
       throw NetworkException('No internet connection');
     } on HttpException {
       throw NetworkException('Network error occurred');
     } catch (e) {
-      throw ServerException('Something went wrong: ${e.toString()}');
+      throw ServerException('Something went wrong');
     }
   }
 
@@ -245,15 +216,7 @@ class ApiClient {
   }
 
   // Handle Response
-  static Map<String, dynamic> _handleResponse(http.Response response,
-      [String? apiName]) {
-    // Debug print with emoji and status code
-    print('\n🔥 API Response Debug 🔥');
-    print('📡 API: ${apiName ?? 'Unknown'}');
-    print('📊 Status Code: ${response.statusCode}');
-    print('📝 Response Body: ${response.body}');
-    print('🔚 End Response\n');
-
+  static Map<String, dynamic> _handleResponse(http.Response response) {
     switch (response.statusCode) {
       case 200:
       case 201:
@@ -281,12 +244,11 @@ class ApiClient {
       case 404:
         throw NotFoundException('Resource not found');
       case 405:
-        throw ServerException('Method not allowed - Check API endpoint method');
+        throw ServerException('Method not allowed');
       case 500:
         throw ServerException('Internal server error');
       default:
-        throw ServerException(
-            'Error occurred with status: ${response.statusCode}');
+        throw ServerException('An error occurred');
     }
   }
 

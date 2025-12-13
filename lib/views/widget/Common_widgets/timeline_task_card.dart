@@ -8,17 +8,29 @@ class TimelineTaskCard extends StatelessWidget {
   final Color? bgColor;
   final IconData? icon;
 
-  const TimelineTaskCard({super.key, required this.item, this.bgColor, this.icon});
+  const TimelineTaskCard(
+      {super.key, required this.item, this.bgColor, this.icon});
 
   @override
   Widget build(BuildContext context) {
     final bool isSchedule = item is MedicineSchedule;
-    final String type = isSchedule ? (item as MedicineSchedule).type : (item as TimelineEvent).type;
-    final String title = isSchedule ? (item as MedicineSchedule).medicineName : (item as TimelineEvent).title;
-    final String time = isSchedule ? (item as MedicineSchedule).time : _formatTimestamp((item as TimelineEvent).timestamp);
-    final String status = isSchedule ? (item as MedicineSchedule).status : (item as TimelineEvent).status;
-    final String? subtitle = isSchedule ? (item as MedicineSchedule).dosage : (item as TimelineEvent).subtitle;
-    final String? frequency = isSchedule ? (item as MedicineSchedule).frequency : null;
+    final String type = isSchedule
+        ? (item as MedicineSchedule).type
+        : (item as TimelineEvent).type;
+    final String title = isSchedule
+        ? (item as MedicineSchedule).medicineName
+        : (item as TimelineEvent).title;
+    final String time = isSchedule
+        ? _formatTime((item as MedicineSchedule).time)
+        : _formatTimestamp((item as TimelineEvent).timestamp);
+    final String status = isSchedule
+        ? (item as MedicineSchedule).status
+        : (item as TimelineEvent).status;
+    final String? subtitle = isSchedule
+        ? (item as MedicineSchedule).dosage
+        : (item as TimelineEvent).subtitle;
+    final String? frequency =
+        isSchedule ? (item as MedicineSchedule).frequency : null;
 
     final cardStyle = _getCardStyle(type, status);
     final displayBgColor = bgColor ?? cardStyle['bgColor'];
@@ -27,7 +39,8 @@ class TimelineTaskCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       decoration: BoxDecoration(
-        color: displayBgColor,
+        border: Border.all(color: displayBgColor, width: 1),
+        color: displayBgColor.withOpacity(0.7),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -36,7 +49,7 @@ class TimelineTaskCard extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: AppColors.white.withOpacity(0.7),
+              color: displayBgColor,
               shape: BoxShape.circle,
             ),
             child: Center(
@@ -54,13 +67,12 @@ class TimelineTaskCard extends StatelessWidget {
               children: [
                 subText5(
                   title,
-                  fontSize: 13,
+                  fontSize: 11,
                   fontWeight: FontWeight.w500,
                   color: AppColors.headingTextColor,
                   align: TextAlign.start,
                 ),
                 if (subtitle != null) ...[
-                  const SizedBox(height: 4),
                   subText5(
                     subtitle,
                     fontSize: 11,
@@ -69,18 +81,17 @@ class TimelineTaskCard extends StatelessWidget {
                     align: TextAlign.start,
                   ),
                 ],
-                const SizedBox(height: 8),
                 Row(
                   children: [
                     const Icon(
                       Icons.access_time,
-                      size: 16,
+                      size: 13,
                       color: AppColors.textColor,
                     ),
                     const SizedBox(width: 6),
                     subText5(
                       time,
-                      fontSize: 12,
+                      fontSize: 11,
                       fontWeight: FontWeight.w400,
                       color: AppColors.textColor,
                       align: TextAlign.start,
@@ -88,7 +99,8 @@ class TimelineTaskCard extends StatelessWidget {
                     if (frequency != null) ...[
                       const SizedBox(width: 12),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
                           color: AppColors.white.withOpacity(0.5),
                           borderRadius: BorderRadius.circular(6),
@@ -115,8 +127,11 @@ class TimelineTaskCard extends StatelessWidget {
     switch (type) {
       case 'medicine_schedule':
         return {
-          'bgColor': status == 'completed' ? AppColors.lightGreenCard : AppColors.lightBlue,
-          'iconColor': status == 'completed' ? AppColors.green : Colors.blue[600]!,
+          'bgColor': status == 'completed'
+              ? AppColors.lightGreenCard
+              : AppColors.lightBlue,
+          'iconColor':
+              status == 'completed' ? AppColors.green : Colors.blue[600]!,
           'icon': status == 'completed' ? Icons.check : Icons.medication,
         };
       case 'medicine_added':
@@ -144,6 +159,16 @@ class TimelineTaskCard extends StatelessWidget {
           'icon': Icons.info,
         };
     }
+  }
+
+  String _formatTime(String time) {
+    if (time.contains(':')) {
+      final parts = time.split(':');
+      if (parts.length >= 2) {
+        return '${parts[0]}:${parts[1]}';
+      }
+    }
+    return time;
   }
 
   String _formatTimestamp(String timestamp) {
