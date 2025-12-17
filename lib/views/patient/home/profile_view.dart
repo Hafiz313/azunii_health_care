@@ -50,12 +50,7 @@ class _ProfileViewState extends State<ProfileView>
     final user = Staticdata.userModel;
     final name = user?.name ?? 'Guest User';
     final email = user?.email ?? 'No email provided';
-    final id = user?.id.toString() ?? 'N/A';
     final role = user?.role ?? 'N/A';
-    final status = user?.status ?? 'N/A';
-    final phone = user?.phone ?? 'Not provided';
-    final gender = user?.gender ?? 'Not specified';
-    final dob = user?.dob ?? 'Not provided';
     final initial = name.isNotEmpty ? name[0].toUpperCase() : 'G';
 
     return Scaffold(
@@ -77,7 +72,7 @@ class _ProfileViewState extends State<ProfileView>
                     child: Column(
                       children: [
                         const SizedBox(height: 20),
-                        // Profile Avatar with gradient
+                        // Profile Avatar
                         Container(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
@@ -123,82 +118,12 @@ class _ProfileViewState extends State<ProfileView>
                           ),
                         ),
                         const SizedBox(height: 32),
-                        // Profile Details Card
-                        Card(
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            side: BorderSide(
-                                color: AppColors.primary.withOpacity(0.1)),
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.all(24),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  AppColors.primary.withOpacity(0.05),
-                                  AppColors.white,
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                        child: _buildInfoCard(
-                                            context,
-                                            Icons.badge_outlined,
-                                            'User ID',
-                                            id)),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                        child: _buildInfoCard(
-                                            context,
-                                            Icons.person_outline,
-                                            'Role',
-                                            role.toUpperCase())),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                        child: _buildInfoCard(
-                                            context,
-                                            Icons.check_circle_outline,
-                                            'Status',
-                                            status.toUpperCase())),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                        child: _buildInfoCard(
-                                            context,
-                                            Icons.phone_outlined,
-                                            'Phone',
-                                            phone)),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                        child: _buildInfoCard(context,
-                                            Icons.wc_outlined, 'Gender', gender)),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                        child: _buildInfoCard(
-                                            context,
-                                            Icons.cake_outlined,
-                                            'DOB',
-                                            dob)),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
+                        // Role Card
+                        _buildInfoCard(
+                          context,
+                          Icons.person_outline,
+                          'Role',
+                          role.toUpperCase(),
                         ),
                       ],
                     ),
