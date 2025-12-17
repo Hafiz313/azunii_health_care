@@ -112,8 +112,8 @@ class SignUpView extends StatelessWidget {
                           !controller.isPasswordVisible.value,
                       child: Icon(
                         controller.isPasswordVisible.value
-                            ? FontAwesomeIcons.eye
-                            : FontAwesomeIcons.eyeSlash,
+                            ? FontAwesomeIcons.eyeSlash
+                            : FontAwesomeIcons.eye,
                         color: AppColors.borderColor,
                         size: context.percentHeight * 2.0,
                       ),
@@ -122,8 +122,8 @@ class SignUpView extends StatelessWidget {
                       if (val == null || val.isEmpty) {
                         return "Password cannot be empty";
                       }
-                      if (val.length < 4) {
-                        return "Password must be at least 4 characters";
+                      if (val.length < 8) {
+                        return "Password must be at least 8 characters";
                       }
                       return null;
                     },
@@ -146,8 +146,8 @@ class SignUpView extends StatelessWidget {
                           !controller.isConformPasswordVisible.value,
                       child: Icon(
                         controller.isConformPasswordVisible.value
-                            ? FontAwesomeIcons.eye
-                            : FontAwesomeIcons.eyeSlash,
+                            ? FontAwesomeIcons.eyeSlash
+                            : FontAwesomeIcons.eye,
                         color: AppColors.borderColor,
                         size: context.percentHeight * 2.0,
                       ),
@@ -163,14 +163,14 @@ class SignUpView extends StatelessWidget {
                   SizedBox(
                     height: context.screenHeight * 0.005,
                   ),
-                  Obx(() => CustomDropdown(
-                        hintText: 'Select Role',
-                        label: 'Role',
-                        prefixIcon: Icon(Icons.person_outline),
-                        selectedValue: controller.selectedRole.value,
-                        items: controller.roles,
-                        onChanged: controller.setRole,
-                      )),
+                  // Obx(() => CustomDropdown(
+                  //       hintText: 'Select Role',
+                  //       label: 'Role',
+                  //       prefixIcon: Icon(Icons.person_outline),
+                  //       selectedValue: controller.selectedRole.value,
+                  //       items: controller.roles,
+                  //       onChanged: controller.setRole,
+                  //     )),
                   SizedBox(
                     height: context.percentHeight * 2.0,
                   ),

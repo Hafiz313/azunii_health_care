@@ -60,8 +60,8 @@ class LoginWidgets {
                 !controller.isPasswordVisible.value,
             child: Icon(
               controller.isPasswordVisible.value
-                  ? FontAwesomeIcons.eye
-                  : FontAwesomeIcons.eyeSlash,
+                  ? FontAwesomeIcons.eyeSlash
+                  : FontAwesomeIcons.eye,
               color: AppColors.borderColor,
               size: context.percentHeight * 2.0,
             ),

@@ -8,7 +8,7 @@ class Lang {
   static const String appName = 'AzuNii';
   static const String appSlang = 'Care that speaks your language';
   static const String welcomeBack = 'Welcome Back';
-  static const String welcomeyou = 'Welcome you';
+  static const String welcomeyou = 'Welcome Aboard!';
   static const String forgetPassword = 'Forgot Passoword';
 
   static const String email = 'Email';

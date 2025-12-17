@@ -1,5 +1,7 @@
-import 'package:get/get.dart';
-import '../../networking/api_client.dart';
+import 'package:Azunii_Health/utils/ApiExceptions.dart';
+import 'package:Azunii_Health/views/widget/Common_widgets/custom_snackbar.dart';
+import 'package:get/get_rx/src/rx_types/rx_types.dart';
+import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 
 abstract class BaseController extends GetxController {
   final RxBool isLoading = false.obs;
@@ -8,24 +10,15 @@ abstract class BaseController extends GetxController {
     isLoading.value = loading;
   }
 
-  void handleError(Exception e) {
-    setLoading(false);
-    ApiClient.handleException(e);
-  }
-
   Future<T?> safeApiCall<T>(Future<T> Function() apiCall) async {
     try {
       setLoading(true);
-      final result = await apiCall();
-      setLoading(false);
-      return result;
+      return await apiCall();
+    } on ApiException catch (e) {
+      CustomSnackbar.show(e.message, isSuccess: false);
+      return null;
     } catch (e) {
-      setLoading(false);
-      if (e is Exception) {
-        handleError(e);
-      } else {
-        print('Error in safeApiCall: $e');
-      }
+      CustomSnackbar.show('Unexpected error occurred', isSuccess: false);
       return null;
     } finally {
       setLoading(false);

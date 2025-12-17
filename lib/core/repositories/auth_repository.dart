@@ -8,7 +8,11 @@ class AuthRepository {
   // Register User
   Future<AuthResponse> register(Map<String, dynamic> userData) async {
     try {
-      final response = await ApiClient.post(Apis.register, body: userData);
+      final fields = userData.map((key, value) => MapEntry(key, value.toString()));
+      final response = await ApiClient.registerUserMultipart(
+        Apis.register,
+        body: fields,
+      );
       return AuthResponse.fromJson(response);
     } catch (e) {
       rethrow;
