@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../consts/colors.dart';
 import '../../../consts/assets.dart';
+import '../../../utils/percentage_size_ext.dart';
 import '../text.dart';
 
 class DatePickerButton extends StatelessWidget {
@@ -44,12 +45,14 @@ class DatePickerButton extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            subText5(
+            Text(
               date,
-              fontSize: 12,
-              fontWeight: FontWeight.normal,
-              color: AppColors.headingTextColor,
-              align: TextAlign.start,
+              style: TextStyle(
+                fontSize: context.percentHeight * 1.5,
+                fontWeight: FontWeight.normal,
+                color: AppColors.headingTextColor,
+                fontFamily: 'Satoshi',
+              ),
             ),
             const SizedBox(width: 4),
             const Icon(

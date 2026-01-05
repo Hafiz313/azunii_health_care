@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/controllers/base_controller.dart';
 import '../../../../core/repositories/auth_repository.dart';
-import '../../../../utils/snackbar_helper.dart';
+import '../../../../core/exceptions/app_exceptions.dart';
+import '../../../../utils/ApiExceptions.dart';
+import '../../../widget/Common_widgets/custom_snackbar.dart';
 
 class ForgetController extends BaseController {
   final formKey = GlobalKey<FormState>();
@@ -14,23 +16,34 @@ class ForgetController extends BaseController {
   Future<void> forgotPassword() async {
     if (!formKey.currentState!.validate()) return;
 
-    // Show loader for 2 seconds instead of API call
-    setLoading(true);
-    // await Future.delayed(Duration(seconds: 2));
-
-    // Commented out API call for testing
-    final result = await safeApiCall(() => _authRepository.forgotPassword(
-          emailTxtField.text.trim(),
-        ));
-    setLoading(false);
-    InfoDialog.show(
-      title: 'Email Sent',
-      message:
-          'Password reset email has been sent to ${emailTxtField.text}. Please check your Gmail to reset your password.',
-      onPressed: () {
-        Get.back(); // Navigate back to login
-      },
-    );
+    try {
+      setLoading(true);
+      final result = await _authRepository.forgotPassword(
+        emailTxtField.text.trim(),
+      );
+      setLoading(false);
+      
+      final message = result['message'] ?? 'Email sent successfully';
+      InfoDialog.show(
+        title: 'Success',
+        message: message,
+        onPressed: () => Get.back(),
+      );
+    } on ApiException catch (e) {
+      setLoading(false);
+      InfoDialog.show(
+        title: 'Error',
+        message: e.message,
+        onPressed: () {},
+      );
+    } catch (e) {
+      setLoading(false);
+      InfoDialog.show(
+        title: 'Error',
+        message: 'Something went wrong',
+        onPressed: () {},
+      );
+    }
   }
 
   String? validateEmail(String? value) {

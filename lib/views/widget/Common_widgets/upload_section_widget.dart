@@ -13,6 +13,7 @@ class UploadSectionWidget extends StatelessWidget {
   final String subtitle;
   final VoidCallback onTap;
   final Rx<File?> selectedImage;
+  final RxString? existingImageUrl;
 
   const UploadSectionWidget({
     super.key,
@@ -21,6 +22,7 @@ class UploadSectionWidget extends StatelessWidget {
     required this.subtitle,
     required this.onTap,
     required this.selectedImage,
+    this.existingImageUrl,
   });
 
   @override
@@ -83,45 +85,96 @@ class UploadSectionWidget extends StatelessWidget {
                 color: AppColors.white,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Obx(() => selectedImage.value != null
-                  ? Container(
-                      padding: const EdgeInsets.all(16),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.file(
-                          selectedImage.value!,
-                          height: 200,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
+              child: Obx(() {
+                // Show local file if selected
+                if (selectedImage.value != null) {
+                  return Container(
+                    padding: const EdgeInsets.all(16),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.file(
+                        selectedImage.value!,
+                        height: 200,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  );
+                }
+                // Show network image if available
+                else if (existingImageUrl != null && existingImageUrl!.value.isNotEmpty) {
+                  return Container(
+                    padding: const EdgeInsets.all(16),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        existingImageUrl!.value,
+                        height: 200,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            height: 200,
+                            decoration: BoxDecoration(
+                              color: AppColors.cardGray,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.broken_image,
+                                size: 50,
+                                color: AppColors.textColor,
+                              ),
+                            ),
+                          );
+                        },
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            height: 200,
+                            decoration: BoxDecoration(
+                              color: AppColors.cardGray,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                }
+                // Show upload placeholder
+                else {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(vertical: 40),
+                    child: Column(
+                      children: [
+                        const Icon(
+                          Icons.cloud_upload_outlined,
+                          size: 25,
+                          color: AppColors.textColor,
                         ),
-                      ),
-                    )
-                  : Container(
-                      padding: const EdgeInsets.symmetric(vertical: 40),
-                      child: Column(
-                        children: [
-                          const Icon(
-                            Icons.cloud_upload_outlined,
-                            size: 25,
-                            color: AppColors.textColor,
-                          ),
-                          const SizedBox(height: 16),
-                          subText5(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            Lang.chooseFileOrDrag,
-                            color: AppColors.headingTextColor,
-                          ),
-                          const SizedBox(height: 8),
-                          subText5(
-                            Lang.fileFormats,
-                            fontWeight: FontWeight.normal,
-                            fontSize: 13,
-                            color: AppColors.textColor,
-                          ),
-                        ],
-                      ),
-                    )),
+                        const SizedBox(height: 16),
+                        subText5(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          Lang.chooseFileOrDrag,
+                          color: AppColors.headingTextColor,
+                        ),
+                        const SizedBox(height: 8),
+                        subText5(
+                          Lang.fileFormats,
+                          fontWeight: FontWeight.normal,
+                          fontSize: 13,
+                          color: AppColors.textColor,
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              }),
             ),
           )
         ],

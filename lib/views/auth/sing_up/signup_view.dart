@@ -194,7 +194,7 @@ class SignUpView extends StatelessWidget {
                           SizedBox(
                             height: context.percentHeight * 2.0,
                           ),
-                          SignUpWidgets.buildSocialButtons(context),
+                          // SignUpWidgets.buildSocialButtons(context),
                           SizedBox(
                             height: context.percentHeight * 2.0,
                           ),

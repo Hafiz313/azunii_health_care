@@ -34,11 +34,12 @@ class LoginController extends BaseController {
     if (result != null) {
       // Validate user role from API response
       final userRole = result.user?.role;
-      if (userRole == null || (userRole != 'patient' && userRole != 'caregiver')) {
+      if (userRole == null ||
+          (userRole != 'patient' && userRole != 'caregiver')) {
         CustomSnackbar.show('Invalid user role received', isSuccess: false);
         return;
       }
-      
+
       final userType =
           userRole == 'patient' ? Appconsts.patient : Appconsts.caregiver;
 
@@ -56,9 +57,6 @@ class LoginController extends BaseController {
       } else {
         Get.offAllNamed(CareTakerDashboard.routeName);
       }
-    } else {
-      CustomSnackbar.show('Failed to login, Please try again later',
-          isSuccess: false);
     }
   }
 
@@ -84,11 +82,12 @@ class LoginController extends BaseController {
     if (result != null) {
       // Validate user role from API response
       final userRole = result.user?.role;
-      if (userRole == null || (userRole != 'patient' && userRole != 'caregiver')) {
+      if (userRole == null ||
+          (userRole != 'patient' && userRole != 'caregiver')) {
         CustomSnackbar.show('Invalid user role received', isSuccess: false);
         return;
       }
-      
+
       final userType =
           userRole == 'patient' ? Appconsts.patient : Appconsts.caregiver;
 

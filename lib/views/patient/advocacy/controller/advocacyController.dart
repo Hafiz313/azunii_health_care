@@ -113,9 +113,23 @@ class AdvocacyController extends BaseController {
       'can_add_notes': addNotesPermission.value ? 1 : 0,
     };
 
-    await safeApiCall(
+    final result = await safeApiCall(
         () => _caregiversRepository.storeCaregivers(caregiverData));
-    Get.back();
+
+    if (result != null) {
+      // Show success message from API
+      final message = result['message'] ?? 'Caregiver invited successfully';
+
+      // Clear fields after successful API call
+      emailController.clear();
+      fullNameController.clear();
+      selectedRelationship.value = '';
+      viewPermission.value = true;
+      addNotesPermission.value = true;
+      Get.back();
+      CustomSnackbar.show(message, isSuccess: true);
+    }
+
     await fetchCaregivers();
   }
 
@@ -124,5 +138,11 @@ class AdvocacyController extends BaseController {
     emailController.dispose();
     fullNameController.dispose();
     super.onClose();
+  }
+
+  @override
+  void dispose() {
+    Get.delete<AdvocacyController>();
+    super.dispose();
   }
 }

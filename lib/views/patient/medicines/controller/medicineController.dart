@@ -26,6 +26,7 @@ class MedicineController extends BaseController {
   final RxString selectedDosage = RxString('');
   final RxString selectedStatus = RxString('active');
   final Rx<File?> selectedImage = Rx<File?>(null);
+  final RxString existingImageUrl = RxString('');
   final RxInt editingMedicineId = RxInt(0);
   final RxBool isEditMode = RxBool(false);
 
@@ -139,6 +140,7 @@ class MedicineController extends BaseController {
       final XFile? image = await _picker.pickImage(source: source);
       if (image != null) {
         selectedImage.value = File(image.path);
+        existingImageUrl.value = ''; // Clear existing URL when new image is selected
       }
     } catch (e) {
       CustomSnackbar.show('Failed to pick image: $e', isSuccess: false);
@@ -147,6 +149,7 @@ class MedicineController extends BaseController {
 
   void clearImage() {
     selectedImage.value = null;
+    existingImageUrl.value = '';
   }
 
   // Load medicine data for editing
@@ -158,6 +161,12 @@ class MedicineController extends BaseController {
     medNameController.text = medicine.medicineName;
     selectedDosage.value = medicine.dosage;
     selectedStatus.value = medicine.status;
+    
+    // Load existing image URL if available
+    if (medicine.attachment != null && medicine.attachment!.isNotEmpty) {
+      existingImageUrl.value = medicine.attachment!;
+      selectedImage.value = null; // Clear local file since we have network image
+    }
 
     // Clear existing frequency rows
     for (var row in frequencyRows) {
@@ -441,6 +450,7 @@ class MedicineController extends BaseController {
     frequencyRows.clear();
     addFrequencyRow(); // Add one empty row
     selectedImage.value = null;
+    existingImageUrl.value = '';
   }
 
   @override

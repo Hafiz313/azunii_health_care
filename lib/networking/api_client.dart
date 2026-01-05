@@ -1,25 +1,103 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:Azunii_Health/utils/ApiExceptions.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../core/exceptions/app_exceptions.dart';
 import '../core/services/local_storage_service.dart';
+import '../utils/ApiExceptions.dart';
 import '../utils/snackbar_helper.dart';
 import 'api_ref.dart';
 
+/// ApiClient - Centralized HTTP client for all API requests
+/// Handles authentication, error handling, and response parsing
 class ApiClient {
+  // ============================================================================
+  // CONFIGURATION
+  // ============================================================================
+  
   static const Duration _timeout = Duration(seconds: 30);
 
-  // Helper method to get authorization headers
+  // ============================================================================
+  // HELPER METHODS
+  // ============================================================================
+
+  /// Get authorization headers with Bearer token
   static Future<Map<String, String>> _getAuthHeaders() async {
     final token = await LocalStorageService.getToken();
     return {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
     };
   }
 
-  // GET Request
+  /// Handle API response and extract data or throw exceptions
+  /// Checks for status field in response body and HTTP status codes
+  static Map<String, dynamic> _handleResponse(http.Response response) {
+    debugPrint('\n🔥 API RESPONSE 🔥');
+    debugPrint('Status Code: ${response.statusCode}');
+    debugPrint('Response Body: ${response.body}');
+    debugPrint('🔚 End Response\n');
+
+    switch (response.statusCode) {
+      // Success responses
+      case 200:
+      case 201:
+        final responseBody = jsonDecode(response.body);
+
+        // Check if API returned status: false in response body
+        if (responseBody['status'] != null && responseBody['status'] == false) {
+          final message = responseBody['message'] ?? 'Something went wrong';
+          throw ApiException(message: message);
+        }
+
+        return responseBody;
+
+      // Redirect responses
+      case 301:
+      case 302:
+        throw ApiException(
+            message: 'Server redirect detected. Please check API configuration.');
+
+      // Error responses - Extract message from response body
+      case 400:
+      case 401:
+      case 404:
+      case 405:
+      case 409:
+      case 422:
+      case 500:
+        final responseBody = jsonDecode(response.body);
+        String errorMessage = 'Something went wrong';
+
+        // Try to extract message from response
+        if (responseBody['message'] != null) {
+          errorMessage = responseBody['message'];
+        } else if (responseBody['errors'] != null) {
+          // Handle validation errors
+          final errors = responseBody['errors'];
+          if (errors is Map && errors.isNotEmpty) {
+            final firstError = errors.values.first;
+            if (firstError is List && firstError.isNotEmpty) {
+              errorMessage = firstError.first.toString();
+            }
+          }
+        }
+
+        throw ApiException(message: errorMessage);
+
+      // Unknown status codes
+      default:
+        throw ApiException(
+            message: 'Unexpected error occurred (status: ${response.statusCode})');
+    }
+  }
+
+  // ============================================================================
+  // GET REQUESTS
+  // ============================================================================
+
+  /// GET request without authentication
   static Future<Map<String, dynamic>> get(String endpoint,
       {Map<String, String>? headers}) async {
     try {
@@ -35,7 +113,7 @@ class ApiClient {
     }
   }
 
-  // GET Request with Auth
+  /// GET request with authentication
   static Future<Map<String, dynamic>> getWithAuth(String endpoint) async {
     try {
       final url = Uri.parse('${Apis.baseUrl}$endpoint');
@@ -51,23 +129,35 @@ class ApiClient {
     }
   }
 
-  // POST Request
+  // ============================================================================
+  // POST REQUESTS
+  // ============================================================================
+
+  /// POST request without authentication
+  /// Uses http.Client to properly handle redirects
   static Future<Map<String, dynamic>> post(String endpoint,
       {Map<String, dynamic>? body, Map<String, String>? headers}) async {
     try {
       final url = Uri.parse('${Apis.baseUrl}$endpoint');
-      print('\n🚀 API REQUEST 🚀');
-      print('URL: $url');
-      print('Body: ${jsonEncode(body)}');
-      print('🔚 End Request\n');
+      debugPrint('\n🚀 API REQUEST 🚀');
+      debugPrint('URL: $url');
+      debugPrint('Body: ${jsonEncode(body)}');
+      debugPrint('🔚 End Request\n');
 
-      final response = await http
-          .post(
-            url,
-            headers: {'Content-Type': 'application/json', ...?headers},
-            body: body != null ? jsonEncode(body) : null,
-          )
-          .timeout(_timeout);
+      final client = http.Client();
+      final request = http.Request('POST', url);
+      request.headers.addAll({
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        ...?headers
+      });
+      if (body != null) {
+        request.body = jsonEncode(body);
+      }
+
+      final streamedResponse = await client.send(request).timeout(_timeout);
+      final response = await http.Response.fromStream(streamedResponse);
+      client.close();
 
       return _handleResponse(response);
     } on SocketException {
@@ -79,16 +169,16 @@ class ApiClient {
     }
   }
 
-  // POST Request with Auth
+  /// POST request with authentication
   static Future<Map<String, dynamic>> postWithAuth(String endpoint,
       {Map<String, dynamic>? body}) async {
     try {
       final url = Uri.parse('${Apis.baseUrl}$endpoint');
       final headers = await _getAuthHeaders();
-      print('\n🚀 API REQUEST (AUTH) 🚀');
-      print('URL: $url');
-      print('Body: ${jsonEncode(body)}');
-      print('🔚 End Request\n');
+      debugPrint('\n🚀 API REQUEST (AUTH) 🚀');
+      debugPrint('URL: $url');
+      debugPrint('Body: ${jsonEncode(body)}');
+      debugPrint('🔚 End Request\n');
 
       final response = await http
           .post(
@@ -107,7 +197,11 @@ class ApiClient {
     }
   }
 
-  // Multipart POST Request with Auth (for file uploads)
+  // ============================================================================
+  // MULTIPART REQUESTS (File Uploads)
+  // ============================================================================
+
+  /// Multipart POST request with authentication (for file uploads)
   static Future<Map<String, dynamic>> postMultipartWithAuth(String endpoint,
       {required Map<String, String> fields,
       File? file,
@@ -118,10 +212,7 @@ class ApiClient {
       final headers = await _getAuthHeaders();
 
       request.headers.addAll(headers);
-
-      fields.forEach((key, value) {
-        request.fields[key] = value;
-      });
+      request.fields.addAll(fields);
 
       if (file != null && fileFieldName != null) {
         request.files.add(await http.MultipartFile.fromPath(
@@ -144,7 +235,69 @@ class ApiClient {
     }
   }
 
-  // PUT Request
+  /// Multipart POST request for user registration (without auth)
+  static Future<Map<String, dynamic>> registerUserMultipart(String endpoint,
+      {required Map<String, String> body, File? file}) async {
+    try {
+      final url = Uri.parse('${Apis.baseUrl}$endpoint');
+      debugPrint('\n🚀 MULTIPART REQUEST 🚀');
+      debugPrint('URL: $url');
+      debugPrint('Fields: $body');
+      debugPrint('File: ${file?.path}');
+      debugPrint('🔚 End Request\n');
+
+      var request = http.MultipartRequest('POST', url);
+      request.headers['Accept'] = 'application/json';
+      request.fields.addAll(body);
+
+      if (file != null) {
+        request.files.add(await http.MultipartFile.fromPath('file', file.path));
+      }
+
+      var streamedResponse = await request.send().timeout(_timeout);
+      var responseString = await streamedResponse.stream.bytesToString();
+      final responseJson = jsonDecode(responseString);
+
+      debugPrint('\n🔥 API RESPONSE 🔥');
+      debugPrint('Status Code: ${streamedResponse.statusCode}');
+      debugPrint('Response Body: $responseString');
+      debugPrint('🔚 End Response\n');
+
+      if (streamedResponse.statusCode >= 200 &&
+          streamedResponse.statusCode < 300) {
+        // Check if response has status field and it's false
+        if (responseJson['status'] != null && responseJson['status'] == false) {
+          final message = responseJson['message'] ?? 'Something went wrong';
+          throw ApiException(message: message);
+        }
+
+        return responseJson;
+      } else {
+        // Extract error message from response
+        String message = responseJson['message'] ?? 'Something went wrong';
+        if (responseJson['errors'] != null) {
+          final errors = responseJson['errors'];
+          if (errors is Map && errors.isNotEmpty) {
+            final firstError = errors.values.first;
+            if (firstError is List && firstError.isNotEmpty) {
+              message = firstError.first.toString();
+            }
+          }
+        }
+        throw ApiException(message: message);
+      }
+    } on SocketException {
+      throw ApiException(message: 'No internet connection');
+    } catch (e) {
+      throw ApiException(message: '$e');
+    }
+  }
+
+  // ============================================================================
+  // PUT REQUESTS
+  // ============================================================================
+
+  /// PUT request without authentication
   static Future<Map<String, dynamic>> put(String endpoint,
       {Map<String, dynamic>? body, Map<String, String>? headers}) async {
     try {
@@ -166,7 +319,11 @@ class ApiClient {
     }
   }
 
-  // DELETE Request
+  // ============================================================================
+  // DELETE REQUESTS
+  // ============================================================================
+
+  /// DELETE request without authentication
   static Future<Map<String, dynamic>> delete(String endpoint,
       {Map<String, String>? headers}) async {
     try {
@@ -183,7 +340,7 @@ class ApiClient {
     }
   }
 
-  // DELETE Request with Auth
+  /// DELETE request with authentication
   static Future<Map<String, dynamic>> deleteWithAuth(String endpoint) async {
     try {
       final url = Uri.parse('${Apis.baseUrl}$endpoint');
@@ -200,7 +357,11 @@ class ApiClient {
     }
   }
 
-  // Logout API
+  // ============================================================================
+  // SPECIFIC API ENDPOINTS
+  // ============================================================================
+
+  /// Logout user
   static Future<Map<String, dynamic>> logout() async {
     try {
       final url = Uri.parse('${Apis.baseUrl}${Apis.logout}');
@@ -216,120 +377,22 @@ class ApiClient {
     }
   }
 
-  // Delete Account API
+  /// Delete user account
   static Future<Map<String, dynamic>> deleteAccount() async {
     return await deleteWithAuth(Apis.deleteAccount);
   }
 
-  // Forgot Password API
+  /// Send forgot password request
   static Future<Map<String, dynamic>> forgotPassword(
       Map<String, dynamic> body) async {
     return await post(Apis.forgotPassword, body: body);
   }
 
-  // Multipart Register User
-  static Future<Map<String, dynamic>> registerUserMultipart(String endpoint,
-      {required Map<String, String> body, File? file}) async {
-    try {
-      final url = Uri.parse('${Apis.baseUrl}$endpoint');
-      print('\n🚀 MULTIPART REQUEST 🚀');
-      print('URL: $url');
-      print('Fields: $body');
-      print('File: ${file?.path}');
-      print('🔚 End Request\n');
+  // ============================================================================
+  // EXCEPTION HANDLER
+  // ============================================================================
 
-      var request = http.MultipartRequest('POST', url);
-      request.headers['Accept'] = 'application/json';
-      request.fields.addAll(body);
-
-      if (file != null) {
-        request.files.add(await http.MultipartFile.fromPath('file', file.path));
-      }
-
-      var streamedResponse = await request.send().timeout(_timeout);
-      var responseString = await streamedResponse.stream.bytesToString();
-      final responseJson = jsonDecode(responseString);
-
-      print('\n🔥 API RESPONSE 🔥');
-      print('Status Code: ${streamedResponse.statusCode}');
-      print('Response Body: $responseString');
-      print('🔚 End Response\n');
-
-      if (streamedResponse.statusCode >= 200 &&
-          streamedResponse.statusCode < 300) {
-        return responseJson;
-      } else {
-        String message = responseJson['message'] ?? 'Something went wrong';
-        if (responseJson['errors'] != null) {
-          final errors = responseJson['errors'];
-          if (errors is Map && errors.isNotEmpty) {
-            final firstError = errors.values.first;
-            if (firstError is List && firstError.isNotEmpty) {
-              message = firstError.first.toString();
-            }
-          }
-        }
-        throw ApiException(message: message);
-      }
-    } on SocketException {
-      throw ApiException(message: 'No internet connection');
-    } catch (e) {
-      throw ApiException(message: '$e');
-    }
-  }
-
-  // Handle Response
-  static Map<String, dynamic> _handleResponse(http.Response response) {
-    print('\n🔥 API RESPONSE 🔥');
-    print('Status Code: ${response.statusCode}');
-    print('Response Body: ${response.body}');
-    print('Headers: ${response.headers}');
-    print('🔚 End Response\n');
-
-    switch (response.statusCode) {
-      case 200:
-      case 201:
-        return jsonDecode(response.body);
-
-      case 400:
-      case 422:
-        final responseBody = jsonDecode(response.body);
-        String errorMessage = 'Invalid request';
-
-        if (responseBody['message'] != null) {
-          errorMessage = responseBody['message'];
-        } else if (responseBody['errors'] != null) {
-          final errors = responseBody['errors'];
-          if (errors is Map && errors.isNotEmpty) {
-            final firstError = errors.values.first;
-            if (firstError is List && firstError.isNotEmpty) {
-              errorMessage = firstError.first.toString();
-            }
-          }
-        }
-
-        throw ApiException(message: errorMessage);
-
-      case 401:
-        throw ApiException(message: 'Unauthorized');
-
-      case 404:
-        throw ApiException(message: 'Resource not found');
-
-      case 405:
-        throw ApiException(message: 'Method not allowed');
-
-      case 500:
-        throw ApiException(message: 'Internal server error');
-
-      default:
-        throw ApiException(
-            message:
-                'Unexpected error occurred (status: ${response.statusCode})');
-    }
-  }
-
-  // Exception Handler
+  /// Handle exceptions and show appropriate snackbar messages
   static void handleException(Exception e) {
     if (e is NetworkException) {
       SnackbarHelper.showError(e.message);

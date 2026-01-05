@@ -45,4 +45,8 @@ class Apis {
   static const String listCaregiver = '/caregiver/notes/index';
   //timeline
   static const String getTimeline = '/patient/timeline/index';
+
+  //medicine caregiver
+  static const String getMedicineCaregiver = '/caregiver/medicines/index';
+  static const String storeMedicineCaregiver = '/caregiver/medicines/store';
 }

@@ -115,37 +115,43 @@ class _EditMedicineViewState extends State<EditMedicineView> {
   }
 
   Widget _buildDosageDropdown() {
-    return Obx(() => CustomDropdown(
-          label: Lang.dosage,
-          hintText: Lang.enterDosage,
-          items: controller.dosageList,
-          selectedValue: controller.selectedDosage.value.isEmpty
-              ? null
-              : controller.selectedDosage.value,
-          onChanged: controller.setDosage,
-          prefixIcon: const Icon(
-            Icons.science_outlined,
-            color: AppColors.textColor,
-            size: 20,
-          ),
-        ));
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Obx(() => CustomDropdown(
+            label: Lang.dosage,
+            hintText: Lang.enterDosage,
+            items: controller.dosageList,
+            selectedValue: controller.selectedDosage.value.isEmpty
+                ? null
+                : controller.selectedDosage.value,
+            onChanged: controller.setDosage,
+            prefixIcon: const Icon(
+              Icons.science_outlined,
+              color: AppColors.textColor,
+              size: 20,
+            ),
+          )),
+    );
   }
 
   Widget _buildStatusDropdown() {
-    return Obx(() => CustomDropdown(
-          label: Lang.status,
-          hintText: 'Select status',
-          items: const ['active', 'inactive'],
-          selectedValue: controller.selectedStatus.value.isEmpty
-              ? null
-              : controller.selectedStatus.value.toLowerCase(),
-          onChanged: controller.setStatus,
-          prefixIcon: const Icon(
-            Icons.medical_services_outlined,
-            color: AppColors.textColor,
-            size: 20,
-          ),
-        ));
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Obx(() => CustomDropdown(
+            label: Lang.status,
+            hintText: 'Select status',
+            items: const ['active', 'inactive'],
+            selectedValue: controller.selectedStatus.value.isEmpty
+                ? null
+                : controller.selectedStatus.value.toLowerCase(),
+            onChanged: controller.setStatus,
+            prefixIcon: const Icon(
+              Icons.medical_services_outlined,
+              color: AppColors.textColor,
+              size: 20,
+            ),
+          )),
+    );
   }
 
   Widget _buildFrequencySection(BuildContext context) {
@@ -158,22 +164,21 @@ class _EditMedicineViewState extends State<EditMedicineView> {
             color: AppColors.headingTextColor,
             fontFamily: 'Satoshi',
             fontWeight: FontWeight.w600,
-            fontSize: context.percentWidth * 4,
+            fontSize: context.percentHeight * 2.5,
           ),
         ),
         const SizedBox(height: 16),
         Obx(() => Column(
               children: [
-                if (controller.frequencyRows.isNotEmpty) _buildFrequencyRow(0),
-                const SizedBox(height: 12),
+                // Show all frequency rows above the button
+                ...controller.frequencyRows
+                    .asMap()
+                    .entries
+                    .map((entry) => _buildFrequencyRow(entry.key))
+                    .toList(),
+                if (controller.frequencyRows.isNotEmpty)
+                  const SizedBox(height: 12),
                 _buildAddFrequencyButton(context),
-                if (controller.frequencyRows.length > 1)
-                  ...controller.frequencyRows
-                      .asMap()
-                      .entries
-                      .skip(1)
-                      .map((entry) => _buildFrequencyRow(entry.key))
-                      .toList(),
               ],
             )),
       ],
@@ -183,15 +188,15 @@ class _EditMedicineViewState extends State<EditMedicineView> {
   Widget _buildFrequencyRow(int index) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.cardsColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primary.withOpacity(0.2)),
-      ),
-      child: Row(
+      child: Stack(
         children: [
-          Expanded(
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.cardsColor,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+            ),
             child: Row(
               children: [
                 Expanded(child: _buildFrequencyDropdown(index)),
@@ -200,56 +205,79 @@ class _EditMedicineViewState extends State<EditMedicineView> {
               ],
             ),
           ),
-          if (controller.frequencyRows.length > 1) _buildRemoveButton(index),
+          if (controller.frequencyRows.length > 1)
+            Positioned(
+              top: 4,
+              right: 4,
+              child: _buildRemoveButton(index),
+            ),
         ],
       ),
     );
   }
 
   Widget _buildFrequencyDropdown(int index) {
-    return Obx(() => CustomDropdown(
-          label: 'Frequency',
-          hintText: 'Select ',
-          items: controller.frequencyList,
-          selectedValue: controller.frequencyRows[index].frequency.value.isEmpty
-              ? null
-              : controller.frequencyRows[index].frequency.value,
-          onChanged: (value) => controller.setFrequencyForRow(index, value),
-          prefixIcon: const Icon(
-            Icons.schedule,
-            color: AppColors.textColor,
-            size: 18,
-          ),
-        ));
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Obx(() => CustomDropdown(
+            label: 'Frequency',
+            hintText: 'Select ',
+            items: controller.frequencyList,
+            selectedValue: controller.frequencyRows[index].frequency.value.isEmpty
+                ? null
+                : controller.frequencyRows[index].frequency.value,
+            onChanged: (value) => controller.setFrequencyForRow(index, value),
+            prefixIcon: const Icon(
+              Icons.schedule,
+              color: AppColors.textColor,
+              size: 18,
+            ),
+          )),
+    );
   }
 
   Widget _buildTimePicker(int index) {
-    return Obx(() => CustomTimePicker(
-          label: 'Time',
-          selectedTime:
-              controller.frequencyRows[index].timeController.text.isEmpty
-                  ? null
-                  : controller.frequencyRows[index].timeController.text,
-          onTimeSelected: (time) {
-            controller.frequencyRows[index].timeController.text = time;
-          },
-        ));
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Obx(() => CustomTimePicker(
+            label: 'Time',
+            selectedTime:
+                controller.frequencyRows[index].timeController.text.isEmpty
+                    ? null
+                    : controller.frequencyRows[index].timeController.text,
+            onTimeSelected: (time) {
+              controller.frequencyRows[index].timeController.text = time;
+            },
+          )),
+    );
   }
 
   Widget _buildRemoveButton(int index) {
-    return IconButton(
-      onPressed: () => controller.removeFrequencyRow(index),
-      icon: const Icon(
-        Icons.remove_circle_outline,
+    return Container(
+      width: 24,
+      height: 24,
+      decoration: BoxDecoration(
         color: AppColors.redColor,
-        size: 18,
+        shape: BoxShape.circle,
+      ),
+      child: IconButton(
+        padding: EdgeInsets.zero,
+        onPressed: () => controller.removeFrequencyRow(index),
+        icon: const Icon(
+          Icons.close,
+          color: AppColors.white,
+          size: 14,
+        ),
       ),
     );
   }
 
   Widget _buildAddFrequencyButton(BuildContext context) {
     return InkWell(
-      onTap: controller.addFrequencyRow,
+      onTap: () {
+        FocusScope.of(context).unfocus();
+        controller.addFrequencyRow();
+      },
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -260,7 +288,7 @@ class _EditMedicineViewState extends State<EditMedicineView> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.add, color: AppColors.primary, size: context.percentWidth * 5),
+            Icon(Icons.add, color: AppColors.primary, size: context.percentHeight * 3),
             SizedBox(width: 8),
             Text(
               'Add Another Frequency',
@@ -268,7 +296,7 @@ class _EditMedicineViewState extends State<EditMedicineView> {
                 color: AppColors.primary,
                 fontFamily: 'Satoshi',
                 fontWeight: FontWeight.w500,
-                fontSize: context.percentWidth * 3.5,
+                fontSize: context.percentHeight * 2,
               ),
             ),
           ],
@@ -284,6 +312,7 @@ class _EditMedicineViewState extends State<EditMedicineView> {
       subtitle: Lang.selectAndUploadPhoto,
       onTap: controller.showImagePickerDialog,
       selectedImage: controller.selectedImage,
+      existingImageUrl: controller.existingImageUrl,
     );
   }
 

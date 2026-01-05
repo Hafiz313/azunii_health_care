@@ -24,6 +24,7 @@ class HomeController extends BaseController {
           .obs;
   final RxString userName = ''.obs;
   final RxString userProfileImage = ''.obs;
+  final RxList<Medicine> allMedicinesList = <Medicine>[].obs;
   final RxList<Medicine> medicinesList = <Medicine>[].obs;
   final RxList<VisitModel> visitsList = <VisitModel>[].obs;
   final AuthRepository _authRepository = AuthRepository();
@@ -51,7 +52,7 @@ class HomeController extends BaseController {
     selectedDate.value = date;
   }
 
-  void onDatePickerTap() {
+  void onDatePickerTap() async {
     DateTime initialDate;
     try {
       final parts = selectedDate.value.split('-');
@@ -61,53 +62,18 @@ class HomeController extends BaseController {
       initialDate = DateTime.now();
     }
 
-    showDialog(
+    final DateTime? picked = await showDatePicker(
       context: Get.context!,
-      builder: (context) => Dialog(
-        child: Container(
-          height: MediaQuery.of(context).size.height * 0.5,
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              const Text(
-                'Select Date',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.headingTextColor,
-                ),
-              ),
-              Expanded(
-                child: Theme(
-                  data: Theme.of(Get.context!).copyWith(
-                    colorScheme: Theme.of(Get.context!).colorScheme.copyWith(
-                          primary: Colors.blue,
-                          onPrimary: const Color.fromARGB(255, 31, 30, 30),
-                          surface: Colors.white,
-                          onSurface: Colors.black,
-                        ),
-                  ),
-                  child: CalendarDatePicker(
-                    initialDate: initialDate,
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime(2030),
-                    onDateChanged: (DateTime date) {
-                      selectedDate.value =
-                          '${date.day.toString().padLeft(2, '0')}-${date.month.toString().padLeft(2, '0')}-${date.year}';
-                      Navigator.pop(context);
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      initialDate: initialDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
     );
+
+    if (picked != null) {
+      selectedDate.value =
+          '${picked.day.toString().padLeft(2, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.year}';
+      filterMedicinesByDate();
+    }
   }
 
   void onViewAllTap() {
@@ -151,7 +117,34 @@ class HomeController extends BaseController {
         await safeApiCall(() => _medicineRepository.getMedicinesList());
 
     if (result != null) {
-      medicinesList.value = result;
+      allMedicinesList.value = result;
+      filterMedicinesByDate();
+    }
+  }
+
+  void filterMedicinesByDate() {
+    if (allMedicinesList.isEmpty) {
+      medicinesList.value = [];
+      return;
+    }
+
+    try {
+      final parts = selectedDate.value.split('-');
+      final selectedDateTime = DateTime(
+          int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
+
+      medicinesList.value = allMedicinesList.where((medicine) {
+        try {
+          final updatedAt = DateTime.parse(medicine.updatedAt);
+          return updatedAt.year == selectedDateTime.year &&
+              updatedAt.month == selectedDateTime.month &&
+              updatedAt.day == selectedDateTime.day;
+        } catch (e) {
+          return false;
+        }
+      }).toList();
+    } catch (e) {
+      medicinesList.value = allMedicinesList;
     }
   }
 
@@ -222,12 +215,13 @@ class HomeController extends BaseController {
   }
 
   Future<void> logout() async {
-    final result = await safeApiCall(() => _authRepository.logout());
-    if (result != null) {
-      await LocalStorageService.logout();
-      Get.offAllNamed(LoginView.routeName);
-    } else {
-      print('logout api failed');
-    }
+    ////  final result = await safeApiCall(() => _authRepository.logout());
+    //if (result != null) {
+    await LocalStorageService.logout();
+    Get.offAllNamed(LoginView.routeName);
+
+    /// } else {
+    print('logout api failed');
+    // }
   }
 }

@@ -69,7 +69,7 @@ class TimelineView extends GetView<TimelineController> {
                 children: [
                   CustomAppBar(
                     title: Lang.timeline,
-                    isOndashboard: isOndashboard ?? false,
+                    isOndashboard: false,
                   ),
                   Expanded(
                     child: RefreshIndicator(
@@ -237,6 +237,8 @@ class TimelineView extends GetView<TimelineController> {
             const SizedBox(height: 16),
             ...controller.eventsList
                 .where((e) => e.type == 'visit')
+                .toList()
+                .reversed
                 .toList()
                 .asMap()
                 .entries

@@ -73,77 +73,70 @@ class HomeView extends StatelessWidget {
     final controller = Get.find<HomeController>();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-      child: Container(
-        decoration: BoxDecoration(
-            border: Border(
-                bottom: BorderSide(color: AppColors.textColor, width: 0.1))),
-        child: Row(
-          children: [
-            // Menu Icon
-            GestureDetector(
-              onTap: () => _scaffoldKey.currentState?.openDrawer(),
-              child: Icon(Icons.menu),
-            ),
-            const SizedBox(width: 12),
-            // Logo/Icon (R or ribbon icon)
-            Container(
-              width: context.screenWidth * 0.1,
-              height: context.screenWidth * 0.1,
-              decoration: BoxDecoration(
-                color: AppColors.valueTextColor,
-                borderRadius: BorderRadius.circular(8),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              // Menu Icon
+              GestureDetector(
+                onTap: () => _scaffoldKey.currentState?.openDrawer(),
+                child: Icon(Icons.menu),
               ),
-              child: Center(
-                child: Text(
-                  'R',
-                  style: TextStyle(
-                    color: AppColors.white,
-                    fontSize: context.percentWidth * 4.5,
-                    fontWeight: FontWeight.normal,
-                  ),
+              const SizedBox(width: 12),
+              // Logo/Icon (R or ribbon icon)
+
+              const SizedBox(width: 12),
+              // Welcome text
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    subText3(
+                      Lang.welcome,
+                      color: AppColors.textColor,
+                      align: TextAlign.start,
+                      context: context,
+                    ),
+                    subText4(
+                      Staticdata.userModel?.name?.isNotEmpty == true
+                          ? Staticdata.userModel!.name!
+                          : 'User',
+                      color: AppColors.headingTextColor,
+                      align: TextAlign.start,
+                      fontWeight: FontWeight.w500,
+                      context: context,
+                    ),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(width: 12),
-            // Welcome text
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  subText3(
-                    Lang.welcome,
-                    color: AppColors.textColor,
-                    align: TextAlign.start,
-                    context: context,
-                  ),
-                  subText4(
-                    Staticdata.userModel?.name?.isNotEmpty == true
-                        ? Staticdata.userModel!.name!
-                        : 'User',
-                    color: AppColors.headingTextColor,
-                    align: TextAlign.start,
-                    fontWeight: FontWeight.w500,
-                    context: context,
-                  ),
-                ],
-              ),
-            ),
-            // Profile picture
-            Obx(() => CircleAvatar(
-                  radius: 18,
-                  backgroundColor: AppColors.cardGray,
-                  backgroundImage: controller.userProfileImage.value.isNotEmpty
-                      ? NetworkImage(controller.userProfileImage.value)
-                      : const AssetImage(AppAssets.profile) as ImageProvider,
-                  onBackgroundImageError:
-                      controller.userProfileImage.value.isNotEmpty
-                          ? (exception, stackTrace) =>
-                              const AssetImage(AppAssets.profile)
-                          : null,
-                )),
-          ],
-        ),
+              // Profile picture
+              Obx(() => GestureDetector(
+                    onTap: () =>
+                        Navigator.pushNamed(context, ProfileView.routeName),
+                    child: CircleAvatar(
+                      radius: 18,
+                      backgroundColor: AppColors.cardGray,
+                      backgroundImage:
+                          controller.userProfileImage.value.isNotEmpty
+                              ? NetworkImage(controller.userProfileImage.value)
+                              : const AssetImage(AppAssets.profile)
+                                  as ImageProvider,
+                      onBackgroundImageError:
+                          controller.userProfileImage.value.isNotEmpty
+                              ? (exception, stackTrace) =>
+                                  const AssetImage(AppAssets.profile)
+                              : null,
+                    ),
+                  )),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Container(
+            height: 0.2,
+            color: AppColors.textColor,
+          ),
+        ],
       ),
     );
   }
@@ -284,10 +277,14 @@ class HomeView extends StatelessWidget {
     ];
 
     final medicineIcons = [
-      FaIcon(FontAwesomeIcons.pills, color: Colors.blue[600], size: context.percentWidth * 6),
-      FaIcon(FontAwesomeIcons.capsules, color: Colors.orange[600], size: context.percentWidth * 6),
-      FaIcon(FontAwesomeIcons.tablets, color: AppColors.green, size: context.percentWidth * 6),
-      FaIcon(FontAwesomeIcons.syringe, color: Colors.purple[600], size: context.percentWidth * 6),
+      FaIcon(FontAwesomeIcons.pills,
+          color: Colors.blue[600], size: context.percentWidth * 6),
+      FaIcon(FontAwesomeIcons.capsules,
+          color: Colors.orange[600], size: context.percentWidth * 6),
+      FaIcon(FontAwesomeIcons.tablets,
+          color: AppColors.green, size: context.percentWidth * 6),
+      FaIcon(FontAwesomeIcons.syringe,
+          color: Colors.purple[600], size: context.percentWidth * 6),
     ];
 
     return Padding(
@@ -511,8 +508,7 @@ class HomeView extends StatelessWidget {
                   context,
                   icon: Icons.feedback,
                   title: 'Feedback',
-                  onTap: () =>
-                      Navigator.pushNamed(context, '/feedback'),
+                  onTap: () => Navigator.pushNamed(context, '/feedback'),
                 ),
                 _buildDrawerItem(
                   context,
