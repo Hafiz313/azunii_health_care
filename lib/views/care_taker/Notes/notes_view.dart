@@ -3,10 +3,12 @@ import 'package:get/get.dart';
 import '../../../consts/colors.dart';
 import '../../../consts/lang.dart';
 import '../../../utils/percentage_size_ext.dart';
+import '../../../core/models/notes_model.dart';
 import '../../widget/text.dart';
 import '../../widget/buttons.dart';
 import '../../widget/Common_widgets/customAppBar.dart';
 import '../../widget/Common_widgets/custom_dropdown.dart';
+import '../../widget/Common_widgets/overlayloader.dart';
 import '../../widget/text_fields.dart';
 import 'controller/notes_controller.dart';
 
@@ -18,32 +20,35 @@ class Notesview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(NotesController());
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            CustomAppBar(
-              title: Lang.caregiverNotes,
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: context.screenWidth * 0.05),
-                    _buildAddNotesSection(context, controller),
-                    SizedBox(height: context.screenWidth * 0.06),
-                    _buildPreviousNotesSection(context, controller),
-                    SizedBox(height: context.screenWidth * 0.05),
-                  ],
-                ),
+    return Obx(() => OverlayLoader(
+          isLoading: controller.isLoading.value,
+          child: Scaffold(
+            backgroundColor: AppColors.white,
+            body: SafeArea(
+              child: Column(
+                children: [
+                  CustomAppBar(
+                    title: Lang.caregiverNotes,
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: context.screenWidth * 0.05),
+                          _buildAddNotesSection(context, controller),
+                          SizedBox(height: context.screenWidth * 0.06),
+                          _buildPreviousNotesSection(context, controller),
+                          SizedBox(height: context.screenWidth * 0.05),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 
   Widget _buildAddNotesSection(
@@ -127,24 +132,48 @@ class Notesview extends StatelessWidget {
             ],
           ),
           SizedBox(height: context.screenWidth * 0.04),
-          Obx(() => ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: controller.previousNotes.length,
-                separatorBuilder: (context, index) =>
-                    SizedBox(height: context.screenWidth * 0.04),
-                itemBuilder: (context, index) {
-                  final note = controller.previousNotes[index];
-                  return _buildNoteCard(context, note, controller);
-                },
-              )),
+          Obx(() {
+            if (controller.previousNotes.isEmpty) {
+              return Center(
+                child: Padding(
+                  padding: EdgeInsets.all(context.screenWidth * 0.1),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.note_outlined,
+                        size: 60,
+                        color: AppColors.textColor.withOpacity(0.3),
+                      ),
+                      SizedBox(height: context.screenWidth * 0.04),
+                      subText5(
+                        'No notes available',
+                        fontSize: 14,
+                        color: AppColors.textColor,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+            return ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: controller.previousNotes.length,
+              separatorBuilder: (context, index) =>
+                  SizedBox(height: context.screenWidth * 0.04),
+              itemBuilder: (context, index) {
+                final note = controller.previousNotes[index];
+                return _buildNoteCard(context, note, controller);
+              },
+            );
+          }),
         ],
       ),
     );
   }
 
-  Widget _buildNoteCard(BuildContext context, Map<String, dynamic> note,
-      NotesController controller) {
+  Widget _buildNoteCard(
+      BuildContext context, NotesModel note, NotesController controller) {
     return Container(
       padding: EdgeInsets.all(context.screenWidth * 0.04),
       decoration: BoxDecoration(
@@ -185,7 +214,7 @@ class Notesview extends StatelessWidget {
                   ),
                   SizedBox(width: context.screenWidth * 0.02),
                   subText4(
-                    note['category'],
+                    note.category,
                     color: AppColors.headingTextColor,
                     fontWeight: FontWeight.w500,
                     align: TextAlign.start,
@@ -193,7 +222,7 @@ class Notesview extends StatelessWidget {
                 ],
               ),
               subText3(
-                note['date'],
+                'ID: ${note.id}',
                 color: AppColors.textColor,
                 align: TextAlign.start,
               ),
@@ -203,35 +232,14 @@ class Notesview extends StatelessWidget {
           subText5(
             fontSize: 13,
             fontWeight: FontWeight.normal,
-            note['note'],
+            note.note,
             color: AppColors.textColor,
             align: TextAlign.start,
           ),
           SizedBox(height: context.screenWidth * 0.03),
           Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.person_outline,
-                      color: AppColors.textColor,
-                      size: context.screenWidth * 0.06,
-                    ),
-                    SizedBox(width: context.screenWidth * 0.01),
-                    Expanded(
-                      child: subText5(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        note['addedBy'],
-                        color: AppColors.textColor,
-                        align: TextAlign.start,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(width: context.screenWidth * 0.02),
               SizedBox(
                 width: context.screenWidth * 0.24,
                 height: context.screenWidth * 0.08,

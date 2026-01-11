@@ -20,20 +20,21 @@ class NotesController extends BaseController {
     'Mood',
   ];
 
-  final RxList<Map<String, dynamic>> previousNotes = <Map<String, dynamic>>[
-    {
-      'category': Lang.generalHealth,
-      'date': '09-12-2025',
-      'note': Lang.patientReportedFeeling,
-      'addedBy': Lang.addedBySarahJohnson,
-    },
-    {
-      'category': Lang.generalHealth,
-      'date': '09-12-2025',
-      'note': Lang.patientReportedFeeling,
-      'addedBy': Lang.addedBySarahJohnson,
-    },
-  ].obs;
+  final RxList<NotesModel> previousNotes = <NotesModel>[].obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchNotes();
+  }
+
+  Future<void> fetchNotes() async {
+    final result = await safeApiCall(
+        () => _notesRepository.getNotesList(1)); // TODO: Replace with actual patient ID
+    if (result != null) {
+      previousNotes.value = result;
+    }
+  }
 
   void setCategory(String? category) {
     selectedCategory.value = category ?? '';
@@ -61,17 +62,10 @@ class NotesController extends BaseController {
     final result = await safeApiCall(() => _notesRepository.storeNote(note));
 
     if (result != null) {
-      previousNotes.insert(0, {
-        'category': selectedCategory.value,
-        'date': DateTime.now().toString().substring(0, 10),
-        'note': noteController.text,
-        'addedBy': 'Added by Current User',
-      });
-
       noteController.clear();
       selectedCategory.value = '';
-
       CustomSnackbar.show('Note saved successfully!', isSuccess: true);
+      await fetchNotes();
     }
   }
 
@@ -79,24 +73,18 @@ class NotesController extends BaseController {
     CustomSnackbar.show('Showing all ${previousNotes.length} notes', isSuccess: true);
   }
 
-  void viewNoteDetails(Map<String, dynamic> note) {
+  void viewNoteDetails(NotesModel note) {
     Get.dialog(
       AlertDialog(
         backgroundColor: Colors.white,
-        title: Text(note['category']),
+        title: Text(note.category),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Date: ${note['date']}'),
+            Text('Category: ${note.category}'),
             const SizedBox(height: 8),
-            Text('Note: ${note['note']}'),
-            const SizedBox(height: 8),
-            Text(
-              'Added by: ${note['addedBy']}',
-              style:
-                  TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
-            ),
+            Text('Note: ${note.note}'),
           ],
         ),
         actions: [

@@ -154,6 +154,9 @@ class MedicineController extends BaseController {
 
   // Load medicine data for editing
   void loadMedicineData(Medicine medicine) {
+    print('📊 Loading medicine data for editing');
+    print('📸 Medicine attachment: ${medicine.attachment}');
+    
     isEditMode.value = true;
     editingMedicineId.value = medicine.id;
 
@@ -166,6 +169,9 @@ class MedicineController extends BaseController {
     if (medicine.attachment != null && medicine.attachment!.isNotEmpty) {
       existingImageUrl.value = medicine.attachment!;
       selectedImage.value = null; // Clear local file since we have network image
+      print('✅ Existing image URL set: ${existingImageUrl.value}');
+    } else {
+      print('⚠️ No attachment found');
     }
 
     // Clear existing frequency rows

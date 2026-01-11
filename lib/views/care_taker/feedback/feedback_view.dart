@@ -30,7 +30,7 @@ class FeedbackView extends StatelessWidget {
         child: Column(
           children: [
             CustomAppBar(
-              isOndashboard: false,
+              isOndashboard: true,
               title: 'User Feedback',
             ),
             Expanded(

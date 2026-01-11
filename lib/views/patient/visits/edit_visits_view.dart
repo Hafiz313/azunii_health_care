@@ -123,6 +123,7 @@ class _EditVisitsViewState extends State<EditVisitsView> {
                           subtitle: Lang.selectAndUploadPhoto,
                           onTap: controller.showImagePickerDialog,
                           selectedImage: controller.selectedImage,
+                          existingImageUrl: controller.existingImageUrl,
                         ),
                         const SizedBox(height: 24),
                         AppElevatedButton(

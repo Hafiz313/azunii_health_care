@@ -187,7 +187,35 @@ class ApiClient {
             body: body != null ? jsonEncode(body) : null,
           )
           .timeout(_timeout);
-      return _handleResponse(response);
+      
+      final responseJson = jsonDecode(response.body);
+      
+      debugPrint('\n🔥 API RESPONSE 🔥');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
+      debugPrint('🔚 End Response\n');
+      
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        // Check if response has status field and it's false
+        if (responseJson['status'] != null && responseJson['status'] == false) {
+          final message = responseJson['message'] ?? 'Something went wrong';
+          throw ApiException(message: message);
+        }
+        return responseJson;
+      } else {
+        // Extract error message from response
+        String message = responseJson['message'] ?? 'Something went wrong';
+        if (responseJson['errors'] != null) {
+          final errors = responseJson['errors'];
+          if (errors is Map && errors.isNotEmpty) {
+            final firstError = errors.values.first;
+            if (firstError is List && firstError.isNotEmpty) {
+              message = firstError.first.toString();
+            }
+          }
+        }
+        throw ApiException(message: message);
+      }
     } on SocketException {
       throw ApiException(message: 'No internet connection');
     } on ApiException {
@@ -221,11 +249,38 @@ class ApiClient {
         ));
       }
 
-      final response = await http.Response.fromStream(
-        await request.send().timeout(_timeout),
-      );
+      var streamedResponse = await request.send().timeout(_timeout);
+      var responseString = await streamedResponse.stream.bytesToString();
+      final responseJson = jsonDecode(responseString);
 
-      return _handleResponse(response);
+      debugPrint('\n🔥 API RESPONSE 🔥');
+      debugPrint('Status Code: ${streamedResponse.statusCode}');
+      debugPrint('Response Body: $responseString');
+      debugPrint('🔚 End Response\n');
+
+      if (streamedResponse.statusCode >= 200 &&
+          streamedResponse.statusCode < 300) {
+        // Check if response has status field and it's false
+        if (responseJson['status'] != null && responseJson['status'] == false) {
+          final message = responseJson['message'] ?? 'Something went wrong';
+          throw ApiException(message: message);
+        }
+
+        return responseJson;
+      } else {
+        // Extract error message from response
+        String message = responseJson['message'] ?? 'Something went wrong';
+        if (responseJson['errors'] != null) {
+          final errors = responseJson['errors'];
+          if (errors is Map && errors.isNotEmpty) {
+            final firstError = errors.values.first;
+            if (firstError is List && firstError.isNotEmpty) {
+              message = firstError.first.toString();
+            }
+          }
+        }
+        throw ApiException(message: message);
+      }
     } on SocketException {
       throw ApiException(message: 'No internet connection');
     } on ApiException {

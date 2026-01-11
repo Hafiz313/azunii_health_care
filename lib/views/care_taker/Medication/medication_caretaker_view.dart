@@ -7,7 +7,9 @@ import '../../../utils/percentage_size_ext.dart';
 import '../../widget/text.dart';
 import '../../widget/buttons.dart';
 import '../../widget/Common_widgets/customAppBar.dart';
+import '../../widget/Common_widgets/overlayloader.dart';
 import 'controller/medication_controller.dart';
+import '../../../core/models/caregiver_medicine_list_model.dart';
 
 class Medication_caretaker extends StatelessWidget {
   static const String routeName = '/medication-caregiver';
@@ -20,28 +22,31 @@ class Medication_caretaker extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
-        child: Column(
-          children: [
-            CustomAppBar(
-              title: Lang.medication,
-              onIconTap: () {},
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 5),
-                    _buildHeader(context, controller),
-                    const SizedBox(height: 20),
-                    _buildMedicationList(context, controller),
-                    const SizedBox(height: 20),
-                  ],
+        child: Obx(() => OverlayLoader(
+          isLoading: controller.isLoading.value,
+          child: Column(
+            children: [
+              CustomAppBar(
+                title: Lang.medication,
+                onIconTap: () {},
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 5),
+                      _buildHeader(context, controller),
+                      const SizedBox(height: 20),
+                      _buildMedicationList(context, controller),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
+        )),
       ),
     );
   }
@@ -77,7 +82,9 @@ class Medication_caretaker extends StatelessWidget {
                   Obx(() => subText5(
                         fontSize: 12,
                         fontWeight: FontWeight.normal,
-                        '${controller.selectedDate.value.day.toString().padLeft(2, '0')}-${controller.selectedDate.value.month.toString().padLeft(2, '0')}-${controller.selectedDate.value.year}',
+                        controller.selectedDate.value == null 
+                            ? 'All'
+                            : '${controller.selectedDate.value!.day.toString().padLeft(2, '0')}-${controller.selectedDate.value!.month.toString().padLeft(2, '0')}-${controller.selectedDate.value!.year}',
                         color: AppColors.textColor,
                       )),
                   const SizedBox(width: 4),
@@ -99,21 +106,36 @@ class Medication_caretaker extends StatelessWidget {
       BuildContext context, MedicationController controller) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Obx(() => ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: controller.medications.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 16),
-            itemBuilder: (context, index) {
-              final medication = controller.medications[index];
-              return _buildMedicationCard(context, medication, controller);
-            },
-          )),
+      child: Obx(() {
+        if (controller.filteredMedications.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(40),
+              child: subText4(
+                'No medicines are available',
+                color: AppColors.textColor,
+                fontWeight: FontWeight.w500,
+                align: TextAlign.center,
+              ),
+            ),
+          );
+        }
+        return ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: controller.filteredMedications.length,
+          separatorBuilder: (context, index) => const SizedBox(height: 16),
+          itemBuilder: (context, index) {
+            final medication = controller.filteredMedications[index];
+            return _buildMedicationCard(context, medication, controller);
+          },
+        );
+      }),
     );
   }
 
   Widget _buildMedicationCard(BuildContext context,
-      Map<String, dynamic> medication, MedicationController controller) {
+      CaregiverMedicineItem medication, MedicationController controller) {
     return Container(
       padding: EdgeInsets.all(context.screenWidth * 0.04),
       decoration: BoxDecoration(
@@ -139,7 +161,7 @@ class Medication_caretaker extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               subText4(
-                medication['name'],
+                medication.medicineName,
                 color: AppColors.headingTextColor,
                 fontWeight: FontWeight.w500,
                 align: TextAlign.start,
@@ -147,7 +169,7 @@ class Medication_caretaker extends StatelessWidget {
               subText5(
                 fontSize: 12,
                 fontWeight: FontWeight.normal,
-                medication['dosage'],
+                medication.dosage,
                 color: AppColors.textColor,
                 align: TextAlign.start,
               ),
@@ -161,7 +183,7 @@ class Medication_caretaker extends StatelessWidget {
               subText5(
                 fontSize: 13,
                 fontWeight: FontWeight.normal,
-                medication['timing'],
+                medication.frequencies.isNotEmpty ? medication.frequencies.map((f) => '${f.frequency} at ${f.time}').join(', ') : 'No timing specified',
                 color: AppColors.textColor,
                 align: TextAlign.start,
               ),
@@ -182,7 +204,7 @@ class Medication_caretaker extends StatelessWidget {
                       subText5(
                         fontSize: 13,
                         fontWeight: FontWeight.normal,
-                        '${medication['startDate']}',
+                        medication.createdAt.split(' ')[0],
                         color: AppColors.textColor,
                         align: TextAlign.start,
                       ),
@@ -201,7 +223,7 @@ class Medication_caretaker extends StatelessWidget {
                       subText5(
                         fontSize: 13,
                         fontWeight: FontWeight.normal,
-                        '${medication['endDate']}',
+                        medication.updatedAt.split(' ')[0],
                         color: AppColors.textColor,
                         align: TextAlign.start,
                       ),
@@ -213,7 +235,7 @@ class Medication_caretaker extends StatelessWidget {
           ),
           SizedBox(height: context.screenWidth * 0.03),
           // Drug interactions section - matching Figma design
-          if (medication['hasInteraction'])
+          if (medication.interactionFlag == '1')
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -259,7 +281,7 @@ class Medication_caretaker extends StatelessWidget {
                           subText5(
                             fontSize: 12,
                             fontWeight: FontWeight.normal,
-                            ' ${medication['interactionWith']}',
+                            ' ${medication.interactionDetails ?? 'Unknown interaction'}',
                             color: AppColors.textColor,
                             align: TextAlign.start,
                           ),
@@ -269,7 +291,7 @@ class Medication_caretaker extends StatelessWidget {
                       subText5(
                         fontSize: 12,
                         fontWeight: FontWeight.normal,
-                        medication['interactionMessage'],
+                        medication.interactionMessage ?? 'No interaction message available',
                         color: AppColors.textColor,
                         align: TextAlign.start,
                       ),

@@ -18,6 +18,7 @@ class VisitsController extends BaseController {
   final RxString selectedSpecialty = RxString('');
   final Rx<DateTime?> selectedDate = Rx<DateTime?>(null);
   final Rx<File?> selectedImage = Rx<File?>(null);
+  final RxString existingImageUrl = RxString('');
   final RxInt editingVisitId = RxInt(0);
   final RxBool isEditMode = RxBool(false);
 
@@ -80,6 +81,7 @@ class VisitsController extends BaseController {
       final XFile? image = await _picker.pickImage(source: source);
       if (image != null) {
         selectedImage.value = File(image.path);
+        existingImageUrl.value = ''; // Clear existing URL when new image is selected
       }
     } catch (e) {
       Get.snackbar('Error', 'Failed to pick image: $e');
@@ -88,10 +90,14 @@ class VisitsController extends BaseController {
 
   void clearImage() {
     selectedImage.value = null;
+    existingImageUrl.value = '';
   }
 
   // Load visit data for editing
   void loadVisitData(VisitModel visit) {
+    print('📊 Loading visit data for editing');
+    print('📸 Visit attachment: ${visit.attachment}');
+    
     isEditMode.value = true;
     editingVisitId.value = visit.id;
 
@@ -105,6 +111,15 @@ class VisitsController extends BaseController {
       selectedDate.value = DateTime.parse(visit.visitDate);
     } catch (e) {
       selectedDate.value = null;
+    }
+    
+    // Load existing image URL if available
+    if (visit.attachment != null && visit.attachment!.isNotEmpty) {
+      existingImageUrl.value = visit.attachment!;
+      selectedImage.value = null; // Clear local file since we have network image
+      print('✅ Existing image URL set: ${existingImageUrl.value}');
+    } else {
+      print('⚠️ No attachment found');
     }
   }
 
@@ -213,6 +228,7 @@ class VisitsController extends BaseController {
     selectedSpecialty.value = '';
     selectedDate.value = null;
     selectedImage.value = null;
+    existingImageUrl.value = '';
     isEditMode.value = false;
     editingVisitId.value = 0;
   }

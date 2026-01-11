@@ -1,7 +1,9 @@
 import 'package:Azunii_Health/core/controllers/base_controller.dart';
+import 'package:Azunii_Health/core/models/static_user_model.dart';
 import 'package:Azunii_Health/core/repositories/auth_repository.dart';
 import 'package:Azunii_Health/core/repositories/Medicine_repo.dart';
 import 'package:Azunii_Health/core/repositories/visits_repo.dart';
+import 'package:Azunii_Health/core/repositories/profile_repository.dart';
 import 'package:Azunii_Health/core/models/Medicine_model.dart';
 import 'package:Azunii_Health/core/models/visit_model.dart';
 import 'package:Azunii_Health/core/services/local_storage_service.dart';
@@ -13,6 +15,7 @@ import 'package:Azunii_Health/views/patient/visits/edit_visits_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../consts/colors.dart';
+import '../../../widget/Common_widgets/custom_snackbar.dart';
 
 import '../../../auth/login/login_view.dart';
 import '../../medicines/medicines_view.dart';
@@ -30,6 +33,14 @@ class HomeController extends BaseController {
   final AuthRepository _authRepository = AuthRepository();
   final MedicineRepository _medicineRepository = MedicineRepository();
   final VisitsRepository _visitsRepository = VisitsRepository();
+  final ProfileRepository _profileRepository = ProfileRepository();
+
+  // Profile update controllers
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
   @override
   void onInit() {
@@ -113,17 +124,27 @@ class HomeController extends BaseController {
   }
 
   Future<void> getMedicines() async {
+    print('🔍 getMedicines called');
     final result =
         await safeApiCall(() => _medicineRepository.getMedicinesList());
 
+    print('📦 API Result: ${result?.length ?? 0} medicines');
     if (result != null) {
       allMedicinesList.value = result;
+      print('✅ allMedicinesList updated: ${allMedicinesList.length} medicines');
       filterMedicinesByDate();
+    } else {
+      print('❌ API returned null');
     }
   }
 
   void filterMedicinesByDate() {
+    print('🔍 filterMedicinesByDate called');
+    print('📅 Selected date: ${selectedDate.value}');
+    print('📦 allMedicinesList count: ${allMedicinesList.length}');
+    
     if (allMedicinesList.isEmpty) {
+      print('⚠️ allMedicinesList is empty, setting medicinesList to empty');
       medicinesList.value = [];
       return;
     }
@@ -132,19 +153,30 @@ class HomeController extends BaseController {
       final parts = selectedDate.value.split('-');
       final selectedDateTime = DateTime(
           int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
+      
+      print('📅 Filtering for date: ${selectedDateTime.toString()}');
 
-      medicinesList.value = allMedicinesList.where((medicine) {
+      final filtered = allMedicinesList.where((medicine) {
         try {
           final updatedAt = DateTime.parse(medicine.updatedAt);
-          return updatedAt.year == selectedDateTime.year &&
+          print('  Medicine: ${medicine.medicineName}, updatedAt: ${updatedAt.toString()}');
+          final matches = updatedAt.year == selectedDateTime.year &&
               updatedAt.month == selectedDateTime.month &&
               updatedAt.day == selectedDateTime.day;
+          print('    Matches: $matches');
+          return matches;
         } catch (e) {
+          print('  ❌ Error parsing date for ${medicine.medicineName}: $e');
           return false;
         }
       }).toList();
+      
+      medicinesList.value = filtered;
+      print('✅ Filtered medicinesList count: ${medicinesList.length}');
     } catch (e) {
+      print('❌ Error in filterMedicinesByDate: $e');
       medicinesList.value = allMedicinesList;
+      print('⚠️ Fallback: showing all medicines (${medicinesList.length})');
     }
   }
 
@@ -173,6 +205,7 @@ class HomeController extends BaseController {
     final medicine =
         medicinesList.firstWhereOrNull((med) => med.id == medicineId);
     if (medicine != null) {
+      print('📸 Medicine attachment: ${medicine.attachment}');
       Get.to(
           () => EditMedicineView(
                 isOndashboard: false,
@@ -214,6 +247,50 @@ class HomeController extends BaseController {
     ]);
   }
 
+  Future<void> updateProfile() async {
+    if (nameController.text.trim().isEmpty) {
+      CustomSnackbar.show('Please enter name', isSuccess: false);
+      return;
+    }
+
+    if (emailController.text.trim().isEmpty) {
+      CustomSnackbar.show('Please enter email', isSuccess: false);
+      return;
+    }
+
+    if (passwordController.text.isNotEmpty &&
+        passwordController.text != confirmPasswordController.text) {
+      CustomSnackbar.show('Passwords do not match', isSuccess: false);
+      return;
+    }
+
+    setLoading(true);
+    final result = await safeApiCall(() => _profileRepository.updateProfile(
+          name: nameController.text.trim(),
+          email: emailController.text.trim(),
+          password: passwordController.text.isNotEmpty
+              ? passwordController.text
+              : null,
+          passwordConfirmation: confirmPasswordController.text.isNotEmpty
+              ? confirmPasswordController.text
+              : null,
+        ));
+
+    if (result != null) {
+      // Refresh profile data
+      final profileResult =
+          await safeApiCall(() => _authRepository.getProfileInfo());
+      if (profileResult != null && profileResult.status) {
+        Staticdata.userModel = profileResult.user;
+      }
+
+      passwordController.clear();
+      confirmPasswordController.clear();
+      CustomSnackbar.show('Profile updated successfully!', isSuccess: true);
+    }
+    setLoading(false);
+  }
+
   Future<void> logout() async {
     ////  final result = await safeApiCall(() => _authRepository.logout());
     //if (result != null) {
@@ -223,5 +300,14 @@ class HomeController extends BaseController {
     /// } else {
     print('logout api failed');
     // }
+  }
+
+  @override
+  void onClose() {
+    nameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.onClose();
   }
 }

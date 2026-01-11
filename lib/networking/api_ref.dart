@@ -15,7 +15,7 @@ class Apis {
 
   // Profile endpoints
   static const String profileInfo = '/profile/info';
-
+  static const String profileUpdate = '/profile/update';
   // Patient visits endpoints
   static const String storePatientVisit = '/patient/visits/store';
   static const String getPatientVisits = '/patient/visits/index';
