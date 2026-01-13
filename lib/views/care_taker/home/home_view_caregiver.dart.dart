@@ -1,6 +1,7 @@
 import 'package:Azunii_Health/consts/assets.dart';
 import 'package:Azunii_Health/utils/percentage_size_ext.dart';
 import 'package:Azunii_Health/views/care_taker/home/controller/care-giver-controller.dart';
+import 'package:Azunii_Health/views/care_taker/home/select_patient_view.dart';
 import 'package:Azunii_Health/views/patient/medicines/medicines_view.dart';
 import 'package:Azunii_Health/views/patient/visits/visits_view.dart';
 
@@ -33,20 +34,30 @@ class HomeView_caregiver extends StatelessWidget {
       backgroundColor: AppColors.white,
       drawer: _buildDrawer(context),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(context),
-              _buildQuickActions(context),
-              const SizedBox(height: 13),
-              _buildMedicationAlert(context),
-              const SizedBox(height: 13),
-              _buildAsOfTodaySection(context),
-              const SizedBox(height: 13),
-              _buildFutureAppointmentsSection(context),
-              const SizedBox(height: 20),
-            ],
+        child: RefreshIndicator(
+          onRefresh: () async {
+            final patientId = controller.activePatient.value?.userId;
+            if (patientId != null) {
+              await controller.loadDashboardData(int.parse(patientId));
+            }
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(context),
+                _buildPatientSwitcher(context),
+                _buildQuickActions(context),
+                const SizedBox(height: 13),
+                // _buildMedicationAlert(context),
+                // const SizedBox(height: 13),
+                _buildAsOfTodaySection(context),
+                const SizedBox(height: 13),
+                _buildFutureAppointmentsSection(context),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),
@@ -65,10 +76,10 @@ class HomeView_caregiver extends StatelessWidget {
         child: Row(
           children: [
             // Menu Icon
-            GestureDetector(
-              onTap: () => _scaffoldKey.currentState?.openDrawer(),
-              child: Icon(Icons.menu),
-            ),
+            // GestureDetector(
+            //   onTap: () => _scaffoldKey.currentState?.openDrawer(),
+            //   child: Icon(Icons.menu),
+            // ),
             const SizedBox(width: 4),
 
             Obx(() => CircleAvatar(
@@ -133,6 +144,74 @@ class HomeView_caregiver extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildPatientSwitcher(BuildContext context) {
+    final controller = Get.find<HomeController_caregiver>();
+    return Obx(() {
+      final activePatient = controller.activePatient.value;
+      if (activePatient == null) return const SizedBox.shrink();
+
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.primary.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+          ),
+          child: Row(
+            children: [
+              CircleAvatar(
+                backgroundColor: AppColors.primary,
+                radius: 20,
+                child: Text(
+                  activePatient.patient.name[0].toUpperCase(),
+                  style: const TextStyle(
+                      color: AppColors.white, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    subText5(
+                      fontSize: 11,
+                      fontWeight: FontWeight.normal,
+                      'Active Patient',
+                      color: AppColors.textColor.withOpacity(0.7),
+                    ),
+                    subText4(
+                      activePatient.patient.name,
+                      color: AppColors.headingTextColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ],
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SelectPatientView(),
+                    ),
+                  );
+                },
+                child: subText5(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  'Change',
+                  color: AppColors.primary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    });
   }
 
   /// Quick Action Buttons in 2x2 Grid
@@ -205,26 +284,26 @@ class HomeView_caregiver extends StatelessWidget {
   }
 
   /// Medication Alert Section
-  Widget _buildMedicationAlert(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          headline6(
-            Lang.medicationAlert,
-            color: AppColors.headingTextColor,
-            fontWeight: FontWeight.w500,
-            //   textAlign: TextAlign.start,
-          ),
-          const SizedBox(height: 8),
-          MedicationAlertCard(
-            message: Lang.medContraindication,
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildMedicationAlert(BuildContext context) {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(horizontal: 20),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         headline6(
+  //           Lang.medicationAlert,
+  //           color: AppColors.headingTextColor,
+  //           fontWeight: FontWeight.w500,
+  //           //   textAlign: TextAlign.start,
+  //         ),
+  //         const SizedBox(height: 8),
+  //         MedicationAlertCard(
+  //           message: Lang.medContraindication,
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   /// As of Today Section
   Widget _buildAsOfTodaySection(BuildContext context) {
@@ -242,30 +321,67 @@ class HomeView_caregiver extends StatelessWidget {
                 fontWeight: FontWeight.w500,
                 Lang.asOfToday,
                 color: AppColors.headingTextColor,
-//textAlign: TextAlign.start,
               ),
-              DatePickerButton(
-                date: controller.selectedDate.value,
-                onTap: controller.onDatePickerTap,
+              Row(
+                children: [
+                  if (controller.selectedDateString.value.isNotEmpty)
+                    TextButton(
+                      onPressed: controller.clearDateFilter,
+                      child: subText5(
+                        fontSize: 12,
+                        'Clear Filter',
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  Obx(() => DatePickerButton(
+                        date: controller.selectedDateString.value.isEmpty
+                            ? 'Select Date'
+                            : controller.selectedDateString.value,
+                        onTap: controller.onDatePickerTap,
+                      )),
+                ],
               ),
             ],
           ),
           const SizedBox(height: 12),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: controller.todayTasks.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 12),
-            itemBuilder: (context, index) {
-              final task = controller.todayTasks[index];
-              return TodayTaskCard(
-                backgroundColor: task['backgroundColor'],
-                icon: task['icon'],
-                title: task['title'],
-                isCompleted: task['isCompleted'],
+          Obx(() {
+            final controller = Get.find<HomeController_caregiver>();
+            if (controller.isLoading.value) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (controller.filteredMedicines.isEmpty) {
+              return Center(
+                child: Column(
+                  children: [
+                    Icon(Icons.medication_outlined,
+                        size: 48, color: AppColors.textColor.withOpacity(0.3)),
+                    const SizedBox(height: 8),
+                    subText4(
+                        controller.selectedDateString.value.isEmpty
+                            ? 'No medications available'
+                            : 'No medications for selected date',
+                        color: AppColors.textColor.withOpacity(0.6)),
+                  ],
+                ),
               );
-            },
-          ),
+            }
+            return ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: controller.filteredMedicines.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final medicine = controller.filteredMedicines[index];
+                return TodayTaskCard(
+                  backgroundColor: Colors.blue[100]!,
+                  icon: FaIcon(FontAwesomeIcons.pills,
+                      color: Colors.blue[600], size: 24),
+                  title: '${medicine.medicineName} - ${medicine.dosage}',
+                  isCompleted: medicine.status == 'active',
+                );
+              },
+            );
+          }),
         ],
       ),
     );
@@ -299,21 +415,40 @@ class HomeView_caregiver extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: controller.appointments.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 12),
-            itemBuilder: (context, index) {
-              final appointment = controller.appointments[index];
-              return AppointmentCard(
-                date: appointment['date']!,
-                doctor: appointment['doctor']!,
-                reason: appointment['reason']!,
-                specialty: appointment['specialty']!,
+          Obx(() {
+            final dashboard = controller.dashboardData.value;
+            if (controller.isLoading.value) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (dashboard == null || dashboard.upcomingVisits.isEmpty) {
+              return Center(
+                child: Column(
+                  children: [
+                    Icon(Icons.event_note_outlined,
+                        size: 48, color: AppColors.textColor.withOpacity(0.3)),
+                    const SizedBox(height: 8),
+                    subText4('No upcoming visits',
+                        color: AppColors.textColor.withOpacity(0.6)),
+                  ],
+                ),
               );
-            },
-          ),
+            }
+            return ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: dashboard.upcomingVisits.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final visit = dashboard.upcomingVisits[index];
+                return AppointmentCard(
+                  date: visit.visitDate,
+                  doctor: visit.providerName,
+                  reason: visit.notes,
+                  specialty: visit.specialty,
+                );
+              },
+            );
+          }),
         ],
       ),
     );

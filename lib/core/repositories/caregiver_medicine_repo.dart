@@ -2,8 +2,7 @@ import '../../networking/api_client.dart';
 import '../../networking/api_ref.dart';
 import '../models/caregiver_medicine_model.dart';
 import '../models/caregiver_medicine_list_model.dart';
-import '../../utils/localStorage/storage_service.dart';
-import '../../utils/localStorage/storage_consts.dart';
+import '../services/caregiver_state.dart';
 
 class CaregiverMedicineRepository {
   // Get Caregiver Medicines
@@ -24,14 +23,14 @@ class CaregiverMedicineRepository {
     try {
       print('\n💊 GET CAREGIVER MEDICINES LIST Request 💊');
       
-      final patientId = StorageService().getData(StorageConsts.kUserId);
+      final patientId = CaregiverState().activePatientId.value;
       if (patientId == null) {
-        throw Exception('Patient ID not found in storage');
+        throw Exception('No active patient selected');
       }
       
       final response = await ApiClient.postWithAuth(
         Apis.getMedicineCaregiver,
-        body: {'patient_id': patientId.toString()},
+        body: {'patient_id': patientId},
       );
       
       print('📄 Medicines List Response: Retrieved caregiver medicines\n');

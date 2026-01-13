@@ -14,7 +14,7 @@ class NotesModel {
   factory NotesModel.fromJson(Map<String, dynamic> json) {
     return NotesModel(
       id: json['id'],
-      patientId: json['patient_id'] ?? 0,
+      patientId: int.tryParse(json['patient_id']?.toString() ?? '0') ?? 0,
       category: json['category'] ?? '',
       note: json['note'] ?? '',
     );

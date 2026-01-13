@@ -31,6 +31,8 @@ class Notesview extends StatelessWidget {
                     title: Lang.caregiverNotes,
                   ),
                   Expanded(
+                    child: RefreshIndicator(
+                    onRefresh: controller.fetchNotes,
                     child: SingleChildScrollView(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,6 +45,7 @@ class Notesview extends StatelessWidget {
                         ],
                       ),
                     ),
+                  ),
                   ),
                 ],
               ),

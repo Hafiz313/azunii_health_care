@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../consts/colors.dart';
 import '../../../core/models/timeline_model.dart';
+import '../../../utils/percentage_size_ext.dart';
 import '../text.dart';
 
 class TimelineTaskCard extends StatelessWidget {
@@ -37,17 +38,19 @@ class TimelineTaskCard extends StatelessWidget {
     final displayIcon = icon ?? cardStyle['icon'];
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+      padding: EdgeInsets.symmetric(
+          vertical: context.screenHeight * 0.012,
+          horizontal: context.screenWidth * 0.04),
       decoration: BoxDecoration(
         border: Border.all(color: displayBgColor, width: 1),
         color: displayBgColor.withOpacity(0.7),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(context.screenWidth * 0.03),
       ),
       child: Row(
         children: [
           Container(
-            width: 36,
-            height: 36,
+            width: context.screenWidth * 0.09,
+            height: context.screenWidth * 0.09,
             decoration: BoxDecoration(
               color: displayBgColor,
               shape: BoxShape.circle,
@@ -56,18 +59,18 @@ class TimelineTaskCard extends StatelessWidget {
               child: Icon(
                 displayIcon,
                 color: cardStyle['iconColor'],
-                size: 18,
+                size: context.screenWidth * 0.045,
               ),
             ),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: context.screenWidth * 0.04),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 subText5(
                   title,
-                  fontSize: 11,
+                  fontSize: context.screenWidth * 0.028,
                   fontWeight: FontWeight.w500,
                   color: AppColors.headingTextColor,
                   align: TextAlign.start,
@@ -75,7 +78,7 @@ class TimelineTaskCard extends StatelessWidget {
                 if (subtitle != null) ...[
                   subText5(
                     subtitle,
-                    fontSize: 11,
+                    fontSize: context.screenWidth * 0.028,
                     fontWeight: FontWeight.w400,
                     color: AppColors.textColor,
                     align: TextAlign.start,
@@ -83,31 +86,33 @@ class TimelineTaskCard extends StatelessWidget {
                 ],
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.access_time,
-                      size: 13,
+                      size: context.screenWidth * 0.033,
                       color: AppColors.textColor,
                     ),
-                    const SizedBox(width: 6),
+                    SizedBox(width: context.screenWidth * 0.015),
                     subText5(
                       time,
-                      fontSize: 11,
+                      fontSize: context.screenWidth * 0.028,
                       fontWeight: FontWeight.w400,
                       color: AppColors.textColor,
                       align: TextAlign.start,
                     ),
                     if (frequency != null) ...[
-                      const SizedBox(width: 12),
+                      SizedBox(width: context.screenWidth * 0.03),
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 2),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: context.screenWidth * 0.02,
+                            vertical: context.screenHeight * 0.002),
                         decoration: BoxDecoration(
                           color: AppColors.white.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(
+                              context.screenWidth * 0.015),
                         ),
                         child: subText5(
                           frequency,
-                          fontSize: 10,
+                          fontSize: context.screenWidth * 0.025,
                           fontWeight: FontWeight.w400,
                           color: AppColors.headingTextColor,
                         ),

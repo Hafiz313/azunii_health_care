@@ -8,7 +8,9 @@ import 'package:Azunii_Health/views/care_taker/Notes/notes_view.dart';
 import 'package:Azunii_Health/views/care_taker/dashboard/dashboard.dart';
 import 'package:Azunii_Health/views/care_taker/feedback/feedback_view.dart';
 import 'package:Azunii_Health/views/care_taker/home/home_view_caregiver.dart.dart';
+import 'package:Azunii_Health/views/care_taker/home/select_patient_view.dart';
 import 'package:Azunii_Health/views/care_taker/settings/settings_view.dart';
+
 import 'package:Azunii_Health/views/patient/advocacy/add_caregiver_view.dart';
 import 'package:Azunii_Health/views/patient/dashboard/patient_dashboard.dart';
 import 'package:Azunii_Health/views/patient/home/home_view.dart';
@@ -37,6 +39,7 @@ class AppRoutes {
   static const addCaregiver = AddCaregiverView.routeName;
   static const careTakerDashboard = CareTakerDashboard.routeName;
   static const homeCaregiver = HomeView_caregiver.routeName;
+  static const selectPatient = SelectPatientView.routeName;
   static const notesCaregiver = Notesview.routeName;
   static const medicationCaregiver = Medication_caretaker.routeName;
   static const faqsCaregiver = FAQsView.routeName;
@@ -48,6 +51,7 @@ class AppRoutes {
   static const helpSupport = HelpSupportView.routeName;
   static const allVisits = AllVisitsView.routeName;
   static const viewSummaries = ViewSummariesView.routeName;
+ // static const fcmTest = FCMTestScreen.routeName;
 
   static final List<GetPage> pages = [
     GetPage(name: splash, page: () => SplashView()),
@@ -61,6 +65,7 @@ class AppRoutes {
     GetPage(name: addCaregiver, page: () => const AddCaregiverView()),
     GetPage(name: careTakerDashboard, page: () => const CareTakerDashboard()),
     GetPage(name: homeCaregiver, page: () => const HomeView_caregiver()),
+    GetPage(name: selectPatient, page: () => const SelectPatientView()),
     GetPage(name: notesCaregiver, page: () => const Notesview()),
     GetPage(
         name: medicationCaregiver, page: () => const Medication_caretaker()),
@@ -73,5 +78,6 @@ class AppRoutes {
     GetPage(name: helpSupport, page: () => const HelpSupportView()),
     GetPage(name: allVisits, page: () => const AllVisitsView()),
     GetPage(name: viewSummaries, page: () => const ViewSummariesView()),
+   
   ];
 }

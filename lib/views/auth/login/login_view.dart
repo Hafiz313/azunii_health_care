@@ -129,7 +129,9 @@ class _LoginViewState extends State<LoginView> {
                     height: context.percentHeight * 3,
                   ),
                   LoginWidgets.buildSocialButtons(context),
-                ],
+                  SizedBox(height: context.percentHeight * 2),
+                  // FCM Test Button
+                                  ],
               ),
             ],
           )

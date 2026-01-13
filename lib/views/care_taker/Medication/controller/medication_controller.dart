@@ -4,12 +4,14 @@ import '../../../../consts/lang.dart';
 import '../../../../core/repositories/caregiver_medicine_repo.dart';
 import '../../../../core/models/caregiver_medicine_list_model.dart';
 import '../../../../core/controllers/base_controller.dart';
+import '../../../../core/services/caregiver_state.dart';
 
 class MedicationController extends BaseController {
   final Rx<DateTime?> selectedDate = Rx<DateTime?>(null);
   final RxList<CaregiverMedicineItem> allMedications = <CaregiverMedicineItem>[].obs;
   final RxList<CaregiverMedicineItem> filteredMedications = <CaregiverMedicineItem>[].obs;
   final CaregiverMedicineRepository _repository = CaregiverMedicineRepository();
+  final CaregiverState _state = CaregiverState();
 
   @override
   void onInit() {
@@ -18,6 +20,12 @@ class MedicationController extends BaseController {
   }
 
   Future<void> getMedications() async {
+    final patientId = _state.activePatientId.value;
+    if (patientId == null) {
+      print('❌ No active patient selected');
+      return;
+    }
+
     final result = await safeApiCall(() => _repository.getMedicinesList());
     
     if (result != null) {
@@ -103,7 +111,27 @@ class MedicationController extends BaseController {
               Text('Interaction: ${medication.interactionMessage}'),
             if (medication.frequencies.isNotEmpty) ...
               medication.frequencies.map((freq) => 
-                Text('${freq.frequency} at ${freq.time}')
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: RichText(
+                    text: TextSpan(
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black87,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: '${freq.frequency[0].toUpperCase()}${freq.frequency.substring(1)} at ',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        TextSpan(
+                          text: _formatTime(freq.time),
+                          style: const TextStyle(fontWeight: FontWeight.normal),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
               ),
           ],
         ),
@@ -115,5 +143,21 @@ class MedicationController extends BaseController {
         ],
       ),
     );
+  }
+
+  String _formatTime(String time) {
+    try {
+      final parts = time.split(':');
+      int hour = int.parse(parts[0]);
+      final minute = parts[1];
+      
+      final period = hour >= 12 ? 'PM' : 'AM';
+      if (hour > 12) hour -= 12;
+      if (hour == 0) hour = 12;
+      
+      return '$hour:$minute $period';
+    } catch (e) {
+      return time;
+    }
   }
 }

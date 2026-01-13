@@ -49,4 +49,8 @@ class Apis {
   //medicine caregiver
   static const String getMedicineCaregiver = '/caregiver/medicines/index';
   static const String storeMedicineCaregiver = '/caregiver/medicines/store';
+
+  // get caregiver patients
+  static const String getPatientsCaregiver = '/caregiver/patients';
+  static const String caregiverDashboard = '/caregiver/dashboard';
 }

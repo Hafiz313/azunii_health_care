@@ -9,14 +9,38 @@ import '../../../consts/assets.dart';
 import '../../widget/text.dart';
 import '../../widget/buttons.dart';
 
-class FeedbackView extends StatelessWidget {
+class FeedbackView extends StatefulWidget {
   const FeedbackView({super.key});
 
   static const String routeName = '/feedback';
 
   @override
-  Widget build(BuildContext context) {
+  State<FeedbackView> createState() => _FeedbackViewState();
+}
+
+class _FeedbackViewState extends State<FeedbackView> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => false;
+
+  @override
+  void initState() {
+    super.initState();
     final controller = Get.put(FeedbackController());
+    controller.onPageVisible();
+  }
+
+  @override
+  void deactivate() {
+    final controller = Get.find<FeedbackController>();
+    controller.onPageHidden();
+    super.deactivate();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    final controller = Get.find<FeedbackController>();
+    
     return Obx(() => OverlayLoader(
           isLoading: controller.isLoading.value,
           child: _buildScaffold(context, controller),

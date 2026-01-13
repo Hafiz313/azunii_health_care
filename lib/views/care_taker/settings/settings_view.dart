@@ -1,256 +1,300 @@
-import 'package:Azunii_Health/views/auth/login/controller/login_controller.dart';
+import 'package:Azunii_Health/core/models/static_user_model.dart';
 import 'package:Azunii_Health/views/care_taker/settings/controller/settings_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../consts/colors.dart';
 import '../../../consts/lang.dart';
 import '../../../utils/percentage_size_ext.dart';
 import '../../widget/text.dart';
 import '../../widget/buttons.dart';
 import '../../widget/Common_widgets/customAppBar.dart';
-import '../../auth/login/login_view.dart';
-import 'profile/profile_view.dart';
-import 'accessibility/accessibility_view.dart';
-import 'notification/notification_view.dart';
-import 'privacy/privacy_view.dart';
+import '../../widget/Common_widgets/overlayloader.dart';
 
-class Settingsview extends StatelessWidget {
+class Settingsview extends StatefulWidget {
   static const String routeName = '/settings-caregiver';
 
   const Settingsview({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final SettingsController controller = Get.put(SettingsController());
+  State<Settingsview> createState() => _SettingsviewState();
+}
 
-    return Stack(
-      children: [
-        Scaffold(
-          backgroundColor: AppColors.white,
-          body: SafeArea(
-            child: Column(
-              children: [
-                CustomAppBar(
-                  title: Lang.settings,
-                ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: context.screenWidth * 0.05),
-                        _buildSettingsHeader(),
-                        SizedBox(height: context.screenWidth * 0.04),
-                        _buildSettingsMenu(context),
-                        SizedBox(height: context.screenWidth * 0.08),
-                        _buildActionButtons(context),
-                        SizedBox(height: context.screenWidth * 0.05),
-                      ],
-                    ),
+class _SettingsviewState extends State<Settingsview> {
+  final RxBool isEditMode = false.obs;
+
+  @override
+  void initState() {
+    super.initState();
+    _prefillData();
+  }
+
+  void _prefillData() {
+    final controller = Get.put(SettingsController());
+    final user = Staticdata.userModel;
+    if (user != null) {
+      controller.nameController.text = user.name;
+      controller.emailController.text = user.email;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.put(SettingsController());
+    final user = Staticdata.userModel;
+    final name = user?.name ?? 'Guest User';
+    final email = user?.email ?? 'No email provided';
+    final role = user?.role ?? 'N/A';
+    final initial = name.isNotEmpty ? name[0].toUpperCase() : 'G';
+
+    return Obx(() => OverlayLoader(
+          isLoading: controller.isLoading.value,
+          child: Scaffold(
+            backgroundColor: AppColors.white,
+            body: SafeArea(
+              child: Column(
+                children: [
+                  CustomAppBar(
+                    title: 'Profile',
                   ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        // Overlay Loader
-        Obx(
-          () => controller.isLoading.value
-              ? Container(
-                  color: Colors.black.withOpacity(0.2),
-                  child: Center(
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.15),
-                            blurRadius: 8,
-                            spreadRadius: 1,
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.all(context.screenWidth * 0.05),
+                      child: Column(
+                        children: [
+                          // Profile Avatar
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primary.withOpacity(0.3),
+                                  blurRadius: 20,
+                                  spreadRadius: 5,
+                                ),
+                              ],
+                            ),
+                            child: CircleAvatar(
+                              radius: context.screenWidth * 0.13,
+                              backgroundColor: AppColors.primary,
+                              child: Text(
+                                initial,
+                                style: GoogleFonts.manrope(
+                                  fontSize: context.screenWidth * 0.13,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.white,
+                                ),
+                              ),
+                            ),
                           ),
+                          SizedBox(height: context.screenHeight * 0.02),
+                          // Name
+                          Text(
+                            name,
+                            style: GoogleFonts.manrope(
+                              fontSize: context.screenWidth * 0.07,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.headingTextColor,
+                            ),
+                          ),
+                          SizedBox(height: context.screenHeight * 0.005),
+                          // Email
+                          Text(
+                            email,
+                            style: GoogleFonts.manrope(
+                              fontSize: context.screenWidth * 0.0375,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.textColor,
+                            ),
+                          ),
+                          SizedBox(height: context.screenHeight * 0.04),
+                          // Role Card
+                          _buildInfoCard(context, Icons.person_outline, 'Role',
+                              role.toUpperCase()),
+                          SizedBox(height: context.screenHeight * 0.03),
+                          // Profile Update Form
+                          _buildUpdateForm(context, controller),
+                          SizedBox(height: context.screenHeight * 0.03),
+                          // Action Buttons
+                          _buildActionButtons(context, controller),
                         ],
                       ),
-                      child: const CircularProgressIndicator(
-                        valueColor:
-                            AlwaysStoppedAnimation<Color>(AppColors.primary),
-                        strokeWidth: 3,
-                      ),
                     ),
                   ),
-                )
-              : const SizedBox.shrink(),
+                ],
+              ),
+            ),
+          ),
+        ));
+  }
+
+  Widget _buildInfoCard(
+      BuildContext context, IconData icon, String label, String value) {
+    return Container(
+      padding: EdgeInsets.all(context.screenWidth * 0.04),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(context.screenWidth * 0.04),
+        border: Border.all(color: AppColors.primary.withOpacity(0.15)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: AppColors.primary, size: context.screenWidth * 0.05),
+          SizedBox(width: context.screenWidth * 0.03),
+          Text(
+            label,
+            style: GoogleFonts.manrope(
+              fontSize: context.screenWidth * 0.0325,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textColor.withOpacity(0.7),
+            ),
+          ),
+          const Spacer(),
+          Text(
+            value,
+            style: GoogleFonts.manrope(
+              fontSize: context.screenWidth * 0.035,
+              fontWeight: FontWeight.w600,
+              color: AppColors.headingTextColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUpdateForm(BuildContext context, SettingsController controller) {
+    return Obx(() => Container(
+          padding: EdgeInsets.all(context.screenWidth * 0.05),
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(context.screenWidth * 0.04),
+            border: Border.all(color: AppColors.primary.withOpacity(0.15)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Update Profile',
+                style: GoogleFonts.manrope(
+                  fontSize: context.screenWidth * 0.045,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.headingTextColor,
+                ),
+              ),
+              SizedBox(height: context.screenHeight * 0.02),
+              _buildTextField(context, 'Name', controller.nameController,
+                  enabled: isEditMode.value),
+              SizedBox(height: context.screenHeight * 0.015),
+              _buildTextField(context, 'Email', controller.emailController,
+                  enabled: isEditMode.value),
+              SizedBox(height: context.screenHeight * 0.015),
+              _buildTextField(context, 'Password', controller.passwordController,
+                  isPassword: true, enabled: isEditMode.value),
+              SizedBox(height: context.screenHeight * 0.015),
+              _buildTextField(context, 'Confirm Password',
+                  controller.confirmPasswordController,
+                  isPassword: true, enabled: isEditMode.value),
+              SizedBox(height: context.screenHeight * 0.025),
+              SizedBox(
+                width: double.infinity,
+                height: context.screenWidth * 0.12,
+                child: AppElevatedButton(
+                  onPressed: () {
+                    if (isEditMode.value) {
+                      controller.updateProfile();
+                      isEditMode.value = false;
+                    } else {
+                      isEditMode.value = true;
+                    }
+                  },
+                  title: isEditMode.value ? 'Update Profile' : 'Edit Profile',
+                  backgroundColor: AppColors.primary,
+                ),
+              ),
+            ],
+          ),
+        ));
+  }
+
+  Widget _buildTextField(
+      BuildContext context, String label, TextEditingController textController,
+      {bool isPassword = false, bool enabled = true}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.manrope(
+            fontSize: context.screenWidth * 0.0325,
+            fontWeight: FontWeight.w500,
+            color: AppColors.textColor,
+          ),
+        ),
+        SizedBox(height: context.screenHeight * 0.008),
+        TextField(
+          controller: textController,
+          obscureText: isPassword,
+          enabled: enabled,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(context.screenWidth * 0.02),
+              borderSide: BorderSide(color: AppColors.primary.withOpacity(0.3)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(context.screenWidth * 0.02),
+              borderSide: BorderSide(color: AppColors.primary.withOpacity(0.3)),
+            ),
+            disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(context.screenWidth * 0.02),
+              borderSide:
+                  BorderSide(color: AppColors.textColor.withOpacity(0.2)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(context.screenWidth * 0.02),
+              borderSide: BorderSide(color: AppColors.primary),
+            ),
+            contentPadding: EdgeInsets.symmetric(
+                horizontal: context.screenWidth * 0.03,
+                vertical: context.screenHeight * 0.015),
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildSettingsHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: headline6(
-        Lang.settings,
-        color: AppColors.headingTextColor,
-        fontWeight: FontWeight.w500,
-      ),
-    );
-  }
-
-  Widget _buildSettingsMenu(BuildContext context) {
-    final List<Map<String, dynamic>> menuItems = [
-      {
-        'title': Lang.profile,
-        'icon': Icons.person_outline,
-        'color': AppColors.primary,
-        'onTap': () => Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const ProfileView())),
-      },
-      {
-        'title': Lang.accessibility,
-        'icon': Icons.accessibility_outlined,
-        'color': AppColors.primary,
-        'onTap': () => Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const AccessibilityView())),
-      },
-      {
-        'title': Lang.notifications,
-        'icon': Icons.notifications_outlined,
-        'color': AppColors.primary,
-        'onTap': () => Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const NotificationView())),
-      },
-      {
-        'title': Lang.privacySecurity,
-        'icon': Icons.security_outlined,
-        'color': AppColors.primary,
-        'onTap': () => Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const PrivacyView())),
-      },
-    ];
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: ListView.separated(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: menuItems.length,
-        separatorBuilder: (context, index) =>
-            SizedBox(height: context.screenWidth * 0.03),
-        itemBuilder: (context, index) {
-          final item = menuItems[index];
-          return _buildMenuItem(
-            context: context,
-            title: item['title'],
-            icon: item['icon'],
-            color: item['color'],
-            onTap: item['onTap'],
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildMenuItem({
-    required BuildContext context,
-    required String title,
-    required IconData icon,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: EdgeInsets.all(context.screenWidth * 0.04),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: AppColors.dividerGray,
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
+  Widget _buildActionButtons(
+      BuildContext context, SettingsController controller) {
+    return Row(
+      children: [
+        Expanded(
+          child: SizedBox(
+            height: context.screenWidth * 0.12,
+            child: AppElevatedButton(
+              onPressed: () {
+                controller.logout();
+              },
+              title: Lang.logOut,
+              backgroundColor: AppColors.cardGray,
+              textColor: AppColors.headingTextColor,
             ),
-          ],
+          ),
         ),
-        child: Row(
-          children: [
-            Container(
-              width: context.screenWidth * 0.1,
-              height: context.screenWidth * 0.1,
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                icon,
-                color: color,
-                size: context.screenWidth * 0.05,
-              ),
+        SizedBox(width: context.screenWidth * 0.04),
+        Expanded(
+          child: SizedBox(
+            height: context.screenWidth * 0.12,
+            child: AppElevatedButton(
+              onPressed: () {
+                controller.deleteAccount();
+              },
+              title: Lang.deleteAccount,
+              backgroundColor: AppColors.lightRed,
+              textColor: AppColors.redColor,
             ),
-            SizedBox(width: context.screenWidth * 0.04),
-            Expanded(
-              child: subText4(
-                title,
-                color: AppColors.headingTextColor,
-                fontWeight: FontWeight.w500,
-                align: TextAlign.start,
-              ),
-            ),
-            Icon(
-              Icons.chevron_right,
-              color: AppColors.textColor,
-              size: context.screenWidth * 0.06,
-            ),
-          ],
+          ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildActionButtons(BuildContext context) {
-    final SettingsController controller = Get.put(SettingsController());
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          Expanded(
-            child: SizedBox(
-              height: context.screenWidth * 0.12,
-              child: AppElevatedButton(
-                onPressed: () {
-                  controller.logout();
-                },
-                title: Lang.logOut,
-                backgroundColor: AppColors.cardGray,
-                textColor: AppColors.headingTextColor,
-              ),
-            ),
-          ),
-          SizedBox(width: context.screenWidth * 0.04),
-          Expanded(
-            child: SizedBox(
-              height: context.screenWidth * 0.12,
-              child: AppElevatedButton(
-                onPressed: () {
-                  controller.deleteAccount();
-                },
-                title: Lang.deleteAccount,
-                backgroundColor: AppColors.lightRed,
-                textColor: AppColors.redColor,
-              ),
-            ),
-          ),
-        ],
-      ),
+      ],
     );
   }
 }

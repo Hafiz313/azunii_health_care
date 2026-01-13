@@ -53,8 +53,8 @@ class HomeView extends StatelessWidget {
                       _buildHeader(context),
                       _buildQuickActions(context),
                       const SizedBox(height: 13),
-                      _buildMedicationAlert(context),
-                      const SizedBox(height: 13),
+                      // _buildMedicationAlert(context),
+                      // const SizedBox(height: 13),
                       _buildAsOfTodaySection(context),
                       const SizedBox(height: 13),
                       _buildFutureAppointmentsSection(context),
@@ -302,9 +302,32 @@ class HomeView extends StatelessWidget {
                 color: AppColors.headingTextColor,
                 context: context,
               ),
-              DatePickerButton(
-                date: controller.selectedDate.value,
-                onTap: controller.onDatePickerTap,
+              Row(
+                children: [
+                  Obx(() => controller.selectedDate.value.isNotEmpty
+                      ? TextButton(
+                          onPressed: controller.clearDateFilter,
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.symmetric(horizontal: 8),
+                            minimumSize: Size(0, 0),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Text(
+                            'Clear Filter',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        )
+                      : SizedBox.shrink()),
+                  Obx(() => DatePickerButton(
+                        date: controller.selectedDate.value.isEmpty
+                            ? 'Select Date'
+                            : controller.selectedDate.value,
+                        onTap: controller.onDatePickerTap,
+                      )),
+                ],
               ),
             ],
           ),
@@ -510,12 +533,12 @@ class HomeView extends StatelessWidget {
                   title: 'Feedback',
                   onTap: () => Navigator.pushNamed(context, '/feedback'),
                 ),
-                _buildDrawerItem(
-                  context,
-                  icon: Icons.settings,
-                  title: 'Settings',
-                  onTap: () => Navigator.pop(context),
-                ),
+                // _buildDrawerItem(
+                //   context,
+                //   icon: Icons.settings,
+                //   title: 'Settings',
+                //   onTap: () => Navigator.pop(context),
+                // ),
                 _buildDrawerItem(
                   context,
                   icon: Icons.privacy_tip,

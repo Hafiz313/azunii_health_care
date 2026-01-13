@@ -6,11 +6,14 @@ import '../../../../consts/colors.dart';
 import '../../../../core/controllers/base_controller.dart';
 import '../../../../core/models/notes_model.dart';
 import '../../../../core/repositories/notes_repo.dart';
+import '../../../../core/services/caregiver_state.dart';
 import '../../../widget/Common_widgets/custom_snackbar.dart';
 
 class NotesController extends BaseController {
   final TextEditingController noteController = TextEditingController();
   final RxString selectedCategory = ''.obs;
+  final NotesRepository _notesRepository = NotesRepository();
+  final CaregiverState _state = CaregiverState();
 
   final List<String> categories = [
     Lang.generalHealth,
@@ -29,8 +32,14 @@ class NotesController extends BaseController {
   }
 
   Future<void> fetchNotes() async {
+    final patientId = _state.activePatientId.value;
+    if (patientId == null) {
+      print('❌ No active patient selected');
+      return;
+    }
+
     final result = await safeApiCall(
-        () => _notesRepository.getNotesList(1)); // TODO: Replace with actual patient ID
+        () => _notesRepository.getNotesList(patientId));
     if (result != null) {
       previousNotes.value = result;
     }
@@ -40,9 +49,13 @@ class NotesController extends BaseController {
     selectedCategory.value = category ?? '';
   }
 
-  final NotesRepository _notesRepository = NotesRepository();
-
   Future<void> saveNote() async {
+    final patientId = _state.activePatientId.value;
+    if (patientId == null) {
+      CustomSnackbar.show('No active patient selected', isSuccess: false);
+      return;
+    }
+
     if (selectedCategory.value.isEmpty) {
       CustomSnackbar.show('Please select a category', isSuccess: false);
       return;
@@ -54,7 +67,7 @@ class NotesController extends BaseController {
     }
 
     final note = NotesModel(
-      patientId: 1, // TODO: Replace with actual patient ID
+      patientId: patientId,
       category: selectedCategory.value,
       note: noteController.text.trim(),
     );

@@ -22,9 +22,7 @@ import '../../medicines/medicines_view.dart';
 import '../../visits/visits_view.dart';
 
 class HomeController extends BaseController {
-  final RxString selectedDate =
-      '${DateTime.now().day.toString().padLeft(2, '0')}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().year}'
-          .obs;
+  final RxString selectedDate = ''.obs;
   final RxString userName = ''.obs;
   final RxString userProfileImage = ''.obs;
   final RxList<Medicine> allMedicinesList = <Medicine>[].obs;
@@ -66,9 +64,13 @@ class HomeController extends BaseController {
   void onDatePickerTap() async {
     DateTime initialDate;
     try {
-      final parts = selectedDate.value.split('-');
-      initialDate = DateTime(
-          int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
+      if (selectedDate.value.isEmpty) {
+        initialDate = DateTime.now();
+      } else {
+        final parts = selectedDate.value.split('-');
+        initialDate = DateTime(
+            int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
+      }
     } catch (e) {
       initialDate = DateTime.now();
     }
@@ -85,6 +87,11 @@ class HomeController extends BaseController {
           '${picked.day.toString().padLeft(2, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.year}';
       filterMedicinesByDate();
     }
+  }
+
+  void clearDateFilter() {
+    selectedDate.value = '';
+    filterMedicinesByDate();
   }
 
   void onViewAllTap() {
@@ -146,6 +153,12 @@ class HomeController extends BaseController {
     if (allMedicinesList.isEmpty) {
       print('⚠️ allMedicinesList is empty, setting medicinesList to empty');
       medicinesList.value = [];
+      return;
+    }
+
+    if (selectedDate.value.isEmpty) {
+      medicinesList.value = allMedicinesList;
+      print('✅ No filter: showing all medicines (${medicinesList.length})');
       return;
     }
 

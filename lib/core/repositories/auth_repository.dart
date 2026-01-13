@@ -8,7 +8,8 @@ class AuthRepository {
   // Register User
   Future<AuthResponse> register(Map<String, dynamic> userData) async {
     try {
-      final fields = userData.map((key, value) => MapEntry(key, value.toString()));
+      final fields =
+          userData.map((key, value) => MapEntry(key, value.toString()));
       final response = await ApiClient.registerUserMultipart(
         Apis.register,
         body: fields,
@@ -20,11 +21,12 @@ class AuthRepository {
   }
 
   // Login User
-  Future<AuthResponse> login(String email, String password) async {
+  Future<AuthResponse> login(String email, String password, String fcmToken) async {
     try {
       final response = await ApiClient.post(Apis.login, body: {
         'email': email,
         'password': password,
+        'fcm_token': fcmToken,
       });
       return AuthResponse.fromJson(response);
     } catch (e) {
@@ -89,7 +91,7 @@ class AuthRepository {
   // Delete Account
   Future<Map<String, dynamic>> deleteAccount() async {
     try {
-      final response = await ApiClient.deleteAccount();
+      final response = await ApiClient.getWithAuth(Apis.deleteAccount);
       return response;
     } catch (e) {
       rethrow;

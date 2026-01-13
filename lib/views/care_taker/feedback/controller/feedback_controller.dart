@@ -8,6 +8,28 @@ class FeedbackController extends BaseController {
   final SummariesRepository _summariesRepository = SummariesRepository();
   final TextEditingController noteController = TextEditingController();
   final RxInt selectedRating = RxInt(1);
+  final RxBool isPageActive = RxBool(false);
+
+  @override
+  void onInit() {
+    super.onInit();
+    // Clear form after frame is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      clearForm();
+    });
+  }
+
+  void onPageVisible() {
+    isPageActive.value = true;
+  }
+
+  void onPageHidden() {
+    isPageActive.value = false;
+    // Clear form when leaving the page (scheduled after frame)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      clearForm();
+    });
+  }
 
   void setRating(int rating) {
     selectedRating.value = rating;
@@ -33,12 +55,18 @@ class FeedbackController extends BaseController {
     if (result != null) {
       print('✅ Feedback submitted successfully');
       CustomSnackbar.show('Thank you for your feedback!', isSuccess: true);
+      clearForm();
       Future.delayed(const Duration(seconds: 1), () {
         Navigator.pop(context);
       });
     } else {
       print('❌ Feedback submission failed');
     }
+  }
+
+  void clearForm() {
+    noteController.clear();
+    selectedRating.value = 1;
   }
 
   @override

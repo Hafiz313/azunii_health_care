@@ -126,7 +126,8 @@ class CustomTxtField extends StatelessWidget {
                   fontSize: 13,
                   fontWeight: FontWeight.w200),
               contentPadding: contentPadding ??
-                  const EdgeInsets.symmetric(vertical: 2.0, horizontal: 12.0),
+                  EdgeInsets.symmetric(
+                      vertical: maxLines! > 1 ? 6.0 : 2.0, horizontal: 12.0),
             ),
           ),
         ],

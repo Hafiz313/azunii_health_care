@@ -1,6 +1,9 @@
 import 'package:Azunii_Health/consts/appconsts.dart';
 import 'package:Azunii_Health/core/services/google_auth_service.dart';
 import 'package:Azunii_Health/core/services/local_storage_service.dart';
+import 'package:Azunii_Health/core/services/caregiver_state.dart';
+import 'package:Azunii_Health/core/repositories/caregiver_dashboard.dart';
+import 'package:Azunii_Health/services/fcm_service.dart';
 import 'package:Azunii_Health/utils/localStorage/storage_service.dart';
 import 'package:Azunii_Health/views/care_taker/dashboard/dashboard.dart';
 import 'package:flutter/material.dart';
@@ -19,16 +22,28 @@ class LoginController extends BaseController {
   final RxBool isChecked = false.obs;
   final GoogleAuthService _googleAuthService = GoogleAuthService();
   final AuthRepository _authRepository = AuthRepository();
+  final CaregiverDashboardRepository _caregiverRepository = CaregiverDashboardRepository();
   void toggleRememberMe(bool? value) {
     isChecked.value = value ?? false;
   }
 
+  /// STEP 1: Standard login flow
+  /// - Validates form
+  /// - Gets FCM token
+  /// - Calls login API with FCM token
+  /// - Stores user data and token
+  /// - For caregivers: fetches assigned patients before navigation
   Future<void> login() async {
     if (!formKey.currentState!.validate()) return;
+
+    // Get FCM token before login
+    final fcmToken = await FCMService.getToken();
+    print('🔑 FCM Token for login: $fcmToken');
 
     final result = await safeApiCall(() => _authRepository.login(
           emailController.text.trim(),
           passwordController.text,
+          fcmToken ?? '', // Pass empty string if token is null
         ));
 
     if (result != null) {
@@ -49,12 +64,13 @@ class LoginController extends BaseController {
       // Store user data from login response
       Staticdata.userModel = result.user;
 
-      // SnackbarHelper.showSuccess('Login successful');
-
-      // Navigate based on user role from API
+      // STEP 2: Navigate based on user role
+      // Patient → Direct to patient dashboard
+      // Caregiver → Fetch patients list first, then navigate to caregiver dashboard
       if (userRole == 'patient') {
         Get.offAllNamed(PatientDashboard.routeName);
       } else {
+        await _fetchCaregiverPatients();
         Get.offAllNamed(CareTakerDashboard.routeName);
       }
     }
@@ -64,6 +80,11 @@ class LoginController extends BaseController {
     isPasswordVisible.value = !isPasswordVisible.value;
   }
 
+  /// STEP 1: Google OAuth login flow
+  /// - Authenticates with Google
+  /// - Calls backend API with Google credentials
+  /// - Stores user data and token
+  /// - For caregivers: fetches assigned patients before navigation
   Future<void> googleLogin() async {
     final result = await safeApiCall(() async {
       final googleData = await _googleAuthService.signInWithGoogle();
@@ -99,12 +120,29 @@ class LoginController extends BaseController {
 
       CustomSnackbar.show('Google signin successful!', isSuccess: true);
 
-      // Navigate based on user role from API
+      // STEP 2: Navigate based on user role
+      // Patient → Direct to patient dashboard
+      // Caregiver → Fetch patients list first, then navigate to caregiver dashboard
       if (userRole == 'patient') {
         Get.offAllNamed(PatientDashboard.routeName);
       } else {
+        await _fetchCaregiverPatients();
         Get.offAllNamed(CareTakerDashboard.routeName);
       }
+    }
+  }
+
+  /// STEP 3: Fetch and store caregiver's assigned patients
+  /// - Calls Get Patients API (/caregiver/patients)
+  /// - Stores patients list in global CaregiverState
+  /// - This list is used for patient selection in dashboard
+  /// - Called only for caregiver role after successful login
+  Future<void> _fetchCaregiverPatients() async {
+    try {
+      final result = await _caregiverRepository.getPatients();
+      CaregiverState().setPatients(result.data);
+    } catch (e) {
+      print('Failed to fetch caregiver patients: $e');
     }
   }
 

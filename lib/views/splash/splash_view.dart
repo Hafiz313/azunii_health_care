@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:Azunii_Health/services/fcm_service.dart';
 import 'package:Azunii_Health/views/splash/controller/splash_controller.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/logo_widget.dart';
 import '../base_view/base_scaffold_auth.dart';
@@ -27,6 +28,9 @@ class _SplashViewState extends State<SplashView>
     // Initialize controller
     _splashController = SplashController();
 
+    // Request notification permissions on first launch
+    _requestNotificationPermissions();
+
     // Initialize animation controller
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 2000),
@@ -48,6 +52,15 @@ class _SplashViewState extends State<SplashView>
     _timer = Timer(const Duration(seconds: 1), () {
       _splashController.checkLoginAndNavigate(context);
     });
+  }
+
+  /// Request notification permissions on first app launch
+  Future<void> _requestNotificationPermissions() async {
+    try {
+      await FCMService.requestPermissions();
+    } catch (e) {
+      print('Failed to request notification permissions: $e');
+    }
   }
 
   @override

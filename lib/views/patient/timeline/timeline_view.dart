@@ -18,21 +18,21 @@ class TimelineView extends GetView<TimelineController> {
   const TimelineView({super.key, this.isOndashboard = false});
 
   static final List<Color> _cardColors = [
-    Color(0xFFE8F5E8), // Mint Green
-    Color(0xFFFFF2E8), // Peach
-    Color(0xFFE8F0FF), // Soft Blue
-    Color(0xFFFFF0F5), // Rose
-    Color(0xFFF0E8FF), // Lavender
-    Color(0xFFE8FFF8), // Aqua
-    Color(0xFFFFF8E8), // Cream
-    Color(0xFFFFE8F0), // Blush
-    Color(0xFFE8E8FF), // Periwinkle
-    Color(0xFFF8FFE8), // Light Lime
-    Color(0xFFFFE8E8), // Light Coral
-    Color(0xFFE8FFFF), // Ice Blue
-    Color(0xFFF5F0FF), // Lilac
-    Color(0xFFE8FFF0), // Sage
-    Color(0xFFFFF5E8), // Vanilla
+    Color(0xFF80C680), // Much Darker Mint Green
+    Color(0xFFFFB380), // Much Darker Peach
+    Color(0xFF80A8FF), // Much Darker Soft Blue
+    Color(0xFFFFB3CC), // Much Darker Rose
+    Color(0xFFB380FF), // Much Darker Lavender
+    Color(0xFF80FFCC), // Much Darker Aqua
+    Color(0xFFFFCC80), // Much Darker Cream
+    Color(0xFFFF80B3), // Much Darker Blush
+    Color(0xFF8080FF), // Much Darker Periwinkle
+    Color(0xFFCCFF80), // Much Darker Light Lime
+    Color(0xFFFF8080), // Much Darker Light Coral
+    Color(0xFF80FFFF), // Much Darker Ice Blue
+    Color(0xFFC6B3FF), // Much Darker Lilac
+    Color(0xFF80FFB3), // Much Darker Sage
+    Color(0xFFFFCC80), // Much Darker Vanilla
   ];
 
   static final List<IconData> _cardIcons = [
@@ -69,7 +69,7 @@ class TimelineView extends GetView<TimelineController> {
                 children: [
                   CustomAppBar(
                     title: Lang.timeline,
-                    isOndashboard: false,
+                    isOndashboard: true,
                   ),
                   Expanded(
                     child: RefreshIndicator(

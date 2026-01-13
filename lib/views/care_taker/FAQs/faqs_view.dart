@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../consts/colors.dart';
 import '../../../consts/lang.dart';
+import '../../../utils/percentage_size_ext.dart';
 import '../../widget/text.dart';
 import '../../widget/Common_widgets/customAppBar.dart';
 
@@ -41,11 +42,11 @@ class _FAQsViewState extends State<FAQsView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 20),
-                    _buildFAQHeader(),
-                    const SizedBox(height: 20),
-                    _buildFAQList(),
-                    const SizedBox(height: 20),
+                    SizedBox(height: context.screenHeight * 0.025),
+                    _buildFAQHeader(context),
+                    SizedBox(height: context.screenHeight * 0.025),
+                    _buildFAQList(context),
+                    SizedBox(height: context.screenHeight * 0.025),
                   ],
                 ),
               ),
@@ -56,9 +57,9 @@ class _FAQsViewState extends State<FAQsView> {
     );
   }
 
-  Widget _buildFAQHeader() {
+  Widget _buildFAQHeader(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: context.screenWidth * 0.05),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -70,7 +71,7 @@ class _FAQsViewState extends State<FAQsView> {
           InkWell(
             onTap: () {},
             child: subText5(
-              fontSize: 12,
+              fontSize: context.screenWidth * 0.03,
               Lang.viewAll,
               color: AppColors.borderColor,
               align: TextAlign.start,
@@ -81,19 +82,20 @@ class _FAQsViewState extends State<FAQsView> {
     );
   }
 
-  Widget _buildFAQList() {
+  Widget _buildFAQList(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: context.screenWidth * 0.05),
       child: ListView.separated(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: faqData.length,
-        separatorBuilder: (context, index) => const SizedBox(height: 12),
+        separatorBuilder: (context, index) => SizedBox(height: context.screenHeight * 0.015),
         itemBuilder: (context, index) {
           final faq = faqData[index];
           final isExpanded = expandedIndex == index;
 
           return _buildFAQCard(
+            context: context,
             question: faq['question']!,
             answer: faq['answer']!,
             isExpanded: isExpanded,
@@ -109,6 +111,7 @@ class _FAQsViewState extends State<FAQsView> {
   }
 
   Widget _buildFAQCard({
+    required BuildContext context,
     required String question,
     required String answer,
     required bool isExpanded,
@@ -117,7 +120,7 @@ class _FAQsViewState extends State<FAQsView> {
     return Container(
       decoration: BoxDecoration(
         color: isExpanded ? AppColors.blueV1 : AppColors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(context.screenWidth * 0.03),
         border: Border.all(
           color: AppColors.dividerGray,
           width: 1,
@@ -134,9 +137,9 @@ class _FAQsViewState extends State<FAQsView> {
         children: [
           InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(context.screenWidth * 0.03),
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(context.screenWidth * 0.04),
               child: Row(
                 children: [
                   Expanded(
@@ -154,7 +157,7 @@ class _FAQsViewState extends State<FAQsView> {
                         ? Icons.keyboard_arrow_up
                         : Icons.keyboard_arrow_down,
                     color: isExpanded ? AppColors.white : AppColors.textColor,
-                    size: 24,
+                    size: context.screenWidth * 0.06,
                   ),
                 ],
               ),
@@ -163,14 +166,21 @@ class _FAQsViewState extends State<FAQsView> {
           if (isExpanded)
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: subText3(
+              padding: EdgeInsets.fromLTRB(
+                context.screenWidth * 0.04,
+                0,
+                context.screenWidth * 0.04,
+                context.screenWidth * 0.04,
+              ),
+              child: Text(
                 answer,
-                color: isExpanded
-                    ? AppColors.white.withOpacity(0.9)
-                    : AppColors.textColor,
-                align: TextAlign.start,
-                fontWeight: FontWeight.normal,
+                style: TextStyle(
+                  color: AppColors.white.withOpacity(0.9),
+                  fontSize: 13,
+                  fontWeight: FontWeight.normal,
+                  fontFamily: 'Satoshi',
+                ),
+                textAlign: TextAlign.start,
               ),
             ),
         ],

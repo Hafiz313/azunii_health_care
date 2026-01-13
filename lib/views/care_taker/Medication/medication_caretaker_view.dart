@@ -23,30 +23,34 @@ class Medication_caretaker extends StatelessWidget {
       backgroundColor: AppColors.white,
       body: SafeArea(
         child: Obx(() => OverlayLoader(
-          isLoading: controller.isLoading.value,
-          child: Column(
-            children: [
-              CustomAppBar(
-                title: Lang.medication,
-                onIconTap: () {},
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 5),
-                      _buildHeader(context, controller),
-                      const SizedBox(height: 20),
-                      _buildMedicationList(context, controller),
-                      const SizedBox(height: 20),
-                    ],
+              isLoading: controller.isLoading.value,
+              child: Column(
+                children: [
+                  CustomAppBar(
+                    title: Lang.medication,
+                    onIconTap: () {},
                   ),
-                ),
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: controller.getMedications,
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 5),
+                            _buildHeader(context, controller),
+                            const SizedBox(height: 20),
+                            _buildMedicationList(context, controller),
+                            const SizedBox(height: 20),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        )),
+            )),
       ),
     );
   }
@@ -82,7 +86,7 @@ class Medication_caretaker extends StatelessWidget {
                   Obx(() => subText5(
                         fontSize: 12,
                         fontWeight: FontWeight.normal,
-                        controller.selectedDate.value == null 
+                        controller.selectedDate.value == null
                             ? 'All'
                             : '${controller.selectedDate.value!.day.toString().padLeft(2, '0')}-${controller.selectedDate.value!.month.toString().padLeft(2, '0')}-${controller.selectedDate.value!.year}',
                         color: AppColors.textColor,
@@ -180,13 +184,37 @@ class Medication_caretaker extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              subText5(
-                fontSize: 13,
-                fontWeight: FontWeight.normal,
-                medication.frequencies.isNotEmpty ? medication.frequencies.map((f) => '${f.frequency} at ${f.time}').join(', ') : 'No timing specified',
-                color: AppColors.textColor,
-                align: TextAlign.start,
-              ),
+              if (medication.frequencies.isNotEmpty)
+                ...medication.frequencies.map((f) => Padding(
+                      padding: EdgeInsets.only(bottom: context.screenWidth * 0.01),
+                      child: RichText(
+                        text: TextSpan(
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textColor,
+                            fontFamily: 'Satoshi',
+                          ),
+                          children: [
+                            TextSpan(
+                              text: '${f.frequency[0].toUpperCase()}${f.frequency.substring(1)} at ',
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            TextSpan(
+                              text: _formatTime(f.time),
+                              style: const TextStyle(fontWeight: FontWeight.normal),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ))
+              else
+                subText5(
+                  fontSize: 13,
+                  fontWeight: FontWeight.normal,
+                  'No timing specified',
+                  color: AppColors.textColor,
+                  align: TextAlign.start,
+                ),
               SizedBox(height: context.screenWidth * 0.01),
               Wrap(
                 spacing: context.screenWidth * 0.03,
@@ -204,7 +232,7 @@ class Medication_caretaker extends StatelessWidget {
                       subText5(
                         fontSize: 13,
                         fontWeight: FontWeight.normal,
-                        medication.createdAt.split(' ')[0],
+                        _formatDate(medication.createdAt),
                         color: AppColors.textColor,
                         align: TextAlign.start,
                       ),
@@ -223,7 +251,7 @@ class Medication_caretaker extends StatelessWidget {
                       subText5(
                         fontSize: 13,
                         fontWeight: FontWeight.normal,
-                        medication.updatedAt.split(' ')[0],
+                        _formatDate(medication.updatedAt),
                         color: AppColors.textColor,
                         align: TextAlign.start,
                       ),
@@ -291,7 +319,8 @@ class Medication_caretaker extends StatelessWidget {
                       subText5(
                         fontSize: 12,
                         fontWeight: FontWeight.normal,
-                        medication.interactionMessage ?? 'No interaction message available',
+                        medication.interactionMessage ??
+                            'No interaction message available',
                         color: AppColors.textColor,
                         align: TextAlign.start,
                       ),
@@ -314,5 +343,30 @@ class Medication_caretaker extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _formatDate(String dateTime) {
+    try {
+      final date = DateTime.parse(dateTime);
+      return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+    } catch (e) {
+      return dateTime.split(' ')[0];
+    }
+  }
+
+  String _formatTime(String time) {
+    try {
+      final parts = time.split(':');
+      int hour = int.parse(parts[0]);
+      final minute = parts[1];
+      
+      final period = hour >= 12 ? 'PM' : 'AM';
+      if (hour > 12) hour -= 12;
+      if (hour == 0) hour = 12;
+      
+      return '$hour:$minute $period';
+    } catch (e) {
+      return time;
+    }
   }
 }
