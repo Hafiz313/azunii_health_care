@@ -9,6 +9,7 @@ class CustomDropdown extends StatelessWidget {
   final List<String> items;
   final Function(String?) onChanged;
   final String? label;
+  final bool allowCustomValue;
 
   const CustomDropdown({
     super.key,
@@ -18,6 +19,7 @@ class CustomDropdown extends StatelessWidget {
     required this.items,
     required this.onChanged,
     this.label,
+    this.allowCustomValue = true,
   });
 
   @override
@@ -104,56 +106,58 @@ class CustomDropdown extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            // Custom input field
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-              ),
-              decoration: BoxDecoration(
-                color: AppColors.cardsColor,
-                border: Border.all(width: 0.3, color: AppColors.primary),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  //  prefixIcon,
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextField(
-                      controller: customController,
-                      decoration: const InputDecoration(
-                        hintText: 'Enter custom value',
-                        border: InputBorder.none,
-                        isDense: true,
-                        contentPadding: EdgeInsets.zero,
+            // Custom input field - only show if allowCustomValue is true
+            if (allowCustomValue) ...[
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.cardsColor,
+                  border: Border.all(width: 0.3, color: AppColors.primary),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    //  prefixIcon,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextField(
+                        controller: customController,
+                        decoration: const InputDecoration(
+                          hintText: 'Enter custom value',
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        style: const TextStyle(
+                          fontFamily: 'Satoshi',
+                          fontSize: 14,
+                        ),
+                        onSubmitted: (value) {
+                          if (value.trim().isNotEmpty) {
+                            onChanged(value.trim());
+                            Navigator.pop(context);
+                          }
+                        },
                       ),
-                      style: const TextStyle(
-                        fontFamily: 'Satoshi',
-                        fontSize: 14,
-                      ),
-                      onSubmitted: (value) {
-                        if (value.trim().isNotEmpty) {
-                          onChanged(value.trim());
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        if (customController.text.trim().isNotEmpty) {
+                          onChanged(customController.text.trim());
                           Navigator.pop(context);
                         }
                       },
+                      icon: const Icon(Icons.check,
+                          color: AppColors.primary, size: 20),
                     ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      if (customController.text.trim().isNotEmpty) {
-                        onChanged(customController.text.trim());
-                        Navigator.pop(context);
-                      }
-                    },
-                    icon: const Icon(Icons.check,
-                        color: AppColors.primary, size: 20),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            const Divider(),
+              const SizedBox(height: 16),
+              const Divider(),
+            ],
             const SizedBox(height: 8),
             Flexible(
               child: ListView.builder(

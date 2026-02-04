@@ -1,4 +1,5 @@
 import 'package:Azunii_Health/consts/appconsts.dart';
+import 'package:Azunii_Health/services/fcm_service.dart';
 import 'package:Azunii_Health/views/auth/login/login_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -55,11 +56,10 @@ class SignUpController extends BaseController {
   }
 
   Future<void> googleSignup(String userType) async {
-    // Show loader for 2 seconds instead of API call
+    // Get FCM token before Google signup
+    final fcmToken = await FCMService.getToken();
+    print('🔑 FCM Token for Google signup: $fcmToken');
 
-    // await Future.delayed(Duration(seconds: 2));
-
-    // Commented out API call for testing
     final result = await safeApiCall(() async {
       final googleData = await _googleAuthService.signInWithGoogle();
       if (googleData.isNotEmpty) {
@@ -67,7 +67,7 @@ class SignUpController extends BaseController {
           googleId: googleData['google_id'],
           email: googleData['email'],
           name: googleData['name'],
-          deviceToken: googleData['device_token'],
+          fcmToken: fcmToken ?? '', // Pass FCM token
         );
         await LocalStorageService.setLoginStatus(true, userType: userType);
         return apiResponse;

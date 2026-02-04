@@ -21,7 +21,8 @@ class AuthRepository {
   }
 
   // Login User
-  Future<AuthResponse> login(String email, String password, String fcmToken) async {
+  Future<AuthResponse> login(
+      String email, String password, String fcmToken) async {
     try {
       final response = await ApiClient.post(Apis.login, body: {
         'email': email,
@@ -51,14 +52,14 @@ class AuthRepository {
     required String googleId,
     required String email,
     required String name,
-    required String deviceToken,
+    required String fcmToken,
   }) async {
     try {
       final response = await ApiClient.post(Apis.googleLogin, body: {
         'google_id': googleId,
         'email': email,
         'name': name,
-        'device_token': deviceToken,
+        'fcm_token': fcmToken,
       });
       return AuthResponse.fromJson(response);
     } catch (e) {

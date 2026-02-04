@@ -1,4 +1,5 @@
 import 'package:Azunii_Health/core/models/visit_responce.dart';
+import 'package:flutter/material.dart';
 
 import '../../networking/api_client.dart';
 import '../../networking/api_ref.dart';
@@ -32,12 +33,12 @@ class VisitsRepository {
   // Get Patient Visits
   Future<VisitResponse> getVisits() async {
     try {
-      print('\n📋 GET VISITS Request 📋');
+      debugPrint('\n📋 GET VISITS Request 📋');
       final response = await ApiClient.getWithAuth(Apis.getPatientVisits);
-      print('📄 Visits Response: Retrieved patient visits\n');
+      debugPrint('📄 Visits Response: Retrieved patient visits\n');
       return VisitResponse.fromJson(response);
     } catch (e) {
-      print('❌ Get Visits Error: $e');
+      debugPrint('❌ Get Visits Error: $e');
       rethrow;
     }
   }
@@ -48,7 +49,7 @@ class VisitsRepository {
       final visitResponse = await getVisits();
       return visitResponse.visits;
     } catch (e) {
-      print('❌ Get Visits List Error: $e');
+      debugPrint('❌ Get Visits List Error: $e');
       rethrow;
     }
   }
@@ -56,14 +57,15 @@ class VisitsRepository {
   // Get Visit Details
   Future<VisitDetailResponse> getVisitDetails(int visitId) async {
     try {
-      print('\n📋 GET VISIT DETAILS Request 📋');
-      print('🆔 Visit ID: $visitId');
+      debugPrint('\n📋 GET VISIT DETAILS Request 📋');
+      debugPrint('🆔 Visit ID: $visitId');
       final response =
           await ApiClient.getWithAuth('${Apis.getVisitDetails}/$visitId');
-      print('📄 Visit Detail Response: Retrieved details for visit $visitId\n');
+      debugPrint(
+          '📄 Visit Detail Response: Retrieved details for visit $visitId\n');
       return VisitDetailResponse.fromJson(response);
     } catch (e) {
-      print('❌ Get Visit Details Error: $e');
+      debugPrint('❌ Get Visit Details Error: $e');
       rethrow;
     }
   }
@@ -71,9 +73,9 @@ class VisitsRepository {
   // Update Patient Visit
   Future<Map<String, dynamic>> updateVisit(UpdateVisitRequest request) async {
     try {
-      print('\n📝 UPDATE VISIT Request 📝');
-      print('🆔 Visit ID: ${request.id}');
-      print('🏥 Provider: ${request.providerName}');
+      debugPrint('\n📝 UPDATE VISIT Request 📝');
+      debugPrint('🆔 Visit ID: ${request.id}');
+      debugPrint('🏥 Provider: ${request.providerName}');
 
       final fields = <String, String>{};
 
@@ -90,10 +92,10 @@ class VisitsRepository {
         fileFieldName: 'attachment',
       );
 
-      print('✅ Visit updated successfully for ID: ${request.id}\n');
+      debugPrint('✅ Visit updated successfully for ID: ${request.id}\n');
       return response;
     } catch (e) {
-      print('❌ Update Visit Error: $e');
+      debugPrint('❌ Update Visit Error: $e');
       rethrow;
     }
   }

@@ -22,28 +22,69 @@ class LoginController extends BaseController {
   final RxBool isChecked = false.obs;
   final GoogleAuthService _googleAuthService = GoogleAuthService();
   final AuthRepository _authRepository = AuthRepository();
-  final CaregiverDashboardRepository _caregiverRepository = CaregiverDashboardRepository();
+  final CaregiverDashboardRepository _caregiverRepository =
+      CaregiverDashboardRepository();
   void toggleRememberMe(bool? value) {
     isChecked.value = value ?? false;
   }
 
   /// STEP 1: Standard login flow
   /// - Validates form
-  /// - Gets FCM token
+  /// - Gets FCM token (REQUIRED)
   /// - Calls login API with FCM token
   /// - Stores user data and token
   /// - For caregivers: fetches assigned patients before navigation
   Future<void> login() async {
     if (!formKey.currentState!.validate()) return;
 
-    // Get FCM token before login
-    final fcmToken = await FCMService.getToken();
-    print('🔑 FCM Token for login: $fcmToken');
+    // Get FCM token before login - REQUIRED for notifications
+    String? fcmToken;
+    try {
+      fcmToken = await FCMService.getToken();
+      print('🔑 FCM Token for login: $fcmToken');
+
+      // If token is null, try force refresh (handles corrupted token cache)
+      if (fcmToken == null || fcmToken.isEmpty) {
+        print('⚠️ Initial token fetch failed, trying force refresh...');
+        fcmToken = await FCMService.forceRefreshToken();
+      }
+
+      // Final check after retry
+      if (fcmToken == null || fcmToken.isEmpty) {
+        CustomSnackbar.show(
+          'Unable to initialize notification service. Please restart the app or check Google Play Services.',
+          isSuccess: false,
+        );
+        return;
+      }
+    } catch (e) {
+      print('❌ Failed to retrieve FCM token: $e');
+      
+      // Try one more time with force refresh
+      try {
+        print('🔄 Attempting force token refresh as last resort...');
+        fcmToken = await FCMService.forceRefreshToken();
+        
+        if (fcmToken == null || fcmToken.isEmpty) {
+          CustomSnackbar.show(
+            'Notification service unavailable. Please restart your device and ensure Google Play Services is updated.',
+            isSuccess: false,
+          );
+          return;
+        }
+      } catch (retryError) {
+        CustomSnackbar.show(
+          'Critical: Cannot initialize notifications. Please update Google Play Services.',
+          isSuccess: false,
+        );
+        return;
+      }
+    }
 
     final result = await safeApiCall(() => _authRepository.login(
           emailController.text.trim(),
           passwordController.text,
-          fcmToken ?? '', // Pass empty string if token is null
+          fcmToken!, // Pass the validated token
         ));
 
     if (result != null) {
@@ -82,10 +123,55 @@ class LoginController extends BaseController {
 
   /// STEP 1: Google OAuth login flow
   /// - Authenticates with Google
-  /// - Calls backend API with Google credentials
+  /// - Gets FCM token (REQUIRED)
+  /// - Calls backend API with Google credentials and FCM token
   /// - Stores user data and token
   /// - For caregivers: fetches assigned patients before navigation
   Future<void> googleLogin() async {
+    // Get FCM token before Google login - REQUIRED for notifications
+    String? fcmToken;
+    try {
+      fcmToken = await FCMService.getToken();
+      print('🔑 FCM Token for Google login: $fcmToken');
+
+      // If token is null, try force refresh (handles corrupted token cache)
+      if (fcmToken == null || fcmToken.isEmpty) {
+        print('⚠️ Initial token fetch failed, trying force refresh...');
+        fcmToken = await FCMService.forceRefreshToken();
+      }
+
+      // Final check after retry
+      if (fcmToken == null || fcmToken.isEmpty) {
+        CustomSnackbar.show(
+          'Unable to initialize notification service. Please restart the app or check Google Play Services.',
+          isSuccess: false,
+        );
+        return;
+      }
+    } catch (e) {
+      print('❌ Failed to retrieve FCM token: $e');
+      
+      // Try one more time with force refresh
+      try {
+        print('🔄 Attempting force token refresh as last resort...');
+        fcmToken = await FCMService.forceRefreshToken();
+        
+        if (fcmToken == null || fcmToken.isEmpty) {
+          CustomSnackbar.show(
+            'Notification service unavailable. Please restart your device and ensure Google Play Services is updated.',
+            isSuccess: false,
+          );
+          return;
+        }
+      } catch (retryError) {
+        CustomSnackbar.show(
+          'Critical: Cannot initialize notifications. Please update Google Play Services.',
+          isSuccess: false,
+        );
+        return;
+      }
+    }
+
     final result = await safeApiCall(() async {
       final googleData = await _googleAuthService.signInWithGoogle();
       if (googleData.isNotEmpty && googleData['error'] == null) {
@@ -93,7 +179,7 @@ class LoginController extends BaseController {
           googleId: googleData['google_id'],
           email: googleData['email'],
           name: googleData['name'],
-          deviceToken: googleData['device_token'],
+          fcmToken: fcmToken ?? '', // Pass FCM token
         );
         return apiResponse;
       }

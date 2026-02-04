@@ -220,8 +220,19 @@ class FCMService {
 
   /// Get current FCM token
   /// Use this to retrieve token when needed
+  /// Returns null if FCM service is not available (e.g., emulator without Google Play Services)
   static Future<String?> getToken() async {
-    return await _firebaseMessaging.getToken();
+    try {
+      final token = await _firebaseMessaging.getToken();
+      if (token == null) {
+        print('⚠️ FCM token is null - device may not support FCM');
+      }
+      return token;
+    } catch (e) {
+      print('⚠️ Failed to get FCM token: $e');
+      print('💡 This is normal on emulators without Google Play Services');
+      return null;
+    }
   }
 
   /// Delete FCM token
@@ -229,5 +240,26 @@ class FCMService {
   static Future<void> deleteToken() async {
     await _firebaseMessaging.deleteToken();
     print('🗑️ FCM token deleted');
+  }
+
+  /// Force refresh FCM token
+  /// Deletes old token and gets a new one
+  /// Use this for debugging token issues
+  static Future<String?> forceRefreshToken() async {
+    try {
+      print('🔄 Forcing FCM token refresh...');
+      await _firebaseMessaging.deleteToken();
+      print('🗑️ Old token deleted');
+      
+      // Wait a bit for deletion to complete
+      await Future.delayed(Duration(seconds: 2));
+      
+      final newToken = await _firebaseMessaging.getToken();
+      print('✅ New FCM token: $newToken');
+      return newToken;
+    } catch (e) {
+      print('❌ Failed to refresh FCM token: $e');
+      return null;
+    }
   }
 }
