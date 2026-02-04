@@ -57,7 +57,7 @@ class CaregiversRepository {
       debugPrint('\n🗑️ DESTROY CAREGIVER Request 🗑️');
       debugPrint('🆔 Caregiver ID: $id');
       final response =
-          await ApiClient.deleteWithAuth('${Apis.caregiversDestroy}/$id');
+          await ApiClient.getWithAuth('${Apis.caregiversDestroy}/$id');
       debugPrint('✅ Caregiver destroyed successfully for ID: $id\n');
       return response;
     } catch (e) {
@@ -77,7 +77,8 @@ class CaregiversRepository {
       debugPrint('🆔 Caregiver ID: $caregiverId');
       debugPrint('👁️ Can View: $canView');
       debugPrint('📝 Can Add Notes: $canAddNotes');
-      final response = await ApiClient.postWithAuth(Apis.updatecaregiver, body: {
+      final response =
+          await ApiClient.postWithAuth(Apis.updatecaregiver, body: {
         'caregiver_id': caregiverId,
         'can_view': canView,
         'can_add_notes': canAddNotes,

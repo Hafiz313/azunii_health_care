@@ -209,8 +209,8 @@ class DetailsDialogs {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  ...medicine.frequencies.map((freq) =>
-                      _buildDetailRow('${freq.frequency}', freq.time)),
+                  ...medicine.frequencies.map((freq) => _buildDetailRow(
+                      '${freq.frequency}', convertTo12HourFormat(freq.time))),
                 ],
                 if (medicine.attachment != null &&
                     medicine.attachment!.isNotEmpty) ...[
@@ -438,5 +438,36 @@ class DetailsDialogs {
         ],
       ),
     );
+  }
+
+  /// Converts 24-hour time format to 12-hour format with AM/PM
+  /// Example: "14:30" -> "2:30 PM", "09:15" -> "9:15 AM"
+  static String convertTo12HourFormat(String time24) {
+    try {
+      // Handle empty or invalid input
+      if (time24.isEmpty) return time24;
+      
+      // Split the time string
+      final parts = time24.split(':');
+      if (parts.length != 2) return time24;
+      
+      int hour = int.parse(parts[0]);
+      String minute = parts[1];
+      
+      // Determine AM/PM
+      String period = hour >= 12 ? 'PM' : 'AM';
+      
+      // Convert hour to 12-hour format
+      if (hour == 0) {
+        hour = 12; // Midnight
+      } else if (hour > 12) {
+        hour = hour - 12;
+      }
+      
+      return '$hour:$minute $period';
+    } catch (e) {
+      // If parsing fails, return original time
+      return time24;
+    }
   }
 }

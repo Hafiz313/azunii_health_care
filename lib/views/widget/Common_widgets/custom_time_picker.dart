@@ -30,7 +30,11 @@ class CustomTimePicker extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         GestureDetector(
-          onTap: () => _showTimePickerDialog(context),
+          onTap: () {
+            // Unfocus any active text fields before showing time picker
+            FocusScope.of(context).unfocus();
+            _showTimePickerDialog(context);
+          },
           child: Container(
             height: 50,
             padding: const EdgeInsets.symmetric(horizontal: 12),

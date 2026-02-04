@@ -56,7 +56,7 @@ class _ViewSummariesViewState extends State<ViewSummariesView>
           isLoading: controller.isLoading.value,
           child: SafeArea(
             child: Scaffold(
-              backgroundColor: AppColors.white,
+              backgroundColor: Colors.white70,
               body: SlideTransition(
                 position: _slideAnimation,
                 child: FadeTransition(
@@ -144,85 +144,141 @@ class _ViewSummariesViewState extends State<ViewSummariesView>
         ? summary['created_at'].toString().split('T')[0]
         : 'N/A';
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [
-              Color(0xFFE3F2FD),
-              Color(0xFFBBDEFB),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+      decoration: BoxDecoration(
+        //color: Colors.white70,
+        border: Border.all(color: AppColors.primary),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          // Dark shadow for depth (bottom-right)
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.1),
+            offset: const Offset(8, 8),
+            blurRadius: 12,
+            spreadRadius: 10,
           ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.blue.withOpacity(0.2),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-
-        // ⭐ Proper padding inside card
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // ⭐ Title
-                    Text(
-                      "Summary",
-                      style: TextStyle(
-                        color: AppColors.headingTextColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      ),
-                    ),
-
-                    SizedBox(height: 6),
-
-                    // ⭐ Description text (wrapped properly)
-                    Text(
-                      summary['summary_text'] ?? 'No summary available',
-                      style: TextStyle(
-                        color: AppColors.headingTextColor,
-                        fontSize: 13,
-                        height: 1.4,
-                      ),
-                    ),
-
-                    SizedBox(height: 10),
-
-                    // ⭐ Created date
-                    Text(
-                      "Created: $createdDate",
-                      style: TextStyle(
-                        color: AppColors.textColor.withOpacity(0.7),
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
+          // Light shadow for raised effect (top-left)
+          BoxShadow(
+            color: Colors.white.withOpacity(0.9),
+            offset: const Offset(-4, -4),
+            blurRadius: 8,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Icon container with neumorphic effect
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white70,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    offset: const Offset(2, 2),
+                    blurRadius: 4,
+                  ),
+                  BoxShadow(
+                    color: Colors.white.withOpacity(0.9),
+                    offset: const Offset(-2, -2),
+                    blurRadius: 4,
+                  ),
+                ],
               ),
+              child: Icon(
+                Icons.description_outlined,
+                color: AppColors.primary,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
 
-              // ⭐ Edit button
-              IconButton(
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title
+                  Text(
+                    "Summary",
+                    style: TextStyle(
+                      color: AppColors.headingTextColor,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  // Description text
+                  Text(
+                    summary['summary_text'] ?? 'No summary available',
+                    style: TextStyle(
+                      color: AppColors.textColor,
+                      fontSize: 14,
+                      height: 1.5,
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Created date with icon
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_today,
+                        size: 14,
+                        color: AppColors.textColor.withOpacity(0.6),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        createdDate,
+                        style: TextStyle(
+                          color: AppColors.textColor.withOpacity(0.7),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            // Edit button with neumorphic effect
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white70,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    offset: const Offset(2, 2),
+                    blurRadius: 4,
+                  ),
+                  BoxShadow(
+                    color: Colors.white.withOpacity(0.9),
+                    offset: const Offset(-2, -2),
+                    blurRadius: 4,
+                  ),
+                ],
+              ),
+              child: IconButton(
                 onPressed: () => _showEditDialog(context, summary),
                 icon: Icon(
                   Icons.edit_outlined,
                   color: AppColors.primary,
-                  size: 22,
+                  size: 20,
                 ),
+                padding: const EdgeInsets.all(8),
+                constraints: const BoxConstraints(),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

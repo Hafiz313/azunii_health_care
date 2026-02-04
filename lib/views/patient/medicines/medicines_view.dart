@@ -91,20 +91,14 @@ class _AddMedicineViewState extends State<AddMedicineView> {
   }
 
   Widget _buildMedicineNameField() {
-    return GestureDetector(
-      onTap: () {
-        // Ensure focus is given to the text field when tapped
-        FocusScope.of(context).requestFocus(FocusNode());
-      },
-      child: CustomTxtField(
-        title: Lang.medName,
-        textEditingController: controller.medNameController,
-        hintTxt: Lang.enterMedName,
-        prefixIcon: const Icon(
-          Icons.medication_outlined,
-          color: AppColors.textColor,
-          size: 20,
-        ),
+    return CustomTxtField(
+      title: Lang.medName,
+      textEditingController: controller.medNameController,
+      hintTxt: Lang.enterMedName,
+      prefixIcon: const Icon(
+        Icons.medication_outlined,
+        color: AppColors.textColor,
+        size: 20,
       ),
     );
   }

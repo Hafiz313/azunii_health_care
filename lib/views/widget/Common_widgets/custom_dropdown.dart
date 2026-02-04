@@ -40,7 +40,11 @@ class CustomDropdown extends StatelessWidget {
           const SizedBox(height: 8),
         ],
         InkWell(
-          onTap: () => _showPicker(context),
+          onTap: () {
+            // Unfocus any active text fields before showing picker
+            FocusScope.of(context).unfocus();
+            _showPicker(context);
+          },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(

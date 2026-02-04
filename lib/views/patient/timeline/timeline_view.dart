@@ -60,6 +60,9 @@ class TimelineView extends GetView<TimelineController> {
 
   @override
   Widget build(BuildContext context) {
+    // Initialize controller to ensure onInit is called
+    final controller = Get.put(TimelineController());
+    
     return Scaffold(
       backgroundColor: AppColors.white,
       body: Obx(() => OverlayLoader(
@@ -74,7 +77,9 @@ class TimelineView extends GetView<TimelineController> {
                   Expanded(
                     child: RefreshIndicator(
                       onRefresh: () => controller.fetchTimeline(1),
+                      color: AppColors.primary,
                       child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -191,71 +196,318 @@ class TimelineView extends GetView<TimelineController> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Medicine Schedule Section
           if (controller.scheduleList.isNotEmpty) ...[
+            _buildSectionHeader(
+              icon: Icons.medication_outlined,
+              title: 'Medicine Schedule',
+              subtitle: '${controller.scheduleList.length} medications today',
+              color: AppColors.primary,
+            ),
+            const SizedBox(height: 12),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 243, 245, 247),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                      color: const Color.fromARGB(255, 219, 217, 217),
-                      width: 0.5)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // subText5('Medicine Schedule',
-                  //     color: AppColors.headingTextColor, fontSize: 14),
-                  // const SizedBox(height: 16),
-                  ...controller.scheduleList.asMap().entries.map((entry) {
-                    final random = Random(entry.value.medicineId);
-                    final color =
-                        _cardColors[random.nextInt(_cardColors.length)];
-                    final icon = _cardIcons[random.nextInt(_cardIcons.length)];
-                    return AnimatedOpacity(
-                      opacity: 1.0,
-                      duration: Duration(milliseconds: 300 + (entry.key * 100)),
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: TimelineTaskCard(
-                          item: entry.value,
-                          bgColor: color,
-                          icon: icon,
-                        ),
-                      ),
-                    );
-                  }),
+                color: Colors.white70,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    offset: const Offset(3, 3),
+                    blurRadius: 6,
+                    spreadRadius: 1,
+                  ),
+                  BoxShadow(
+                    color: Colors.white.withOpacity(0.9),
+                    offset: const Offset(-3, -3),
+                    blurRadius: 6,
+                    spreadRadius: 1,
+                  ),
                 ],
+              ),
+              child: Column(
+                children: controller.scheduleList.asMap().entries.map((entry) {
+                  final random = Random(entry.value.medicineId);
+                  final color = _cardColors[random.nextInt(_cardColors.length)];
+                  final icon = _cardIcons[random.nextInt(_cardIcons.length)];
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      bottom: entry.key != controller.scheduleList.length - 1 ? 10 : 0,
+                    ),
+                    child: TimelineTaskCard(
+                      item: entry.value,
+                      bgColor: color,
+                      icon: icon,
+                    ),
+                  );
+                }).toList(),
               ),
             ),
             const SizedBox(height: 24),
           ],
-          if (controller.eventsList
-              .where((e) => e.type == 'visit')
-              .isNotEmpty) ...[
-            subText5(Lang.visitTimeline,
-                color: AppColors.headingTextColor, fontSize: 14),
-            const SizedBox(height: 16),
-            ...controller.eventsList
-                .where((e) => e.type == 'visit')
-                .toList()
-                .reversed
-                .toList()
-                .asMap()
-                .entries
-                .map((entry) {
-              return AnimatedOpacity(
-                opacity: 1.0,
-                duration: Duration(milliseconds: 300 + (entry.key * 100)),
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: VisitCard(event: entry.value),
-                ),
-              );
-            }),
+          
+          // Activity History Section (Events)
+          if (controller.eventsList.isNotEmpty) ...[
+            _buildSectionHeader(
+              icon: Icons.history,
+              title: 'Activity History',
+              subtitle: '${controller.eventsList.length} recent activities',
+              color: Colors.orange,
+            ),
+            const SizedBox(height: 12),
+            _buildEventsTimeline(context),
           ],
         ],
       );
     });
+  }
+
+  Widget _buildSectionHeader({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+  }) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: color, size: 20),
+        ),
+        const SizedBox(width: 12),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                color: AppColors.headingTextColor,
+                fontWeight: FontWeight.w600,
+                fontSize: 15,
+              ),
+            ),
+            Text(
+              subtitle,
+              style: TextStyle(
+                color: AppColors.textColor.withOpacity(0.7),
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEventsTimeline(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white70,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            offset: const Offset(3, 3),
+            blurRadius: 6,
+            spreadRadius: 1,
+          ),
+          BoxShadow(
+            color: Colors.white.withOpacity(0.9),
+            offset: const Offset(-3, -3),
+            blurRadius: 6,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: Column(
+        children: controller.eventsList.asMap().entries.map((entry) {
+          final event = entry.value;
+          final isLast = entry.key == controller.eventsList.length - 1;
+          return _buildEventItem(event, isLast);
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildEventItem(TimelineEvent event, bool isLast) {
+    final eventStyle = _getEventStyle(event.type);
+    
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Timeline connector
+          Column(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: eventStyle['color'].withOpacity(0.15),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: eventStyle['color'],
+                    width: 2,
+                  ),
+                ),
+                child: Icon(
+                  eventStyle['icon'],
+                  size: 16,
+                  color: eventStyle['color'],
+                ),
+              ),
+              if (!isLast)
+                Expanded(
+                  child: Container(
+                    width: 2,
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    color: AppColors.textColor.withOpacity(0.15),
+                  ),
+                ),
+            ],
+          ),
+          
+          const SizedBox(width: 12),
+          
+          // Event content
+          Expanded(
+            child: Container(
+              margin: EdgeInsets.only(bottom: isLast ? 0 : 16),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: eventStyle['color'].withOpacity(0.08),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: eventStyle['color'].withOpacity(0.2),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          event.title,
+                          style: TextStyle(
+                            color: AppColors.headingTextColor,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: eventStyle['color'].withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          eventStyle['label'],
+                          style: TextStyle(
+                            color: eventStyle['color'],
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (event.subtitle != null) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      event.subtitle!,
+                      style: TextStyle(
+                        color: AppColors.textColor,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.access_time,
+                        size: 12,
+                        color: AppColors.textColor.withOpacity(0.6),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        _formatEventTimestamp(event.timestamp),
+                        style: TextStyle(
+                          color: AppColors.textColor.withOpacity(0.6),
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Map<String, dynamic> _getEventStyle(String type) {
+    switch (type) {
+      case 'medicine_added':
+        return {
+          'color': Colors.green,
+          'icon': Icons.add_circle_outline,
+          'label': 'Added',
+        };
+      case 'medicine_updated':
+        return {
+          'color': Colors.orange,
+          'icon': Icons.edit_outlined,
+          'label': 'Updated',
+        };
+      case 'visit':
+        return {
+          'color': Colors.blue,
+          'icon': Icons.local_hospital_outlined,
+          'label': 'Visit',
+        };
+      default:
+        return {
+          'color': AppColors.textColor,
+          'icon': Icons.info_outline,
+          'label': 'Activity',
+        };
+    }
+  }
+
+  String _formatEventTimestamp(String timestamp) {
+    try {
+      final dt = DateTime.parse(timestamp);
+      final now = DateTime.now();
+      final diff = now.difference(dt);
+      
+      if (diff.inDays == 0) {
+        return 'Today at ${_formatTime12Hour(dt)}';
+      } else if (diff.inDays == 1) {
+        return 'Yesterday at ${_formatTime12Hour(dt)}';
+      } else if (diff.inDays < 7) {
+        return '${diff.inDays} days ago';
+      } else {
+        return '${dt.day}/${dt.month}/${dt.year}';
+      }
+    } catch (e) {
+      return timestamp;
+    }
+  }
+
+  String _formatTime12Hour(DateTime dt) {
+    final hour = dt.hour > 12 ? dt.hour - 12 : (dt.hour == 0 ? 12 : dt.hour);
+    final period = dt.hour >= 12 ? 'PM' : 'AM';
+    return '$hour:${dt.minute.toString().padLeft(2, '0')} $period';
   }
 
   Widget _buildPagination(BuildContext context) {

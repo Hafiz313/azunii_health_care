@@ -57,7 +57,12 @@ class _EditSummaryDialogState extends State<EditSummaryDialog>
   Widget build(BuildContext context) {
     return ScaleTransition(
       scale: _scaleAnimation,
-      child: CupertinoAlertDialog(
+      child: AlertDialog(
+        backgroundColor: AppColors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
         title: Text(
           "Edit Summary",
           style: TextStyle(
@@ -66,40 +71,47 @@ class _EditSummaryDialogState extends State<EditSummaryDialog>
             color: AppColors.headingTextColor,
           ),
         ),
-        content: Padding(
-          padding: const EdgeInsets.only(top: 12, bottom: 4),
-          child: Material(
-            // Needed for textfield inside Cupertino dialog
-            color: Colors.transparent,
-            child: CustomTxtField(
-              textEditingController: widget.controller,
-              hintTxt: 'Enter summary text...',
-              maxLines: 4,
-            ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CustomTxtField(
+                textEditingController: widget.controller,
+                hintTxt: 'Enter summary text...',
+                maxLines: 7,
+              ),
+            ],
           ),
         ),
         actions: [
-          CupertinoDialogAction(
+          TextButton(
             onPressed: () => Navigator.pop(context),
-            isDestructiveAction: false,
             child: Text(
               "Cancel",
               style: TextStyle(
-                color: AppColors.textColor.withOpacity(0.7),
+                color: AppColors.textColor,
+                fontSize: 14,
               ),
             ),
           ),
-          CupertinoDialogAction(
+          ElevatedButton(
             onPressed: () {
               widget.onUpdate();
               Navigator.pop(context);
             },
-            isDefaultAction: true,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            ),
             child: Text(
               "Update",
               style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: AppColors.primary,
+                fontWeight: FontWeight.w600,
+                color: AppColors.white,
+                fontSize: 14,
               ),
             ),
           ),

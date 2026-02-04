@@ -305,22 +305,26 @@ class HomeView extends StatelessWidget {
               Row(
                 children: [
                   Obx(() => controller.selectedDate.value.isNotEmpty
-                      ? TextButton(
-                          onPressed: controller.clearDateFilter,
-                          style: TextButton.styleFrom(
-                            padding: EdgeInsets.symmetric(horizontal: 8),
-                            minimumSize: Size(0, 0),
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
-                          child: Text(
-                            'Clear Filter',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: AppColors.primary,
+                      ? Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: InkWell(
+                            onTap: controller.clearDateFilter,
+                            borderRadius: BorderRadius.circular(20),
+                            child: Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withOpacity(0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.close,
+                                size: 16,
+                                color: AppColors.primary,
+                              ),
                             ),
                           ),
                         )
-                      : SizedBox.shrink()),
+                      : const SizedBox.shrink()),
                   Obx(() => DatePickerButton(
                         date: controller.selectedDate.value.isEmpty
                             ? 'Select Date'
