@@ -11,16 +11,16 @@ class TimelineRepository {
       if (page != null) print('📄 Page: $page');
 
       String endpoint = Apis.getTimeline;
-      // if (date != null || page != null) {
-      //   endpoint += '?';
-      //   if (date != null) endpoint += 'date=$date';
-      //   if (date != null && page != null) endpoint += '&';
-      //   if (page != null) endpoint += 'page=$page';
-      // }
+      List<String> queryParams = [];
+      if (date != null) queryParams.add('date=$date');
+      if (page != null) queryParams.add('page=$page');
+      if (queryParams.isNotEmpty) {
+        endpoint += '?${queryParams.join('&')}';
+      }
 
       final response = await ApiClient.getWithAuth(endpoint);
 
-      print('✅ Timeline fetched successfully\n');
+      print('✅ Timeline fetched successfully\\n');
       return TimelineResponse.fromJson(response);
     } catch (e) {
       print('❌ Get Timeline Error: $e');

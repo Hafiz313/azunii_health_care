@@ -83,7 +83,7 @@ class NotesController extends BaseController {
   }
 
   void viewAllNotes() {
-    CustomSnackbar.show('Showing all ${previousNotes.length} notes', isSuccess: true);
+    Get.toNamed('/caregiver-all-notes', arguments: previousNotes.toList());
   }
 
   void viewNoteDetails(NotesModel note) {

@@ -5,11 +5,13 @@ import 'package:Azunii_Health/views/auth/sing_up/signup_view.dart';
 import 'package:Azunii_Health/views/care_taker/FAQs/faqs_view.dart';
 import 'package:Azunii_Health/views/care_taker/Medication/medication_caretaker_view.dart';
 import 'package:Azunii_Health/views/care_taker/Notes/notes_view.dart';
+import 'package:Azunii_Health/views/care_taker/Notes/all_notes_view.dart';
 import 'package:Azunii_Health/views/care_taker/dashboard/dashboard.dart';
 import 'package:Azunii_Health/views/care_taker/feedback/feedback_view.dart';
 import 'package:Azunii_Health/views/care_taker/home/home_view_caregiver.dart.dart';
 import 'package:Azunii_Health/views/care_taker/home/select_patient_view.dart';
 import 'package:Azunii_Health/views/care_taker/settings/settings_view.dart';
+import 'package:Azunii_Health/views/care_taker/home/all_visits_view.dart' as caregiver;
 
 import 'package:Azunii_Health/views/patient/advocacy/add_caregiver_view.dart';
 import 'package:Azunii_Health/views/patient/dashboard/patient_dashboard.dart';
@@ -50,6 +52,7 @@ class AppRoutes {
   static const privacyPolicy = PrivacyPolicyView.routeName;
   static const helpSupport = HelpSupportView.routeName;
   static const allVisits = AllVisitsView.routeName;
+  static const caregiverAllVisits = caregiver.AllVisitsView.routeName;
   static const viewSummaries = ViewSummariesView.routeName;
  // static const fcmTest = FCMTestScreen.routeName;
 
@@ -78,6 +81,8 @@ class AppRoutes {
     GetPage(name: helpSupport, page: () => const HelpSupportView()),
     GetPage(name: allVisits, page: () => const AllVisitsView()),
     GetPage(name: viewSummaries, page: () => const ViewSummariesView()),
+    GetPage(name: caregiverAllVisits, page: () => const caregiver.AllVisitsView()),
+    GetPage(name: '/caregiver-all-notes', page: () => const AllNotesView()),
    
   ];
 }

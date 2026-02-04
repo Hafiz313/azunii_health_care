@@ -120,20 +120,30 @@ class TimelineView extends GetView<TimelineController> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                subText5(Lang.asOfToday,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.headingTextColor,
-                    fontSize: 13),
+                subText5(
+                  controller.showAllDates.value 
+                      ? Lang.asOfToday 
+                      : 'Filtered by date',
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.headingTextColor,
+                  fontSize: 13,
+                ),
                 Row(
                   children: [
+                    // Date Picker Button
                     InkWell(
                       onTap: () => _showDatePicker(context),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: AppColors.cardGray,
+                          color: controller.showAllDates.value 
+                              ? AppColors.cardGray 
+                              : AppColors.primary.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
+                          border: controller.showAllDates.value 
+                              ? null 
+                              : Border.all(color: AppColors.primary, width: 1),
                         ),
                         child: Row(
                           children: [
@@ -141,44 +151,47 @@ class TimelineView extends GetView<TimelineController> {
                               AppAssets.calander,
                               width: 16,
                               height: 16,
-                              colorFilter: const ColorFilter.mode(
-                                AppColors.textColor,
+                              colorFilter: ColorFilter.mode(
+                                controller.showAllDates.value 
+                                    ? AppColors.textColor 
+                                    : AppColors.primary,
                                 BlendMode.srcIn,
                               ),
                             ),
                             const SizedBox(width: 8),
                             subText5(
-                              fontWeight: FontWeight.w400,
+                              fontWeight: FontWeight.w500,
                               controller.selectedDate.value != null
                                   ? _formatDate(controller.selectedDate.value!)
                                   : 'Select Date',
                               fontSize: 13,
-                              color: AppColors.headingTextColor,
+                              color: controller.showAllDates.value 
+                                  ? AppColors.headingTextColor 
+                                  : AppColors.primary,
                             ),
                           ],
                         ),
                       ),
                     ),
                     const SizedBox(width: 8),
-                    InkWell(
-                      onTap: () => controller.resetFilter(),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: controller.showAllDates.value
-                              ? AppColors.primary
-                              : AppColors.cardGray,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.all_inclusive,
-                          size: 12,
-                          color: controller.showAllDates.value
-                              ? AppColors.white
-                              : AppColors.textColor,
+                    // Clear Filter / Show All Button
+                    if (!controller.showAllDates.value)
+                      InkWell(
+                        onTap: () => controller.resetFilter(),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.red.withOpacity(0.3)),
+                          ),
+                          child: const Icon(
+                            Icons.close,
+                            size: 16,
+                            color: Colors.red,
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ],
@@ -189,7 +202,8 @@ class TimelineView extends GetView<TimelineController> {
 
   Widget _buildTimelineContent(BuildContext context) {
     return Obx(() {
-      if (controller.filteredList.isEmpty) {
+      // Check if both lists are empty
+      if (controller.scheduleList.isEmpty && controller.eventsList.isEmpty) {
         return _buildNoDataWidget();
       }
 

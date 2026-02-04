@@ -200,14 +200,7 @@ class _SettingsviewState extends State<Settingsview> {
                 width: double.infinity,
                 height: context.screenWidth * 0.12,
                 child: AppElevatedButton(
-                  onPressed: () {
-                    if (isEditMode.value) {
-                      controller.updateProfile();
-                      isEditMode.value = false;
-                    } else {
-                      isEditMode.value = true;
-                    }
-                  },
+                  onPressed: () => _handleEditProfile(controller),
                   title: isEditMode.value ? 'Update Profile' : 'Edit Profile',
                   backgroundColor: AppColors.primary,
                 ),
@@ -263,6 +256,33 @@ class _SettingsviewState extends State<Settingsview> {
     );
   }
 
+  void _handleEditProfile(SettingsController controller) {
+    if (isEditMode.value) {
+      // Show confirmation before updating
+      _showConfirmationDialog(
+        title: 'Update Profile',
+        message: 'Are you sure you want to update your profile information?',
+        confirmText: 'Update',
+        confirmColor: AppColors.primary,
+        onConfirm: () {
+          controller.updateProfile();
+          isEditMode.value = false;
+        },
+      );
+    } else {
+      // Show confirmation before entering edit mode
+      _showConfirmationDialog(
+        title: 'Edit Profile',
+        message: 'Do you want to edit your profile information?',
+        confirmText: 'Edit',
+        confirmColor: AppColors.primary,
+        onConfirm: () {
+          isEditMode.value = true;
+        },
+      );
+    }
+  }
+
   Widget _buildActionButtons(
       BuildContext context, SettingsController controller) {
     return Row(
@@ -271,9 +291,7 @@ class _SettingsviewState extends State<Settingsview> {
           child: SizedBox(
             height: context.screenWidth * 0.12,
             child: AppElevatedButton(
-              onPressed: () {
-                controller.logout();
-              },
+              onPressed: () => _showLogoutConfirmation(controller),
               title: Lang.logOut,
               backgroundColor: AppColors.cardGray,
               textColor: AppColors.headingTextColor,
@@ -285,9 +303,7 @@ class _SettingsviewState extends State<Settingsview> {
           child: SizedBox(
             height: context.screenWidth * 0.12,
             child: AppElevatedButton(
-              onPressed: () {
-                controller.deleteAccount();
-              },
+              onPressed: () => _showDeleteAccountConfirmation(controller),
               title: Lang.deleteAccount,
               backgroundColor: AppColors.lightRed,
               textColor: AppColors.redColor,
@@ -295,6 +311,95 @@ class _SettingsviewState extends State<Settingsview> {
           ),
         ),
       ],
+    );
+  }
+
+  void _showLogoutConfirmation(SettingsController controller) {
+    _showConfirmationDialog(
+      title: 'Logout',
+      message: 'Are you sure you want to logout from your account?',
+      confirmText: 'Logout',
+      confirmColor: AppColors.primary,
+      onConfirm: () {
+        controller.logout();
+      },
+    );
+  }
+
+  void _showDeleteAccountConfirmation(SettingsController controller) {
+    _showConfirmationDialog(
+      title: 'Delete Account',
+      message: 'Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed.',
+      confirmText: 'Delete',
+      confirmColor: Colors.red,
+      onConfirm: () {
+        controller.deleteAccount();
+      },
+    );
+  }
+
+  void _showConfirmationDialog({
+    required String title,
+    required String message,
+    required String confirmText,
+    required Color confirmColor,
+    required VoidCallback onConfirm,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Text(
+          title,
+          style: GoogleFonts.manrope(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: AppColors.headingTextColor,
+          ),
+        ),
+        content: Text(
+          message,
+          style: GoogleFonts.manrope(
+            fontSize: 14,
+            color: AppColors.textColor,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                color: AppColors.textColor,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              onConfirm();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: confirmColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              confirmText,
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: AppColors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

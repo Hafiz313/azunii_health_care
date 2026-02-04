@@ -149,7 +149,7 @@ class HomeController extends BaseController {
     print('🔍 filterMedicinesByDate called');
     print('📅 Selected date: ${selectedDate.value}');
     print('📦 allMedicinesList count: ${allMedicinesList.length}');
-    
+
     if (allMedicinesList.isEmpty) {
       print('⚠️ allMedicinesList is empty, setting medicinesList to empty');
       medicinesList.value = [];
@@ -166,13 +166,14 @@ class HomeController extends BaseController {
       final parts = selectedDate.value.split('-');
       final selectedDateTime = DateTime(
           int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
-      
+
       print('📅 Filtering for date: ${selectedDateTime.toString()}');
 
       final filtered = allMedicinesList.where((medicine) {
         try {
           final updatedAt = DateTime.parse(medicine.updatedAt);
-          print('  Medicine: ${medicine.medicineName}, updatedAt: ${updatedAt.toString()}');
+          print(
+              '  Medicine: ${medicine.medicineName}, updatedAt: ${updatedAt.toString()}');
           final matches = updatedAt.year == selectedDateTime.year &&
               updatedAt.month == selectedDateTime.month &&
               updatedAt.day == selectedDateTime.day;
@@ -183,7 +184,7 @@ class HomeController extends BaseController {
           return false;
         }
       }).toList();
-      
+
       medicinesList.value = filtered;
       print('✅ Filtered medicinesList count: ${medicinesList.length}');
     } catch (e) {
@@ -305,7 +306,7 @@ class HomeController extends BaseController {
   }
 
   Future<void> logout() async {
-    ////  final result = await safeApiCall(() => _authRepository.logout());
+    final result = await safeApiCall(() => _authRepository.logout());
     //if (result != null) {
     await LocalStorageService.logout();
     Get.offAllNamed(LoginView.routeName);
@@ -313,6 +314,29 @@ class HomeController extends BaseController {
     /// } else {
     print('logout api failed');
     // }
+  }
+
+  Future<void> deleteAccount() async {
+    try {
+      setLoading(true);
+      // TODO: Call delete account API when endpoint is available
+      // final result = await safeApiCall(() => _authRepository.deleteAccount());
+      // if (result != null) {
+      //   await LocalStorageService.logout();
+      //   Get.offAllNamed(LoginView.routeName);
+      // }
+      
+      // For now, show a message that this feature will be available soon
+      Get.snackbar(
+        'Coming Soon',
+        'Account deletion feature will be available soon.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+      print('Delete account error: $e');
+    }
   }
 
   @override

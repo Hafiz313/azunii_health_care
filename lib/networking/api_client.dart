@@ -14,7 +14,7 @@ class ApiClient {
   // ============================================================================
   // CONFIGURATION
   // ============================================================================
-  
+
   static const Duration _timeout = Duration(seconds: 30);
 
   // ============================================================================
@@ -57,20 +57,22 @@ class ApiClient {
       case 301:
       case 302:
         throw ApiException(
-            message: 'Server redirect detected. Please check API configuration.');
+            message:
+                'Server redirect detected. Please check API configuration.');
 
       // Error responses - Extract message from response body
       case 400:
       case 401:
+      case 403:
       case 404:
       case 405:
       case 409:
       case 422:
       case 500:
         final responseBody = jsonDecode(response.body);
-        String errorMessage = 'Something went wrong';
+        String errorMessage = '';
 
-        // Try to extract message from response
+        // Extract exact message from backend response
         if (responseBody['message'] != null) {
           errorMessage = responseBody['message'];
         } else if (responseBody['errors'] != null) {
@@ -86,10 +88,16 @@ class ApiClient {
 
         throw ApiException(message: errorMessage);
 
-      // Unknown status codes
+      // Unknown status codes - try to extract message from response
       default:
-        throw ApiException(
-            message: 'Unexpected error occurred (status: ${response.statusCode})');
+        try {
+          final responseBody = jsonDecode(response.body);
+          final message = responseBody['message'] ?? '';
+          throw ApiException(message: message);
+        } catch (e) {
+          if (e is ApiException) rethrow;
+          throw ApiException(message: '');
+        }
     }
   }
 
@@ -187,14 +195,14 @@ class ApiClient {
             body: body != null ? jsonEncode(body) : null,
           )
           .timeout(_timeout);
-      
+
       final responseJson = jsonDecode(response.body);
-      
+
       debugPrint('\n🔥 API RESPONSE 🔥');
       debugPrint('Status Code: ${response.statusCode}');
       debugPrint('Response Body: ${response.body}');
       debugPrint('🔚 End Response\n');
-      
+
       if (response.statusCode >= 200 && response.statusCode < 300) {
         // Check if response has status field and it's false
         if (responseJson['status'] != null && responseJson['status'] == false) {
@@ -434,7 +442,7 @@ class ApiClient {
 
   /// Delete user account
   static Future<Map<String, dynamic>> deleteAccount() async {
-    return await deleteWithAuth(Apis.deleteAccount);
+    return await getWithAuth(Apis.deleteAccount);
   }
 
   /// Send forgot password request

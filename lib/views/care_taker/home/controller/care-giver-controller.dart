@@ -180,7 +180,7 @@ class HomeController_caregiver extends BaseController {
   }
 
   void onViewAllTap() {
-    // Handle view all appointments
+    Get.toNamed('/caregiver-all-visits');
   }
 
   /// Logout and clear patient state

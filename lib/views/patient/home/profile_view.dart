@@ -190,25 +190,199 @@ class _ProfileViewState extends State<ProfileView>
                   'Confirm Password', controller.confirmPasswordController,
                   isPassword: true, enabled: isEditMode.value),
               const SizedBox(height: 20),
+              // Edit/Update Profile Button
               SizedBox(
                 width: double.infinity,
                 height: 45,
                 child: AppElevatedButton(
-                  onPressed: () {
-                    if (isEditMode.value) {
-                      controller.updateProfile();
-                    } else {
-                      isEditMode.value = true;
-                    }
-                  },
+                  onPressed: () => _handleEditProfile(),
                   title: isEditMode.value ? 'Update Profile' : 'Edit Profile',
                   backgroundColor: AppColors.primary,
+                ),
+              ),
+              const SizedBox(height: 24),
+              const Divider(),
+              const SizedBox(height: 16),
+              // Logout Button
+              SizedBox(
+                width: double.infinity,
+                height: 45,
+                child: OutlinedButton(
+                  onPressed: () => _showLogoutConfirmation(),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: AppColors.primary),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.logout, color: AppColors.primary, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Logout',
+                        style: GoogleFonts.manrope(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              // Delete Account Button
+              SizedBox(
+                width: double.infinity,
+                height: 45,
+                child: OutlinedButton(
+                  onPressed: () => _showDeleteAccountConfirmation(),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.red),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.delete_forever, color: Colors.red, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Delete Account',
+                        style: GoogleFonts.manrope(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
           ),
         ));
   }
+
+  void _handleEditProfile() {
+    if (isEditMode.value) {
+      // Show confirmation before updating
+      _showConfirmationDialog(
+        title: 'Update Profile',
+        message: 'Are you sure you want to update your profile information?',
+        confirmText: 'Update',
+        confirmColor: AppColors.primary,
+        onConfirm: () {
+          controller.updateProfile();
+          isEditMode.value = false;
+        },
+      );
+    } else {
+      // Show confirmation before entering edit mode
+      _showConfirmationDialog(
+        title: 'Edit Profile',
+        message: 'Do you want to edit your profile information?',
+        confirmText: 'Edit',
+        confirmColor: AppColors.primary,
+        onConfirm: () {
+          isEditMode.value = true;
+        },
+      );
+    }
+  }
+
+  void _showLogoutConfirmation() {
+    _showConfirmationDialog(
+      title: 'Logout',
+      message: 'Are you sure you want to logout from your account?',
+      confirmText: 'Logout',
+      confirmColor: AppColors.primary,
+      onConfirm: () {
+        controller.logout();
+      },
+    );
+  }
+
+  void _showDeleteAccountConfirmation() {
+    _showConfirmationDialog(
+      title: 'Delete Account',
+      message: 'Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed.',
+      confirmText: 'Delete',
+      confirmColor: Colors.red,
+      onConfirm: () {
+        controller.deleteAccount();
+      },
+    );
+  }
+
+  void _showConfirmationDialog({
+    required String title,
+    required String message,
+    required String confirmText,
+    required Color confirmColor,
+    required VoidCallback onConfirm,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Text(
+          title,
+          style: GoogleFonts.manrope(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: AppColors.headingTextColor,
+          ),
+        ),
+        content: Text(
+          message,
+          style: GoogleFonts.manrope(
+            fontSize: 14,
+            color: AppColors.textColor,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                color: AppColors.textColor,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              onConfirm();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: confirmColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              confirmText,
+              style: GoogleFonts.manrope(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: AppColors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   Widget _buildTextField(String label, TextEditingController textController,
       {bool isPassword = false, bool enabled = true}) {

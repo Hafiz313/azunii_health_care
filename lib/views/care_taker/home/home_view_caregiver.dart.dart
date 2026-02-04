@@ -1,4 +1,5 @@
 import 'package:Azunii_Health/consts/assets.dart';
+import 'package:Azunii_Health/core/models/static_user_model.dart';
 import 'package:Azunii_Health/utils/percentage_size_ext.dart';
 import 'package:Azunii_Health/views/care_taker/home/controller/care-giver-controller.dart';
 import 'package:Azunii_Health/views/care_taker/home/select_patient_view.dart';
@@ -18,6 +19,7 @@ import '../../widget/Common_widgets/today_task_card.dart';
 import '../../widget/Common_widgets/date_picker_button.dart';
 import '../../widget/Common_widgets/appointment_card.dart';
 import '../../auth/login/login_view.dart';
+import '../../patient/home/profile_view.dart';
 
 class HomeView_caregiver extends StatelessWidget {
   static const String routeName = '/home-caregiver';
@@ -106,20 +108,18 @@ class HomeView_caregiver extends StatelessWidget {
                     color: AppColors.textColor,
                     align: TextAlign.start,
                   ),
-                  Obx(() => subText4(
-                        controller.userName.value.isNotEmpty
-                            ? controller.userName.value
-                            : 'Caregiver',
-                        color: AppColors.headingTextColor,
-                        align: TextAlign.start,
-                        fontWeight: FontWeight.w500,
-                      )),
+                  subText4(
+                    Staticdata.userModel?.name ?? 'Caregiver',
+                    color: AppColors.headingTextColor,
+                    align: TextAlign.start,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ],
               ),
             ),
             // Profile picture
             GestureDetector(
-              onTap: () {},
+              onTap: () => Get.toNamed(ProfileView.routeName),
               child: Container(
                 width: MediaQuery.of(context).size.width * 0.11,
                 height: MediaQuery.of(context).size.width * 0.11,

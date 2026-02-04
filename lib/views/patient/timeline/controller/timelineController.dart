@@ -6,9 +6,15 @@ import '../../../../core/repositories/timeline_Repo.dart';
 class TimelineController extends BaseController {
   final TimelineRepository _timelineRepository = TimelineRepository();
 
+  // Raw data from API
+  final RxList<MedicineSchedule> _allSchedules = <MedicineSchedule>[].obs;
+  final RxList<TimelineEvent> _allEvents = <TimelineEvent>[].obs;
+  
+  // Filtered data for display
   final RxList<MedicineSchedule> scheduleList = <MedicineSchedule>[].obs;
   final RxList<TimelineEvent> eventsList = <TimelineEvent>[].obs;
   final RxList<dynamic> filteredList = <dynamic>[].obs;
+  
   final Rx<DateTime?> selectedDate = Rx<DateTime?>(null);
   final RxInt currentPage = RxInt(1);
   final RxInt totalPages = RxInt(1);
@@ -21,35 +27,59 @@ class TimelineController extends BaseController {
   }
 
   Future<void> fetchTimeline(int page) async {
-    final dateStr = selectedDate.value != null && !showAllDates.value
-        ? _formatDateForApi(selectedDate.value!)
-        : null;
-
     final result = await safeApiCall(
-      () => _timelineRepository.getTimeline(date: dateStr, page: page),
+      () => _timelineRepository.getTimeline(page: page),
     );
 
     if (result != null) {
-      scheduleList.value = result.data.schedule;
-      eventsList.value = result.data.events;
+      _allSchedules.value = result.data.schedule;
+      _allEvents.value = result.data.events;
       currentPage.value = result.data.meta.page;
       totalPages.value = (result.data.meta.total / result.data.meta.perPage).ceil();
-      _updateFilteredList();
+      _applyFilter();
     }
   }
 
   void filterByDate(DateTime? date) {
     selectedDate.value = date;
     showAllDates.value = date == null;
-    currentPage.value = 1;
-    fetchTimeline(1);
+    _applyFilter();
   }
 
   void resetFilter() {
     selectedDate.value = null;
     showAllDates.value = true;
-    currentPage.value = 1;
-    fetchTimeline(1);
+    _applyFilter();
+  }
+
+  void _applyFilter() {
+    if (showAllDates.value || selectedDate.value == null) {
+      // Show all data
+      scheduleList.value = _allSchedules.toList();
+      eventsList.value = _allEvents.toList();
+    } else {
+      // Filter by selected date
+      final filterDate = selectedDate.value!;
+      final filterDateStr = _formatDateForComparison(filterDate);
+      
+      // Filter schedules (they don't have date, so show all on any filter for now)
+      // If schedules have a date field in the API response, filter them here
+      scheduleList.value = _allSchedules.toList();
+      
+      // Filter events by timestamp
+      eventsList.value = _allEvents.where((event) {
+        try {
+          final eventDate = DateTime.parse(event.timestamp);
+          return eventDate.year == filterDate.year &&
+                 eventDate.month == filterDate.month &&
+                 eventDate.day == filterDate.day;
+        } catch (e) {
+          // If timestamp parsing fails, include the event
+          return true;
+        }
+      }).toList();
+    }
+    _updateFilteredList();
   }
 
   void goToPage(int page) {
@@ -61,12 +91,13 @@ class TimelineController extends BaseController {
   void _updateFilteredList() {
     final combined = <dynamic>[
       ...scheduleList,
-      ...eventsList.where((e) => e.type == 'visit'),
+      ...eventsList,
     ];
     filteredList.value = combined;
   }
 
-  String _formatDateForApi(DateTime date) {
+  String _formatDateForComparison(DateTime date) {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
 }
+
