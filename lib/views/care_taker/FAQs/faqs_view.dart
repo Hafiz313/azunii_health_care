@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../../consts/colors.dart';
 import '../../../consts/lang.dart';
 import '../../../utils/percentage_size_ext.dart';
 import '../../widget/text.dart';
 import '../../widget/Common_widgets/customAppBar.dart';
+import 'controller/faqs_controller.dart';
 
 class FAQsView extends StatefulWidget {
   static const String routeName = '/faqs-caregiver';
@@ -16,16 +18,13 @@ class FAQsView extends StatefulWidget {
 
 class _FAQsViewState extends State<FAQsView> {
   int? expandedIndex;
+  late final FAQsController controller;
 
-  final List<Map<String, String>> faqData = [
-    {'question': Lang.faqQuestion1, 'answer': Lang.faqAnswer1},
-    {'question': Lang.faqQuestion2, 'answer': Lang.faqAnswer2},
-    {'question': Lang.faqQuestion3, 'answer': Lang.faqAnswer3},
-    {'question': Lang.faqQuestion4, 'answer': Lang.faqAnswer4},
-    {'question': Lang.faqQuestion5, 'answer': Lang.faqAnswer5},
-    {'question': Lang.faqQuestion6, 'answer': Lang.faqAnswer6},
-    {'question': Lang.faqQuestion7, 'answer': Lang.faqAnswer7},
-  ];
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(FAQsController());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,18 +37,45 @@ class _FAQsViewState extends State<FAQsView> {
               title: Lang.faq,
             ),
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: context.screenHeight * 0.025),
-                    _buildFAQHeader(context),
-                    SizedBox(height: context.screenHeight * 0.025),
-                    _buildFAQList(context),
-                    SizedBox(height: context.screenHeight * 0.025),
-                  ],
-                ),
-              ),
+              child: Obx(() {
+                if (controller.isLoading.value && controller.isFirstLoad.value) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                return RefreshIndicator(
+                  onRefresh: controller.refreshFAQs,
+                  color: AppColors.blueV1,
+                  child: controller.faqList.isEmpty
+                      ? ListView(
+                          children: [
+                            SizedBox(
+                              height: context.screenHeight * 0.6,
+                              child: Center(
+                                child: subText4(
+                                  'No FAQs available',
+                                  color: AppColors.textColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      : SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: context.screenHeight * 0.025),
+                              _buildFAQHeader(context),
+                              SizedBox(height: context.screenHeight * 0.025),
+                              _buildFAQList(context),
+                              SizedBox(height: context.screenHeight * 0.025),
+                            ],
+                          ),
+                        ),
+                );
+              }),
             ),
           ],
         ),
@@ -60,24 +86,10 @@ class _FAQsViewState extends State<FAQsView> {
   Widget _buildFAQHeader(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: context.screenWidth * 0.05),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          headline6(
-            Lang.faq,
-            color: AppColors.headingTextColor,
-            fontWeight: FontWeight.w500,
-          ),
-          InkWell(
-            onTap: () {},
-            child: subText5(
-              fontSize: context.screenWidth * 0.03,
-              Lang.viewAll,
-              color: AppColors.borderColor,
-              align: TextAlign.start,
-            ),
-          ),
-        ],
+      child: headline6(
+        Lang.faq,
+        color: AppColors.headingTextColor,
+        fontWeight: FontWeight.w500,
       ),
     );
   }
@@ -85,28 +97,29 @@ class _FAQsViewState extends State<FAQsView> {
   Widget _buildFAQList(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: context.screenWidth * 0.05),
-      child: ListView.separated(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: faqData.length,
-        separatorBuilder: (context, index) => SizedBox(height: context.screenHeight * 0.015),
-        itemBuilder: (context, index) {
-          final faq = faqData[index];
-          final isExpanded = expandedIndex == index;
+      child: Obx(() => ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: controller.faqList.length,
+            separatorBuilder: (context, index) =>
+                SizedBox(height: context.screenHeight * 0.015),
+            itemBuilder: (context, index) {
+              final faq = controller.faqList[index];
+              final isExpanded = expandedIndex == index;
 
-          return _buildFAQCard(
-            context: context,
-            question: faq['question']!,
-            answer: faq['answer']!,
-            isExpanded: isExpanded,
-            onTap: () {
-              setState(() {
-                expandedIndex = isExpanded ? null : index;
-              });
+              return _buildFAQCard(
+                context: context,
+                question: faq.question,
+                answer: faq.answer,
+                isExpanded: isExpanded,
+                onTap: () {
+                  setState(() {
+                    expandedIndex = isExpanded ? null : index;
+                  });
+                },
+              );
             },
-          );
-        },
-      ),
+          )),
     );
   }
 
@@ -127,7 +140,7 @@ class _FAQsViewState extends State<FAQsView> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -175,7 +188,7 @@ class _FAQsViewState extends State<FAQsView> {
               child: Text(
                 answer,
                 style: TextStyle(
-                  color: AppColors.white.withOpacity(0.9),
+                  color: AppColors.white.withValues(alpha: 0.9),
                   fontSize: 13,
                   fontWeight: FontWeight.normal,
                   fontFamily: 'Satoshi',

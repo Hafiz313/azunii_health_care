@@ -11,14 +11,37 @@ import '../../widget/Common_widgets/overlayloader.dart';
 import 'controller/medication_controller.dart';
 import '../../../core/models/caregiver_medicine_list_model.dart';
 
-class Medication_caretaker extends StatelessWidget {
+class Medication_caretaker extends StatefulWidget {
   static const String routeName = '/medication-caregiver';
 
   const Medication_caretaker({super.key});
 
   @override
+  State<Medication_caretaker> createState() => _Medication_caretakerState();
+}
+
+class _Medication_caretakerState extends State<Medication_caretaker> {
+  late final MedicationController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    // Use existing controller or create new one
+    if (Get.isRegistered<MedicationController>()) {
+      controller = Get.find<MedicationController>();
+    } else {
+      controller = Get.put(MedicationController());
+    }
+  }
+
+  @override
+  void dispose() {
+    // Don't delete controller - it's shared across page views
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final controller = Get.put(MedicationController());
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
@@ -185,28 +208,44 @@ class Medication_caretaker extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (medication.frequencies.isNotEmpty)
-                ...medication.frequencies.map((f) => Padding(
+                ...medication.frequencies.map((f) {
+                  // Check if frequency is "as_per_needed"
+                  if (f.frequency.toLowerCase() == 'as_per_needed') {
+                    return Padding(
                       padding: EdgeInsets.only(bottom: context.screenWidth * 0.01),
-                      child: RichText(
-                        text: TextSpan(
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: AppColors.textColor,
-                            fontFamily: 'Satoshi',
-                          ),
-                          children: [
-                            TextSpan(
-                              text: '${f.frequency[0].toUpperCase()}${f.frequency.substring(1)} at ',
-                              style: const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            TextSpan(
-                              text: _formatTime(f.time),
-                              style: const TextStyle(fontWeight: FontWeight.normal),
-                            ),
-                          ],
-                        ),
+                      child: subText5(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        'As per needed',
+                        color: AppColors.textColor,
+                        align: TextAlign.start,
                       ),
-                    ))
+                    );
+                  }
+                  // Regular frequency with time
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: context.screenWidth * 0.01),
+                    child: RichText(
+                      text: TextSpan(
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textColor,
+                          fontFamily: 'Satoshi',
+                        ),
+                        children: [
+                          TextSpan(
+                            text: '${f.frequency[0].toUpperCase()}${f.frequency.substring(1)} at ',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          TextSpan(
+                            text: _formatTime(f.time),
+                            style: const TextStyle(fontWeight: FontWeight.normal),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                })
               else
                 subText5(
                   fontSize: 13,
@@ -219,44 +258,48 @@ class Medication_caretaker extends StatelessWidget {
               Wrap(
                 spacing: context.screenWidth * 0.03,
                 children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      subText5(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        '${Lang.startDate}: ',
-                        color: AppColors.textColor,
-                        align: TextAlign.start,
-                      ),
-                      subText5(
-                        fontSize: 13,
-                        fontWeight: FontWeight.normal,
-                        _formatDate(medication.createdAt),
-                        color: AppColors.textColor,
-                        align: TextAlign.start,
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      subText5(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        '${Lang.endDate} ',
-                        color: AppColors.textColor,
-                        align: TextAlign.start,
-                      ),
-                      subText5(
-                        fontSize: 13,
-                        fontWeight: FontWeight.normal,
-                        _formatDate(medication.updatedAt),
-                        color: AppColors.textColor,
-                        align: TextAlign.start,
-                      ),
-                    ],
-                  ),
+                  // Start Date
+                  if (medication.startDate != null && medication.startDate!.isNotEmpty)
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        subText5(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          '${Lang.startDate}: ',
+                          color: AppColors.textColor,
+                          align: TextAlign.start,
+                        ),
+                        subText5(
+                          fontSize: 13,
+                          fontWeight: FontWeight.normal,
+                          _formatDate(medication.startDate!),
+                          color: AppColors.textColor,
+                          align: TextAlign.start,
+                        ),
+                      ],
+                    ),
+                  // End Date - only show if available
+                  if (medication.endDate != null && medication.endDate!.isNotEmpty)
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        subText5(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          '${Lang.endDate}: ',
+                          color: AppColors.textColor,
+                          align: TextAlign.start,
+                        ),
+                        subText5(
+                          fontSize: 13,
+                          fontWeight: FontWeight.normal,
+                          _formatDate(medication.endDate!),
+                          color: AppColors.textColor,
+                          align: TextAlign.start,
+                        ),
+                      ],
+                    ),
                 ],
               ),
             ],

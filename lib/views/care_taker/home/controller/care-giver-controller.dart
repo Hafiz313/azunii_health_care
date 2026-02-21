@@ -9,10 +9,12 @@ import '../../../../core/models/caregiver_patients_model.dart';
 import '../../../../core/models/caregiver_dashboard_model.dart';
 import '../../../../core/controllers/base_controller.dart';
 import '../../../auth/login/login_view.dart';
+import '../../Medication/controller/medication_controller.dart';
+import '../../Notes/controller/notes_controller.dart';
 
 /// CAREGIVER DASHBOARD CONTROLLER
 /// Manages caregiver dashboard state and patient selection
-/// 
+///
 /// KEY RESPONSIBILITIES:
 /// - Initialize and validate active patient on load
 /// - Handle patient switching
@@ -22,11 +24,13 @@ class HomeController_caregiver extends BaseController {
   final RxString selectedDateString = ''.obs;
   final RxString userName = ''.obs;
   final RxString userProfileImage = ''.obs;
-  final CaregiverDashboardRepository _repository = CaregiverDashboardRepository();
+  final CaregiverDashboardRepository _repository =
+      CaregiverDashboardRepository();
   final CaregiverState _state = CaregiverState();
 
   // Dashboard data
-  final Rx<CaregiverDashboardResponse?> dashboardData = Rx<CaregiverDashboardResponse?>(null);
+  final Rx<CaregiverDashboardResponse?> dashboardData =
+      Rx<CaregiverDashboardResponse?>(null);
   final RxList<MedicineQuery> filteredMedicines = <MedicineQuery>[].obs;
 
   RxList<CaregiverPatient> get patients => _state.patients;
@@ -38,21 +42,21 @@ class HomeController_caregiver extends BaseController {
   void onInit() {
     super.onInit();
     loadUserData();
-    _loadPatientsAndInitialize();
+    loadPatientsAndInitialize();
   }
 
   /// Load patients list and initialize active patient
   /// Ensures patients are available before selecting active patient
-  Future<void> _loadPatientsAndInitialize() async {
+  Future<void> loadPatientsAndInitialize() async {
     // If patients list is empty, fetch from API
     if (patients.isEmpty) {
-      await _fetchPatients();
+      await fetchPatients();
     }
     _initializeActivePatient();
   }
 
   /// Fetch patients from API
-  Future<void> _fetchPatients() async {
+  Future<void> fetchPatients() async {
     try {
       final result = await _repository.getPatients();
       _state.setPatients(result.data);
@@ -69,20 +73,22 @@ class HomeController_caregiver extends BaseController {
   void _initializeActivePatient() {
     print('\n🔄 Initializing active patient...');
     print('📋 Total patients available: ${patients.length}');
-    
+
     final lastSelected = _state.getLastSelectedPatient();
     if (lastSelected != null) {
       print('✅ Using cached patient: ${lastSelected.patient.name}');
       _state.setActivePatient(lastSelected);
     } else if (patients.isNotEmpty) {
-      print('⚠️ No cached patient, using first: ${patients.first.patient.name}');
+      print(
+          '⚠️ No cached patient, using first: ${patients.first.patient.name}');
       _state.setActivePatient(patients.first);
     } else {
       print('❌ No patients available');
     }
-    
+
     if (activePatient.value != null) {
-      print('📡 Loading dashboard for patient: ${activePatient.value!.patient.name}');
+      print(
+          '📡 Loading dashboard for patient: ${activePatient.value!.patient.name}');
       final patientId = _state.activePatientId.value;
       if (patientId != null) {
         loadDashboardData(patientId);
@@ -95,12 +101,40 @@ class HomeController_caregiver extends BaseController {
   /// - Persists selection to local storage
   /// - Loads fresh dashboard data for new patient
   /// - Triggers reactive UI updates across all widgets
+  /// - Directly refreshes medication and notes controllers
   void selectPatient(CaregiverPatient patient) {
-    print('\n🔄 Switching to patient: ${patient.patient.name} (ID: ${patient.userId})');
+    print(
+        '\n🔄 Switching to patient: ${patient.patient.name} (ID: ${patient.userId})');
     _state.setActivePatient(patient);
     final patientId = _state.activePatientId.value;
     if (patientId != null) {
       loadDashboardData(patientId);
+
+      // Directly refresh medication controller if registered
+      // try {
+      //   if (Get.isRegistered<MedicationController>()) {
+      //     print('🔄 [HomeController] Refreshing MedicationController...');
+      //     final medicationController = Get.find<MedicationController>();
+      //     medicationController.getMedications();
+      //   } else {
+      //     print('⚠️ [HomeController] MedicationController not registered');
+      //   }
+      // } catch (e) {
+      //   print('❌ [HomeController] Error refreshing MedicationController: $e');
+      // }
+
+      // // Directly refresh notes controller if registered
+      // try {
+      //   if (Get.isRegistered<NotesController>()) {
+      //     print('🔄 [HomeController] Refreshing NotesController...');
+      //     final notesController = Get.find<NotesController>();
+      //     notesController.fetchNotes();
+      //   } else {
+      //     print('⚠️ [HomeController] NotesController not registered');
+      //   }
+      // } catch (e) {
+      //   print('❌ [HomeController] Error refreshing NotesController: $e');
+      // }
     }
   }
 
@@ -136,11 +170,27 @@ class HomeController_caregiver extends BaseController {
     final selected = DateTime.parse(selectedDateString.value);
     filteredMedicines.value = dashboard.medicineQueries.where((medicine) {
       try {
-        final createdDate = DateTime.parse(medicine.createdAt);
-        return createdDate.year == selected.year &&
-               createdDate.month == selected.month &&
-               createdDate.day == selected.day;
+        // Parse start date
+        if (medicine.startDate == null || medicine.startDate!.isEmpty) {
+          return false; // Skip if no start date
+        }
+
+        final startDate = DateTime.parse(medicine.startDate!);
+
+        // If medication has an end date
+        if (medicine.endDate != null && medicine.endDate!.isNotEmpty) {
+          final endDate = DateTime.parse(medicine.endDate!);
+
+          // Check if selected date is between start and end date (inclusive)
+          return (selected
+                  .isAfter(startDate.subtract(const Duration(days: 1))) &&
+              selected.isBefore(endDate.add(const Duration(days: 1))));
+        } else {
+          // If no end date, medication is ongoing - check if selected date is on or after start date
+          return selected.isAfter(startDate.subtract(const Duration(days: 1)));
+        }
       } catch (e) {
+        print('Error filtering medication: $e');
         return false;
       }
     }).toList();
@@ -157,10 +207,10 @@ class HomeController_caregiver extends BaseController {
   }
 
   Future<void> onDatePickerTap() async {
-    final initialDate = selectedDateString.value.isNotEmpty 
-        ? DateTime.parse(selectedDateString.value) 
+    final initialDate = selectedDateString.value.isNotEmpty
+        ? DateTime.parse(selectedDateString.value)
         : DateTime.now();
-    
+
     final DateTime? picked = await showDatePicker(
       context: Get.context!,
       initialDate: initialDate,

@@ -13,23 +13,44 @@ import '../timeline/timeline_view.dart';
 import '../timeline/controller/timelineController.dart';
 import '../visits/visits_view.dart';
 
-class PatientDashboard extends StatelessWidget {
+class PatientDashboard extends StatefulWidget {
   static const String routeName = '/patient-dashboard';
 
   const PatientDashboard({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.put(PatientHomeController());
+  State<PatientDashboard> createState() => _PatientDashboardState();
+}
+
+class _PatientDashboardState extends State<PatientDashboard> {
+  late final PatientHomeController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(PatientHomeController());
     Get.put(TimelineController());
     Get.put(AdvocacyController());
+  }
 
+  @override
+  void dispose() {
+    Get.delete<PatientHomeController>();
+    Get.delete<TimelineController>();
+    Get.delete<AdvocacyController>();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final List<Widget> pages = [
       const HomeView(),
       const AddMedicineView(),
       AddVisitView(),
       const SummaryView(),
-      const TimelineView(),
+      const TimelineView(
+        isOndashboard: true,
+      ),
       const AdvocacyView(),
     ];
 

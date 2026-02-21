@@ -18,9 +18,12 @@ class MedicineFrequencyInput {
 
 class MedicineController extends BaseController {
   final MedicineRepository _medicineRepository = MedicineRepository();
+  
   // Text Controllers
   final TextEditingController medNameController = TextEditingController();
   final TextEditingController dosageController = TextEditingController();
+  final TextEditingController startDateController = TextEditingController();
+  final TextEditingController endDateController = TextEditingController();
 
   // Observable variables
   final RxString selectedDosage = RxString('');
@@ -29,6 +32,9 @@ class MedicineController extends BaseController {
   final RxString existingImageUrl = RxString('');
   final RxInt editingMedicineId = RxInt(0);
   final RxBool isEditMode = RxBool(false);
+  
+  // Frequency type: 'scheduled' or 'unscheduled'
+  final RxString frequencyType = RxString('scheduled');
 
   // Frequency management
   final RxList<MedicineFrequencyInput> frequencyRows =
@@ -37,13 +43,31 @@ class MedicineController extends BaseController {
   // Dropdown lists
   final List<String> dosageList = ['10mg', '20mg', '40mg', '50mg', '100mg'];
 
-  final List<String> frequencyList = [
-    'Daily',
-    'Weekly',
-    'Monthly',
-    'Hourly',
-    'Custom',
-  ];
+  // Dynamic frequency list based on date range duration
+  List<String> get availableFrequencies {
+    final start = _parseDate(startDateController.text.trim());
+    final end = _parseDate(endDateController.text.trim());
+
+    if (start == null || end == null) {
+      // No valid date range → show all options
+      return ['Daily', 'Every other day', 'Weekly', 'Monthly'];
+    }
+
+    final days = end.difference(start).inDays;
+
+    if (days < 3) {
+      return ['Daily'];
+    } else if (days < 7) {
+      return ['Daily', 'Every other day'];
+    } else if (days <= 30) {
+      return ['Daily', 'Every other day', 'Weekly'];
+    } else {
+      return ['Daily', 'Every other day', 'Weekly', 'Monthly'];
+    }
+  }
+
+  // Keep a static reference for backward compatibility
+  List<String> get frequencyList => availableFrequencies;
 
   final List<String> statusList = ['active', 'inactive'];
 
@@ -52,8 +76,34 @@ class MedicineController extends BaseController {
   @override
   void onInit() {
     super.onInit();
+    // Start with scheduled type and one frequency row
     if (frequencyRows.isEmpty) {
-      addFrequencyRow(); // Start with one row
+      addFrequencyRow();
+    }
+  }
+
+  // Set frequency type (scheduled/unscheduled)
+  void setFrequencyType(String type) {
+    frequencyType.value = type;
+    if (type == 'unscheduled') {
+      // Clear end date immediately — it must NOT persist or be sent to API
+      endDateController.clear();
+      // Clear all frequency rows and set single 'as_per_needed'
+      for (var row in frequencyRows) {
+        row.timeController.dispose();
+      }
+      frequencyRows.clear();
+      final row = MedicineFrequencyInput();
+      row.frequency.value = 'as_per_needed';
+      row.timeController.text = '00:00'; // Dummy time for unscheduled
+      frequencyRows.add(row);
+    } else {
+      // Reset to scheduled with one empty row
+      for (var row in frequencyRows) {
+        row.timeController.dispose();
+      }
+      frequencyRows.clear();
+      addFrequencyRow();
     }
   }
 
@@ -80,6 +130,55 @@ class MedicineController extends BaseController {
 
   void addFrequencyRow() {
     frequencyRows.add(MedicineFrequencyInput());
+  }
+
+  // Check if a specific time is already used by another row with given frequency
+  bool isTimeAlreadyUsed(int currentIndex, String time) {
+    if (time.trim().isEmpty) return false;
+    for (int i = 0; i < frequencyRows.length; i++) {
+      if (i == currentIndex) continue;
+      if (frequencyRows[i].timeController.text.trim() == time.trim()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Parse date string (yyyy-MM-dd) to DateTime
+  DateTime? _parseDate(String dateStr) {
+    if (dateStr.isEmpty) return null;
+    try {
+      return DateTime.parse(dateStr);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Check for duplicate frequency + time combinations
+  bool _hasDuplicateFrequency() {
+    for (int i = 0; i < frequencyRows.length; i++) {
+      for (int j = i + 1; j < frequencyRows.length; j++) {
+        if (frequencyRows[i].frequency.value == frequencyRows[j].frequency.value &&
+            frequencyRows[i].timeController.text.trim() ==
+                frequencyRows[j].timeController.text.trim() &&
+            frequencyRows[i].frequency.value.isNotEmpty &&
+            frequencyRows[i].timeController.text.trim().isNotEmpty) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  // Clear selected frequencies that are no longer valid for current date range
+  void recalculateFrequencies() {
+    final available = availableFrequencies;
+    for (var row in frequencyRows) {
+      if (row.frequency.value.isNotEmpty && !available.contains(row.frequency.value)) {
+        row.frequency.value = '';
+      }
+    }
+    frequencyRows.refresh();
   }
 
   void removeFrequencyRow(int index) {
@@ -126,13 +225,15 @@ class MedicineController extends BaseController {
       if (source == ImageSource.camera) {
         final cameraStatus = await Permission.camera.request();
         if (!cameraStatus.isGranted) {
-          CustomSnackbar.show('Camera permission is required', isSuccess: false);
+          CustomSnackbar.show('Camera permission is required',
+              isSuccess: false);
           return;
         }
       } else {
         final storageStatus = await Permission.storage.request();
         if (!storageStatus.isGranted) {
-          CustomSnackbar.show('Storage permission is required', isSuccess: false);
+          CustomSnackbar.show('Storage permission is required',
+              isSuccess: false);
           return;
         }
       }
@@ -140,7 +241,8 @@ class MedicineController extends BaseController {
       final XFile? image = await _picker.pickImage(source: source);
       if (image != null) {
         selectedImage.value = File(image.path);
-        existingImageUrl.value = ''; // Clear existing URL when new image is selected
+        existingImageUrl.value =
+            ''; // Clear existing URL when new image is selected
       }
     } catch (e) {
       CustomSnackbar.show('Failed to pick image: $e', isSuccess: false);
@@ -154,9 +256,9 @@ class MedicineController extends BaseController {
 
   // Load medicine data for editing
   void loadMedicineData(Medicine medicine) {
-    print('📊 Loading medicine data for editing');
-    print('📸 Medicine attachment: ${medicine.attachment}');
-    
+    debugPrint('📊 Loading medicine data for editing');
+    debugPrint('📸 Medicine attachment: ${medicine.attachment}');
+
     isEditMode.value = true;
     editingMedicineId.value = medicine.id;
 
@@ -165,13 +267,21 @@ class MedicineController extends BaseController {
     selectedDosage.value = medicine.dosage;
     selectedStatus.value = medicine.status;
     
+    // Load dates
+    if (medicine.startDate != null && medicine.startDate!.isNotEmpty) {
+      startDateController.text = medicine.startDate!;
+    }
+    if (medicine.endDate != null && medicine.endDate!.isNotEmpty) {
+      endDateController.text = medicine.endDate!;
+    }
+
     // Load existing image URL if available
     if (medicine.attachment != null && medicine.attachment!.isNotEmpty) {
       existingImageUrl.value = medicine.attachment!;
-      selectedImage.value = null; // Clear local file since we have network image
-      print('✅ Existing image URL set: ${existingImageUrl.value}');
+      selectedImage.value = null;
+      debugPrint('✅ Existing image URL set: ${existingImageUrl.value}');
     } else {
-      print('⚠️ No attachment found');
+      debugPrint('⚠️ No attachment found');
     }
 
     // Clear existing frequency rows
@@ -180,24 +290,36 @@ class MedicineController extends BaseController {
     }
     frequencyRows.clear();
 
-    // Load frequencies
-    for (var freq in medicine.frequencies) {
+    // Determine frequency type and load frequencies
+    if (medicine.frequencies.isNotEmpty && 
+        medicine.frequencies[0].frequency == 'as_per_needed') {
+      // Unscheduled type
+      frequencyType.value = 'unscheduled';
       final row = MedicineFrequencyInput();
-      row.frequency.value = freq.frequency;
-      // Strip seconds from time (19:05:00 -> 19:05)
-      final time = freq.time.split(':');
-      row.timeController.text =
-          time.length >= 2 ? '${time[0]}:${time[1]}' : freq.time;
+      row.frequency.value = 'as_per_needed';
+      row.timeController.text = '00:00';
       frequencyRows.add(row);
+    } else {
+      // Scheduled type
+      frequencyType.value = 'scheduled';
+      for (var freq in medicine.frequencies) {
+        final row = MedicineFrequencyInput();
+        row.frequency.value = freq.frequency;
+        // Strip seconds from time (19:05:00 -> 19:05)
+        final time = freq.time.split(':');
+        row.timeController.text =
+            time.length >= 2 ? '${time[0]}:${time[1]}' : freq.time;
+        frequencyRows.add(row);
+      }
     }
 
-    // Ensure at least one row
+    // Ensure at least one row for scheduled
     if (frequencyRows.isEmpty) {
       addFrequencyRow();
     }
   }
 
-  // Store or Update Medicine
+  // Store or Update Medicine with date validation
   Future<void> storeMedicine() async {
     // Validation
     if (medNameController.text.trim().isEmpty) {
@@ -210,20 +332,45 @@ class MedicineController extends BaseController {
       return;
     }
 
-    if (frequencyRows.isEmpty) {
-      _showBottomSnackBar('Please add at least one frequency');
+    // Validate start date (required)
+    if (startDateController.text.trim().isEmpty) {
+      _showBottomSnackBar('Please select start date');
       return;
     }
 
-    // Validate each frequency row
-    for (int i = 0; i < frequencyRows.length; i++) {
-      if (frequencyRows[i].frequency.value.isEmpty) {
-        _showBottomSnackBar('Please select frequency for row ${i + 1}');
+    // For scheduled, validate end date and frequencies
+    if (frequencyType.value == 'scheduled') {
+      if (frequencyRows.isEmpty) {
+        _showBottomSnackBar('Please add at least one frequency');
         return;
       }
-      if (frequencyRows[i].timeController.text.trim().isEmpty) {
-        _showBottomSnackBar('Please enter time for row ${i + 1}');
+
+      // Validate each frequency row
+      for (int i = 0; i < frequencyRows.length; i++) {
+        if (frequencyRows[i].frequency.value.isEmpty) {
+          _showBottomSnackBar('Please select frequency for row ${i + 1}');
+          return;
+        }
+        if (frequencyRows[i].timeController.text.trim().isEmpty) {
+          _showBottomSnackBar('Please enter time for row ${i + 1}');
+          return;
+        }
+      }
+
+      // Block duplicate frequency + time combinations
+      if (_hasDuplicateFrequency()) {
+        _showBottomSnackBar('Duplicate frequency and time combination is not allowed');
         return;
+      }
+
+      // Validate end date is not before start date
+      if (endDateController.text.trim().isNotEmpty) {
+        final startDate = _parseDate(startDateController.text.trim());
+        final endDate = _parseDate(endDateController.text.trim());
+        if (startDate != null && endDate != null && endDate.isBefore(startDate)) {
+          _showBottomSnackBar('End date cannot be before start date');
+          return;
+        }
       }
     }
 
@@ -235,64 +382,48 @@ class MedicineController extends BaseController {
             ))
         .toList();
 
-    // Create request
+    // Force clear end date for unscheduled — never send it to API
+    final String? endDateValue = frequencyType.value == 'unscheduled'
+        ? null
+        : (endDateController.text.trim().isEmpty ? null : endDateController.text.trim());
+
+    // Create request with dates
     final medicineRequest = StoreMedicineRequest(
       medicineName: medNameController.text.trim(),
       dosage: selectedDosage.value,
       status: selectedStatus.value,
+      startDate: startDateController.text.trim(),
+      endDate: endDateValue,
       attachment: selectedImage.value,
       frequencies: frequencies,
     );
 
-    // Print payload for debugging
-    print('\n🔍 MEDICINE REQUEST PAYLOAD 🔍');
-    print('Medicine Name: ${medicineRequest.medicineName}');
-    print('Dosage: ${medicineRequest.dosage}');
-    print('Status: ${medicineRequest.status}');
-    print('Attachment: ${medicineRequest.attachment?.path ?? 'null'}');
-    print('Frequencies:');
+    // Debug payload
+    debugPrint('\n🔍 MEDICINE REQUEST PAYLOAD 🔍');
+    debugPrint('Medicine Name: ${medicineRequest.medicineName}');
+    debugPrint('Dosage: ${medicineRequest.dosage}');
+    debugPrint('Status: ${medicineRequest.status}');
+    debugPrint('Start Date: ${medicineRequest.startDate}');
+    debugPrint('End Date: ${medicineRequest.endDate ?? "null"}');
+    debugPrint('Frequency Type: ${frequencyType.value}');
+    debugPrint('Attachment: ${medicineRequest.attachment?.path ?? 'null'}');
+    debugPrint('Frequencies:');
     for (int i = 0; i < medicineRequest.frequencies.length; i++) {
-      print('  [$i] Frequency: ${medicineRequest.frequencies[i].frequency}');
-      print('  [$i] Time: ${medicineRequest.frequencies[i].time}');
+      debugPrint(
+          '  [$i] Frequency: ${medicineRequest.frequencies[i].frequency}');
+      debugPrint('  [$i] Time: ${medicineRequest.frequencies[i].time}');
     }
-    print('JSON Payload: ${medicineRequest.toJson()}');
-    print('🔍 END PAYLOAD 🔍\n');
+    debugPrint('🔍 END PAYLOAD 🔍\n');
 
     // Show loading
     setLoading(true);
 
     try {
-      final result;
-      // if (isEditMode.value) {
-      //   print('🔄 UPDATE MODE DETECTED');
-      //   print('🆔 Editing Medicine ID: ${editingMedicineId.value}');
-      //   // Update existing medicine
-      //   final updateRequest = UpdateMedicineRequest(
-      //     id: editingMedicineId.value,
-      //     medicineName: medicineRequest.medicineName,
-      //     dosage: medicineRequest.dosage,
-      //     status: medicineRequest.status,
-      //     attachment: medicineRequest.attachment,
-      //     frequencies: medicineRequest.frequencies,
-      //   );
-      //   print('📤 Calling updateMedicine API...');
-      //   result = await safeApiCall(() => _medicineRepository.updateMedicine(
-      //       updateRequest, editingMedicineId.value));
-      //   print('📥 Update API Response: $result');
-      // }
-      //else {
-      // Create new medicine
-      result = await safeApiCall(
+      final result = await safeApiCall(
           () => _medicineRepository.storeMedicine(medicineRequest));
-      // }
 
       if (result != null) {
-        _showBottomSnackBar(
-            // isEditMode.value
-            //     ? 'Medicine updated successfully!'
-            //:
-            'Medicine added successfully!',
-            isSuccess: true);
+        _showBottomSnackBar('Medicine added successfully!', isSuccess: true);
         _clearAllFields();
         Future.delayed(const Duration(seconds: 1), () {
           Get.back();
@@ -315,7 +446,7 @@ class MedicineController extends BaseController {
     }
   }
 
-  // Update Medicine
+  // Update Medicine with date fields
   Future<void> updateMedicine(int medicineId) async {
     // Validation
     if (medNameController.text.trim().isEmpty) {
@@ -328,20 +459,45 @@ class MedicineController extends BaseController {
       return;
     }
 
-    if (frequencyRows.isEmpty) {
-      _showBottomSnackBar('Please add at least one frequency');
+    // Validate start date (required)
+    if (startDateController.text.trim().isEmpty) {
+      _showBottomSnackBar('Please select start date');
       return;
     }
 
-    // Validate each frequency row
-    for (int i = 0; i < frequencyRows.length; i++) {
-      if (frequencyRows[i].frequency.value.isEmpty) {
-        _showBottomSnackBar('Please select frequency for row ${i + 1}');
+    // For scheduled, validate frequencies
+    if (frequencyType.value == 'scheduled') {
+      if (frequencyRows.isEmpty) {
+        _showBottomSnackBar('Please add at least one frequency');
         return;
       }
-      if (frequencyRows[i].timeController.text.trim().isEmpty) {
-        _showBottomSnackBar('Please enter time for row ${i + 1}');
+
+      // Validate each frequency row
+      for (int i = 0; i < frequencyRows.length; i++) {
+        if (frequencyRows[i].frequency.value.isEmpty) {
+          _showBottomSnackBar('Please select frequency for row ${i + 1}');
+          return;
+        }
+        if (frequencyRows[i].timeController.text.trim().isEmpty) {
+          _showBottomSnackBar('Please enter time for row ${i + 1}');
+          return;
+        }
+      }
+
+      // Block duplicate frequency + time combinations
+      if (_hasDuplicateFrequency()) {
+        _showBottomSnackBar('Duplicate frequency and time combination is not allowed');
         return;
+      }
+
+      // Validate end date is not before start date
+      if (endDateController.text.trim().isNotEmpty) {
+        final startDate = _parseDate(startDateController.text.trim());
+        final endDate = _parseDate(endDateController.text.trim());
+        if (startDate != null && endDate != null && endDate.isBefore(startDate)) {
+          _showBottomSnackBar('End date cannot be before start date');
+          return;
+        }
       }
     }
 
@@ -353,16 +509,23 @@ class MedicineController extends BaseController {
             ))
         .toList();
 
-    // Create request
+    // Force clear end date for unscheduled — never send it to API
+    final String? updateEndDateValue = frequencyType.value == 'unscheduled'
+        ? null
+        : (endDateController.text.trim().isEmpty ? null : endDateController.text.trim());
+
+    // Create request with dates
     final updateRequest = UpdateMedicineRequest(
       id: medicineId,
       medicineName: medNameController.text.trim(),
       dosage: selectedDosage.value,
       status: selectedStatus.value,
+      startDate: startDateController.text.trim(),
+      endDate: updateEndDateValue,
       attachment: selectedImage.value,
       frequencies: frequencies,
     );
-    print('update request is ${updateRequest.toJson()}');
+    debugPrint('update request is ${updateRequest.toJson()}');
 
     // Show loading
     setLoading(true);
@@ -445,8 +608,11 @@ class MedicineController extends BaseController {
   void _clearAllFields() {
     medNameController.clear();
     dosageController.clear();
+    startDateController.clear();
+    endDateController.clear();
     selectedDosage.value = '';
     selectedStatus.value = 'active';
+    frequencyType.value = 'scheduled';
     isEditMode.value = false;
     editingMedicineId.value = 0;
     // Clear frequency rows
@@ -464,6 +630,8 @@ class MedicineController extends BaseController {
     _clearAllFields();
     medNameController.dispose();
     dosageController.dispose();
+    startDateController.dispose();
+    endDateController.dispose();
     for (var row in frequencyRows) {
       row.timeController.dispose();
     }

@@ -57,65 +57,148 @@ class _EditSummaryDialogState extends State<EditSummaryDialog>
   Widget build(BuildContext context) {
     return ScaleTransition(
       scale: _scaleAnimation,
-      child: AlertDialog(
-        backgroundColor: AppColors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-        title: Text(
-          "Edit Summary",
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: AppColors.headingTextColor,
+      child: Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding:
+            EdgeInsets.symmetric(horizontal: context.percentWidth * 5),
+        child: Container(
+          width: context.screenWidth * 0.9,
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
-        ),
-        content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CustomTxtField(
-                textEditingController: widget.controller,
-                hintTxt: 'Enter summary text...',
-                maxLines: 7,
+              // Header
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.primary,
+                      AppColors.primary.withOpacity(0.8),
+                    ],
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.edit_note_rounded,
+                      color: AppColors.white,
+                      size: context.percentWidth * 6,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      "Edit Summary",
+                      style: TextStyle(
+                        fontSize: context.percentWidth * 4.5,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Content
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Summary Text",
+                      style: TextStyle(
+                        fontSize: context.percentWidth * 3.5,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.headingTextColor,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.cardGray.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.primary.withOpacity(0.2),
+                        ),
+                      ),
+                      child: CustomTxtField(
+                        textEditingController: widget.controller,
+                        hintTxt: 'Enter summary text...',
+                        maxLines: 6,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    // Buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: context.percentWidth * 4,
+                              vertical: 8,
+                            ),
+                          ),
+                          child: Text(
+                            "Cancel",
+                            style: TextStyle(
+                              color: AppColors.textColor,
+                              fontSize: context.percentWidth * 3.5,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          onPressed: () {
+                            widget.onUpdate();
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: context.percentWidth * 5,
+                              vertical: 8,
+                            ),
+                            elevation: 0,
+                            minimumSize: Size(0, 0),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Text(
+                            "Update",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.white,
+                              fontSize: context.percentWidth * 3.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              "Cancel",
-              style: TextStyle(
-                color: AppColors.textColor,
-                fontSize: 14,
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              widget.onUpdate();
-              Navigator.pop(context);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            ),
-            child: Text(
-              "Update",
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: AppColors.white,
-                fontSize: 14,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

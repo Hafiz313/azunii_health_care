@@ -43,7 +43,10 @@ class CustomDropdown extends StatelessWidget {
           onTap: () {
             // Unfocus any active text fields before showing picker
             FocusScope.of(context).unfocus();
-            _showPicker(context);
+            _showPicker(context).then((_) {
+              // Re-unfocus after sheet closes to prevent focus returning to text field
+              FocusScope.of(context).unfocus();
+            });
           },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -81,10 +84,10 @@ class CustomDropdown extends StatelessWidget {
     );
   }
 
-  void _showPicker(BuildContext context) {
+  Future<void> _showPicker(BuildContext context) {
     final TextEditingController customController = TextEditingController();
 
-    showModalBottomSheet(
+    return showModalBottomSheet(
       context: context,
       backgroundColor: AppColors.white,
       isScrollControlled: true,
@@ -93,14 +96,16 @@ class CustomDropdown extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => Container(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.6,
+      builder: (sheetContext) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
         ),
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+        child: Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(sheetContext).size.height * 0.6,
+          ),
+          padding: const EdgeInsets.all(20),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
             Container(
               width: 40,
               height: 4,
@@ -185,8 +190,8 @@ class CustomDropdown extends StatelessWidget {
                   );
                 },
               ),
-            ),
-          ],
+            )
+          ]),
         ),
       ),
     );

@@ -74,99 +74,114 @@ class _AddVisitViewState extends State<AddVisitView> {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => OverlayLoader(
-        isLoading: controller.isLoading.value,
-        child: Scaffold(
-          backgroundColor: AppColors.white,
-          body: SafeArea(
-            child: Column(
-              children: [
-                CustomAppBar(
-                  isOndashboard: widget.isOndashboard ?? true,
-                  title: Lang.addVisit,
-                ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 10),
-                        _buildHeading(context),
-                        const SizedBox(height: 10),
-                        CustomTxtField(
-                          title: Lang.ProviderName,
-                          textEditingController:
-                              controller.providerNameController,
-                          hintTxt: Lang.enterProviderName,
-                          prefixIcon: const Icon(
-                            Icons.person_outline,
-                            color: AppColors.textColor,
-                            size: 16,
+    return PopScope(
+        canPop: true,
+        onPopInvoked: (didPop) {
+          if (didPop) {
+            // Only clear fields when user manually navigates back
+            Future.delayed(const Duration(milliseconds: 100), () {
+              if (Get.isRegistered<VisitsController>()) {
+                controller.clearAllFields();
+              }
+            });
+          }
+        },
+        child: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Obx(() => OverlayLoader(
+              isLoading: controller.isLoading.value,
+              child: Scaffold(
+                backgroundColor: AppColors.white,
+                body: SafeArea(
+                  child: Column(
+                    children: [
+                      CustomAppBar(
+                        isOndashboard: widget.isOndashboard ?? true,
+                        title: Lang.addVisit,
+                      ),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 10),
+                              _buildHeading(context),
+                              const SizedBox(height: 10),
+                              CustomTxtField(
+                                title: Lang.ProviderName,
+                                textEditingController:
+                                    controller.providerNameController,
+                                hintTxt: Lang.enterProviderName,
+                                prefixIcon: const Icon(
+                                  Icons.person_outline,
+                                  color: AppColors.textColor,
+                                  size: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              Obx(() => CustomDropdown(
+                                    label: Lang.specialty,
+                                    hintText: Lang.selectSpecialty,
+                                    items: const [
+                                      'Cardiologist',
+                                      'Neurologist',
+                                      'Dermatologist',
+                                      'Pediatrician',
+                                      'Orthopedic',
+                                    ],
+                                    selectedValue:
+                                        controller.selectedSpecialty.value.isEmpty
+                                            ? null
+                                            : controller.selectedSpecialty.value,
+                                    onChanged: controller.setSpecialty,
+                                    prefixIcon: const Icon(
+                                      Icons.settings_outlined,
+                                      size: 18,
+                                      color: AppColors.textColor,
+                                    ),
+                                  )),
+                              const SizedBox(height: 20),
+                              Obx(() => CustomDatePicker(
+                                    label: Lang.date,
+                                    hintText: Lang.selectDate,
+                                    selectedDate: controller.selectedDate.value,
+                                    onChanged: controller.setDate,
+                                  )),
+                              const SizedBox(height: 20),
+                              CustomTxtField(
+                                title: Lang.notes,
+                                textEditingController: controller.notesController,
+                                hintTxt: Lang.writeDescription,
+                                maxLines: 4,
+                              ),
+                              const SizedBox(height: 24),
+                              UploadSectionWidget(
+                                headerIcon: Icons.upload,
+                                title: Lang.photoDocumentUpload,
+                                subtitle: Lang.selectAndUploadPhoto,
+                                onTap: controller.showImagePickerDialog,
+                                selectedImage: controller.selectedImage,
+                              ),
+                              const SizedBox(height: 24),
+                              AppElevatedButton(
+                                onPressed: controller.saveVisit,
+                                title: Lang.save,
+                                backgroundColor: AppColors.primary,
+                                width: double.infinity,
+                              ),
+                              SizedBox(
+                                height: 12,
+                              )
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 20),
-                        Obx(() => CustomDropdown(
-                              label: Lang.specialty,
-                              hintText: Lang.selectSpecialty,
-                              items: const [
-                                'Cardiologist',
-                                'Neurologist',
-                                'Dermatologist',
-                                'Pediatrician',
-                                'Orthopedic',
-                              ],
-                              selectedValue:
-                                  controller.selectedSpecialty.value.isEmpty
-                                      ? null
-                                      : controller.selectedSpecialty.value,
-                              onChanged: controller.setSpecialty,
-                              prefixIcon: const Icon(
-                                Icons.settings_outlined,
-                                size: 18,
-                                color: AppColors.textColor,
-                              ),
-                            )),
-                        const SizedBox(height: 20),
-                        Obx(() => CustomDatePicker(
-                              label: Lang.date,
-                              hintText: Lang.selectDate,
-                              selectedDate: controller.selectedDate.value,
-                              onChanged: controller.setDate,
-                            )),
-                        const SizedBox(height: 20),
-                        CustomTxtField(
-                          title: Lang.notes,
-                          textEditingController: controller.notesController,
-                          hintTxt: Lang.writeDescription,
-                          maxLines: 4,
-                        ),
-                        const SizedBox(height: 24),
-                        UploadSectionWidget(
-                          headerIcon: Icons.upload,
-                          title: Lang.photoDocumentUpload,
-                          subtitle: Lang.selectAndUploadPhoto,
-                          onTap: controller.showImagePickerDialog,
-                          selectedImage: controller.selectedImage,
-                        ),
-                        const SizedBox(height: 24),
-                        AppElevatedButton(
-                          onPressed: controller.saveVisit,
-                          title: Lang.save,
-                          backgroundColor: AppColors.primary,
-                          width: double.infinity,
-                        ),
-                        SizedBox(
-                          height: 12,
-                        )
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ),
-        )));
+              ))),
+        ));
   }
 
   Widget _buildHeading(BuildContext context) {

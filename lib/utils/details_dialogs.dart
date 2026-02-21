@@ -14,7 +14,9 @@ class DetailsDialogs {
     Get.dialog(
       Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24),
         child: Container(
+          width: double.infinity,
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: AppColors.white,
@@ -53,7 +55,8 @@ class DetailsDialogs {
                   _buildDetailRow('Updated By', visit.updatedBy!.name),
                 _buildDetailRow('Created At', formatDate(visit.createdAt)),
                 _buildDetailRow('Updated At', formatDate(visit.updatedAt)),
-                if (visit.attachment != null && visit.attachment!.isNotEmpty) ...[
+                if (visit.attachment != null &&
+                    visit.attachment!.isNotEmpty) ...[
                   const SizedBox(height: 16),
                   Text(
                     'Attachment:',
@@ -156,7 +159,9 @@ class DetailsDialogs {
     Get.dialog(
       Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24),
         child: Container(
+          width: double.infinity,
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: AppColors.white,
@@ -188,17 +193,19 @@ class DetailsDialogs {
                 _buildDetailRow('Name', medicine.medicineName),
                 _buildDetailRow('Dosage', medicine.dosage),
                 _buildDetailRow('Status', medicine.status),
-                _buildDetailRow('Interaction Flag', medicine.interactionFlag),
+                // _buildDetailRow('Interaction Flag', medicine.interactionFlag),
                 if (medicine.interactionMessage != null)
                   _buildDetailRow(
                       'Interaction Message', medicine.interactionMessage!),
                 if (medicine.interactionDetails != null)
-                  _buildDetailRow(
-                      'Interaction Details', medicine.interactionDetails!),
-                if (medicine.updatedBy != null)
-                  _buildDetailRow('Updated By', medicine.updatedBy!),
-                _buildDetailRow('Created At', formatDate(medicine.createdAt)),
-                _buildDetailRow('Updated At', formatDate(medicine.updatedAt)),
+                  // _buildDetailRow(
+                  //     'Interaction Details', medicine.interactionDetails!),
+                  if (medicine.updatedBy != null)
+                    _buildDetailRow('Updated By', medicine.updatedBy!),
+                if (medicine.startDate != null)
+                  _buildDetailRow('Start Date', formatDate(medicine.startDate!)),
+                if (medicine.endDate != null)
+                  _buildDetailRow('End Date', formatDate(medicine.endDate!)),
                 if (medicine.frequencies.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   Text(
@@ -210,7 +217,10 @@ class DetailsDialogs {
                   ),
                   const SizedBox(height: 8),
                   ...medicine.frequencies.map((freq) => _buildDetailRow(
-                      '${freq.frequency}', convertTo12HourFormat(freq.time))),
+                      '${freq.frequency}',
+                      freq.frequency.toLowerCase() == 'as_per_needed'
+                          ? 'When Required'
+                          : convertTo12HourFormat(freq.time))),
                 ],
                 if (medicine.attachment != null &&
                     medicine.attachment!.isNotEmpty) ...[
@@ -343,7 +353,8 @@ class DetailsDialogs {
                               if (loadingProgress == null) return child;
                               return Center(
                                 child: CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes != null
+                                  value: loadingProgress.expectedTotalBytes !=
+                                          null
                                       ? loadingProgress.cumulativeBytesLoaded /
                                           loadingProgress.expectedTotalBytes!
                                       : null,
@@ -417,7 +428,7 @@ class DetailsDialogs {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 80,
+            width: 120,
             child: Text(
               '$label:',
               style: TextStyle(
@@ -441,32 +452,28 @@ class DetailsDialogs {
   }
 
   /// Converts 24-hour time format to 12-hour format with AM/PM
-  /// Example: "14:30" -> "2:30 PM", "09:15" -> "9:15 AM"
+  /// Handles both "HH:MM" and "HH:MM:SS" formats
+  /// Example: "14:30:00" -> "2:30 PM", "09:15" -> "9:15 AM"
   static String convertTo12HourFormat(String time24) {
     try {
-      // Handle empty or invalid input
       if (time24.isEmpty) return time24;
-      
-      // Split the time string
+
       final parts = time24.split(':');
-      if (parts.length != 2) return time24;
-      
+      if (parts.length < 2) return time24;
+
       int hour = int.parse(parts[0]);
       String minute = parts[1];
-      
-      // Determine AM/PM
+
       String period = hour >= 12 ? 'PM' : 'AM';
-      
-      // Convert hour to 12-hour format
+
       if (hour == 0) {
-        hour = 12; // Midnight
+        hour = 12;
       } else if (hour > 12) {
         hour = hour - 12;
       }
-      
+
       return '$hour:$minute $period';
     } catch (e) {
-      // If parsing fails, return original time
       return time24;
     }
   }

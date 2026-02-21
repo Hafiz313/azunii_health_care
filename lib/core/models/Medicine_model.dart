@@ -12,6 +12,8 @@ class Medicine {
   final String? attachment;
   final String createdBy;
   final String? updatedBy;
+  final String? startDate; // New: Start date for medication
+  final String? endDate; // New: End date for medication (optional)
   final List<MedicineFrequency> frequencies;
   final String createdAt;
   final String updatedAt;
@@ -28,6 +30,8 @@ class Medicine {
     this.attachment,
     required this.createdBy,
     this.updatedBy,
+    this.startDate,
+    this.endDate,
     required this.frequencies,
     required this.createdAt,
     required this.updatedAt,
@@ -46,6 +50,8 @@ class Medicine {
       attachment: json['attachment'],
       createdBy: json['created_by']?.toString() ?? '',
       updatedBy: json['updated_by']?.toString(),
+      startDate: json['start_date'],
+      endDate: json['end_date'],
       frequencies: (json['frequencies'] as List<dynamic>? ?? [])
           .map((freq) => MedicineFrequency.fromJson(freq))
           .toList(),
@@ -175,10 +181,13 @@ class MedicineFrequency {
   }
 }
 
+// Request model for storing new medicine
 class StoreMedicineRequest {
   final String medicineName;
   final String dosage;
   final String status;
+  final String startDate; // Required: Start date in yyyy-MM-dd format
+  final String? endDate; // Optional: End date in yyyy-MM-dd format
   final File? attachment;
   final List<MedicineFrequency> frequencies;
 
@@ -186,6 +195,8 @@ class StoreMedicineRequest {
     required this.medicineName,
     required this.dosage,
     required this.status,
+    required this.startDate,
+    this.endDate,
     this.attachment,
     required this.frequencies,
   });
@@ -195,17 +206,22 @@ class StoreMedicineRequest {
       'medicine_name': medicineName,
       'dosage': dosage,
       'status': status,
+      'start_date': startDate,
+      if (endDate != null && endDate!.isNotEmpty) 'end_date': endDate,
       if (attachment != null) 'attachment': attachment,
       'frequencies': frequencies.map((freq) => freq.toJson()).toList(),
     };
   }
 }
 
+// Request model for updating existing medicine
 class UpdateMedicineRequest {
   final int id;
   final String medicineName;
   final String dosage;
   final String status;
+  final String startDate; // Required: Start date in yyyy-MM-dd format
+  final String? endDate; // Optional: End date in yyyy-MM-dd format
   final File? attachment;
   final List<MedicineFrequency> frequencies;
 
@@ -214,6 +230,8 @@ class UpdateMedicineRequest {
     required this.medicineName,
     required this.dosage,
     required this.status,
+    required this.startDate,
+    this.endDate,
     this.attachment,
     required this.frequencies,
   });
@@ -224,6 +242,8 @@ class UpdateMedicineRequest {
       'medicine_name': medicineName,
       'dosage': dosage,
       'status': status,
+      'start_date': startDate,
+      if (endDate != null && endDate!.isNotEmpty) 'end_date': endDate,
       if (attachment != null) 'attachment': attachment,
       'frequencies': frequencies.map((freq) => freq.toJson()).toList(),
     };

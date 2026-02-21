@@ -161,13 +161,15 @@ class VisitsController extends BaseController {
     if (result != null) {
       _showBottomSnackBar('Visit updated successfully!', isSuccess: true);
 
-      // Clear all fields immediately after success
-      _clearAllFields();
-
-      // Close screen after delay
-      Future.delayed(const Duration(seconds: 1), () {
+      // Navigate back first, then clear fields
+      await Future.delayed(const Duration(milliseconds: 800));
+      
+      if (Get.isRegistered<VisitsController>()) {
         Get.back();
-      });
+        // Clear fields after navigation
+        await Future.delayed(const Duration(milliseconds: 100));
+        clearAllFields();
+      }
     }
   }
 
@@ -208,13 +210,15 @@ class VisitsController extends BaseController {
     if (result != null) {
       _showBottomSnackBar('Visit saved successfully!', isSuccess: true);
 
-      // Clear all fields immediately after success
-      _clearAllFields();
-
-      // Close after delay
-      Future.delayed(const Duration(seconds: 1), () {
+      // Navigate back first, then clear fields
+      await Future.delayed(const Duration(milliseconds: 800));
+      
+      if (Get.isRegistered<VisitsController>()) {
         Get.back();
-      });
+        // Clear fields after navigation
+        await Future.delayed(const Duration(milliseconds: 100));
+        clearAllFields();
+      }
     }
   }
 
@@ -222,7 +226,7 @@ class VisitsController extends BaseController {
     CustomSnackbar.show(message, isSuccess: isSuccess);
   }
 
-  void _clearAllFields() {
+  void clearAllFields() {
     providerNameController.clear();
     notesController.clear();
     selectedSpecialty.value = '';
@@ -235,7 +239,7 @@ class VisitsController extends BaseController {
 
   @override
   void onClose() {
-    _clearAllFields();
+    clearAllFields();
     providerNameController.dispose();
     notesController.dispose();
     super.onClose();

@@ -13,8 +13,8 @@ import '../../widget/Common_widgets/overlayloader.dart';
 
 class Settingsview extends StatefulWidget {
   static const String routeName = '/settings-caregiver';
-
-  const Settingsview({super.key});
+  final bool isOnDashboard;
+  const Settingsview({super.key, this.isOnDashboard = false});
 
   @override
   State<Settingsview> createState() => _SettingsviewState();
@@ -56,6 +56,7 @@ class _SettingsviewState extends State<Settingsview> {
                 children: [
                   CustomAppBar(
                     title: 'Profile',
+                    isOndashboard: widget.isOnDashboard ?? false,
                   ),
                   Expanded(
                     child: SingleChildScrollView(
@@ -139,7 +140,8 @@ class _SettingsviewState extends State<Settingsview> {
       ),
       child: Row(
         children: [
-          Icon(icon, color: AppColors.primary, size: context.screenWidth * 0.05),
+          Icon(icon,
+              color: AppColors.primary, size: context.screenWidth * 0.05),
           SizedBox(width: context.screenWidth * 0.03),
           Text(
             label,
@@ -189,7 +191,8 @@ class _SettingsviewState extends State<Settingsview> {
               _buildTextField(context, 'Email', controller.emailController,
                   enabled: isEditMode.value),
               SizedBox(height: context.screenHeight * 0.015),
-              _buildTextField(context, 'Password', controller.passwordController,
+              _buildTextField(
+                  context, 'Password', controller.passwordController,
                   isPassword: true, enabled: isEditMode.value),
               SizedBox(height: context.screenHeight * 0.015),
               _buildTextField(context, 'Confirm Password',
@@ -329,7 +332,8 @@ class _SettingsviewState extends State<Settingsview> {
   void _showDeleteAccountConfirmation(SettingsController controller) {
     _showConfirmationDialog(
       title: 'Delete Account',
-      message: 'Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed.',
+      message:
+          'Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed.',
       confirmText: 'Delete',
       confirmColor: Colors.red,
       onConfirm: () {

@@ -28,13 +28,13 @@ class TodayTaskCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: backgroundColor.withValues(alpha: 1.2),
+          color: backgroundColor.withOpacity(0.6),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: [
             CircleAvatar(
-              backgroundColor: backgroundColor,
+              backgroundColor: backgroundColor.withOpacity(1),
               radius: 18,
               child: Center(child: icon),
             ),
@@ -50,9 +50,11 @@ class TodayTaskCard extends StatelessWidget {
             ),
             subText5(
               fontWeight: FontWeight.w500,
-              status ?? (isCompleted ? Lang.completed : 'Active'),
+              status ?? (isCompleted ? 'Active' : 'InActive'),
               fontSize: 12,
-              color: isCompleted ? AppColors.green : AppColors.primary,
+              color: isCompleted
+                  ? const Color.fromARGB(255, 255, 0, 0)
+                  : AppColors.primary,
               align: TextAlign.start,
             ),
           ],

@@ -57,12 +57,10 @@ class CustomAppBar extends StatelessWidget {
 
           // Trailing icon (e.g. bell)
           GestureDetector(
-            onTap: onIconTap ??
-                () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const NotificationView()),
-                    ),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const NotificationView()),
+            ),
             child: Container(
               width: MediaQuery.of(context).size.width * 0.11,
               height: MediaQuery.of(context).size.width * 0.11,

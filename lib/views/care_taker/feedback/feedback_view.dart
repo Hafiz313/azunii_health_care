@@ -18,7 +18,8 @@ class FeedbackView extends StatefulWidget {
   State<FeedbackView> createState() => _FeedbackViewState();
 }
 
-class _FeedbackViewState extends State<FeedbackView> with AutomaticKeepAliveClientMixin {
+class _FeedbackViewState extends State<FeedbackView>
+    with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => false;
 
@@ -40,7 +41,7 @@ class _FeedbackViewState extends State<FeedbackView> with AutomaticKeepAliveClie
   Widget build(BuildContext context) {
     super.build(context);
     final controller = Get.find<FeedbackController>();
-    
+
     return Obx(() => OverlayLoader(
           isLoading: controller.isLoading.value,
           child: _buildScaffold(context, controller),
@@ -54,7 +55,7 @@ class _FeedbackViewState extends State<FeedbackView> with AutomaticKeepAliveClie
         child: Column(
           children: [
             CustomAppBar(
-              isOndashboard: true,
+              isOndashboard: false,
               title: 'User Feedback',
             ),
             Expanded(

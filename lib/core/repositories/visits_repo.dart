@@ -30,12 +30,13 @@ class VisitsRepository {
     }
   }
 
-  // Get Patient Visits
-  Future<VisitResponse> getVisits() async {
+  // Get Patient Visits (with optional page parameter)
+  Future<VisitResponse> getVisits({int page = 1}) async {
     try {
-      debugPrint('\n📋 GET VISITS Request 📋');
-      final response = await ApiClient.getWithAuth(Apis.getPatientVisits);
-      debugPrint('📄 Visits Response: Retrieved patient visits\n');
+      debugPrint('\n📋 GET VISITS Request 📋 (page: $page)');
+      final endpoint = '${Apis.getPatientVisits}?page=$page';
+      final response = await ApiClient.getWithAuth(endpoint);
+      debugPrint('📄 Visits Response: Retrieved patient visits (page: $page)\n');
       return VisitResponse.fromJson(response);
     } catch (e) {
       debugPrint('❌ Get Visits Error: $e');
@@ -43,13 +44,23 @@ class VisitsRepository {
     }
   }
 
-  // Get Visits List Only
+  // Get Visits List Only (first page)
   Future<List<VisitModel>> getVisitsList() async {
     try {
       final visitResponse = await getVisits();
       return visitResponse.visits;
     } catch (e) {
       debugPrint('❌ Get Visits List Error: $e');
+      rethrow;
+    }
+  }
+
+  // Get Visits Page with full pagination response
+  Future<VisitResponse> getVisitsPage(int page) async {
+    try {
+      return await getVisits(page: page);
+    } catch (e) {
+      debugPrint('❌ Get Visits Page Error: $e');
       rethrow;
     }
   }

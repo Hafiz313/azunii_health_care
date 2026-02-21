@@ -23,7 +23,7 @@ class CareTakerDashboard extends StatelessWidget {
       const HomeView_caregiver(),
       const Medication_caretaker(),
       const Notesview(),
-      const FeedbackView(),
+      //const FeedbackView(),
       const FAQsView(),
       const Settingsview(),
     ];

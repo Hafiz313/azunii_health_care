@@ -4,12 +4,13 @@ import '../../networking/api_ref.dart';
 import '../models/Medicine_model.dart';
 
 class MedicineRepository {
-  // Get Patient Medicines
-  Future<MedicineListResponse> getMedicines() async {
+  // Get Patient Medicines (with optional page parameter)
+  Future<MedicineListResponse> getMedicines({int page = 1}) async {
     try {
-      print('\n💊 GET MEDICINES Request 💊');
-      final response = await ApiClient.getWithAuth(Apis.getPatientMedicines);
-      print('📄 Medicines Response: Retrieved patient medicines\n');
+      print('\n💊 GET MEDICINES Request 💊 (page: $page)');
+      final endpoint = '${Apis.getPatientMedicines}?page=$page';
+      final response = await ApiClient.getWithAuth(endpoint);
+      print('📄 Medicines Response: Retrieved patient medicines (page: $page)\n');
       return MedicineListResponse.fromJson(response);
     } catch (e) {
       print('❌ Get Medicines Error: $e');
@@ -17,7 +18,7 @@ class MedicineRepository {
     }
   }
 
-  // Get Medicines List Only
+  // Get Medicines List Only (first page)
   Future<List<Medicine>> getMedicinesList() async {
     try {
       final medicineResponse = await getMedicines();
@@ -28,13 +29,25 @@ class MedicineRepository {
     }
   }
 
-  // Store Patient Medicine
+  // Get Medicines Page with full pagination response
+  Future<MedicineListResponse> getMedicinesPage(int page) async {
+    try {
+      return await getMedicines(page: page);
+    } catch (e) {
+      print('❌ Get Medicines Page Error: $e');
+      rethrow;
+    }
+  }
+
+  // Store Patient Medicine with start_date and end_date
   Future<Map<String, dynamic>> storeMedicine(
       StoreMedicineRequest medicineRequest) async {
     try {
       print('\n💾 STORE MEDICINE Request 💾');
       print('💊 Medicine: ${medicineRequest.medicineName}');
       print('📏 Dosage: ${medicineRequest.dosage}');
+      print('📅 Start Date: ${medicineRequest.startDate}');
+      print('📅 End Date: ${medicineRequest.endDate ?? "Not provided"}');
 
       final fields = <String, String>{};
 
@@ -42,6 +55,10 @@ class MedicineRepository {
       fields['medicine_name'] = medicineRequest.medicineName;
       fields['dosage'] = medicineRequest.dosage;
       fields['status'] = medicineRequest.status;
+      fields['start_date'] = medicineRequest.startDate;
+      if (medicineRequest.endDate != null && medicineRequest.endDate!.isNotEmpty) {
+        fields['end_date'] = medicineRequest.endDate!;
+      }
 
       // Add frequencies in the format: frequencies[0][frequency], frequencies[0][time]
       for (int i = 0; i < medicineRequest.frequencies.length; i++) {
@@ -81,7 +98,7 @@ class MedicineRepository {
     }
   }
 
-  // Update Patient Medicine
+  // Update Patient Medicine with start_date and end_date
   Future<Map<String, dynamic>> updateMedicine(
       UpdateMedicineRequest medicineRequest, int medicineId) async {
     try {
@@ -91,15 +108,19 @@ class MedicineRepository {
       print('🔗 Update URL: $updateUrl');
       print('🔗 Full URL: ${Apis.baseUrl}$updateUrl');
       print('💊 Medicine: ${medicineRequest.medicineName}');
+      print('📅 Start Date: ${medicineRequest.startDate}');
+      print('📅 End Date: ${medicineRequest.endDate ?? "Not provided"}');
 
       final fields = <String, String>{};
-
-      // Add method override for Laravel
 
       fields['id'] = medicineId.toString();
       fields['medicine_name'] = medicineRequest.medicineName;
       fields['dosage'] = medicineRequest.dosage;
       fields['status'] = medicineRequest.status;
+      fields['start_date'] = medicineRequest.startDate;
+      if (medicineRequest.endDate != null && medicineRequest.endDate!.isNotEmpty) {
+        fields['end_date'] = medicineRequest.endDate!;
+      }
 
       // Add frequencies in the format: frequencies[0][frequency], frequencies[0][time]
       for (int i = 0; i < medicineRequest.frequencies.length; i++) {

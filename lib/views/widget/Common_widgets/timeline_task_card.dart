@@ -21,6 +21,7 @@ class TimelineTaskCard extends StatelessWidget {
     final String title = isSchedule
         ? (item as MedicineSchedule).medicineName
         : (item as TimelineEvent).title;
+    final String rawFrequency = isSchedule ? (item as MedicineSchedule).frequency : '';
     final String time = isSchedule
         ? _formatTime((item as MedicineSchedule).time)
         : _formatTimestamp((item as TimelineEvent).timestamp);
@@ -31,7 +32,8 @@ class TimelineTaskCard extends StatelessWidget {
         ? (item as MedicineSchedule).dosage
         : (item as TimelineEvent).subtitle;
     final String? frequency =
-        isSchedule ? (item as MedicineSchedule).frequency : null;
+        isSchedule ? _formatFrequencyText(rawFrequency) : null;
+    final bool showTime = !(isSchedule && rawFrequency.toLowerCase() == 'as_per_needed');
 
     final cardStyle = _getCardStyle(type, status);
     final displayBgColor = bgColor ?? cardStyle['bgColor'];
@@ -84,23 +86,45 @@ class TimelineTaskCard extends StatelessWidget {
                     align: TextAlign.start,
                   ),
                 ],
+                // Status row
+                if (status.isNotEmpty) ...[
+                  Row(
+                    children: [
+                      Icon(
+                        status == 'completed' ? Icons.check_circle : Icons.pending,
+                        size: context.screenWidth * 0.033,
+                        color: status == 'completed' ? AppColors.green : Colors.orange,
+                      ),
+                      SizedBox(width: context.screenWidth * 0.015),
+                      subText5(
+                        _formatFrequencyText(status),
+                        fontSize: context.screenWidth * 0.025,
+                        fontWeight: FontWeight.w400,
+                        color: status == 'completed' ? AppColors.green : Colors.orange,
+                        align: TextAlign.start,
+                      ),
+                    ],
+                  ),
+                ],
                 Row(
                   children: [
-                    Icon(
-                      Icons.access_time,
-                      size: context.screenWidth * 0.033,
-                      color: AppColors.textColor,
-                    ),
-                    SizedBox(width: context.screenWidth * 0.015),
-                    subText5(
-                      time,
-                      fontSize: context.screenWidth * 0.028,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.textColor,
-                      align: TextAlign.start,
-                    ),
+                    if (showTime) ...[
+                      Icon(
+                        Icons.access_time,
+                        size: context.screenWidth * 0.033,
+                        color: AppColors.textColor,
+                      ),
+                      SizedBox(width: context.screenWidth * 0.015),
+                      subText5(
+                        time,
+                        fontSize: context.screenWidth * 0.028,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.textColor,
+                        align: TextAlign.start,
+                      ),
+                    ],
                     if (frequency != null) ...[
-                      SizedBox(width: context.screenWidth * 0.03),
+                      if (showTime) SizedBox(width: context.screenWidth * 0.03),
                       Container(
                         padding: EdgeInsets.symmetric(
                             horizontal: context.screenWidth * 0.02,
@@ -166,11 +190,44 @@ class TimelineTaskCard extends StatelessWidget {
     }
   }
 
+  String _formatFrequencyText(String raw) {
+    switch (raw.toLowerCase()) {
+      case 'daily':
+        return 'Daily';
+      case 'weekly':
+        return 'Weekly';
+      case 'monthly':
+        return 'Monthly';
+      case 'every_other_day':
+        return 'Every Other Day';
+      case 'as_per_needed':
+        return 'As Per Needed';
+      case 'completed':
+        return 'Completed';
+      case 'pending':
+        return 'Pending';
+      case 'missed':
+        return 'Missed';
+      case 'skipped':
+        return 'Skipped';
+      default:
+        // Title-case any unknown values
+        return raw.replaceAll('_', ' ').split(' ')
+            .map((w) => w.isEmpty ? w : '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}')
+            .join(' ');
+    }
+  }
+
   String _formatTime(String time) {
     if (time.contains(':')) {
       final parts = time.split(':');
       if (parts.length >= 2) {
-        return '${parts[0]}:${parts[1]}';
+        int hour = int.tryParse(parts[0]) ?? 0;
+        final minute = parts[1];
+        final period = hour >= 12 ? 'PM' : 'AM';
+        if (hour == 0) hour = 12;
+        if (hour > 12) hour -= 12;
+        return '$hour:$minute $period';
       }
     }
     return time;

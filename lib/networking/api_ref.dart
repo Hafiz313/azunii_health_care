@@ -54,4 +54,7 @@ class Apis {
   // get caregiver patients
   static const String getPatientsCaregiver = '/caregiver/patients';
   static const String caregiverDashboard = '/caregiver/dashboard';
+  static const String faqCaregiver = '/faqs';
+  static const String getNotifications = '/notifications';
+  static const String delNotifications = '/notifications/delete/';
 }

@@ -5,6 +5,8 @@ class CaregiverMedicineItem {
   final String userId;
   final String medicineName;
   final String dosage;
+  final String? startDate;
+  final String? endDate;
   final String status;
   final String interactionFlag;
   final String? interactionMessage;
@@ -21,6 +23,8 @@ class CaregiverMedicineItem {
     required this.userId,
     required this.medicineName,
     required this.dosage,
+    this.startDate,
+    this.endDate,
     required this.status,
     required this.interactionFlag,
     this.interactionMessage,
@@ -39,6 +43,8 @@ class CaregiverMedicineItem {
       userId: json['user_id']?.toString() ?? '',
       medicineName: json['medicine_name'] ?? '',
       dosage: json['dosage'] ?? '',
+      startDate: json['start_date'],
+      endDate: json['end_date'],
       status: json['status'] ?? '',
       interactionFlag: json['interaction_flag']?.toString() ?? '0',
       interactionMessage: json['interaction_message'],

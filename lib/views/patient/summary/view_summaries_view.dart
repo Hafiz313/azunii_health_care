@@ -25,7 +25,7 @@ class _ViewSummariesViewState extends State<ViewSummariesView>
   @override
   void initState() {
     super.initState();
-    controller = Get.put(SummaryController());
+    controller = Get.find<SummaryController>();
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 400),
       vsync: this,
@@ -46,7 +46,6 @@ class _ViewSummariesViewState extends State<ViewSummariesView>
   @override
   void dispose() {
     _animationController.dispose();
-    Get.delete<SummaryController>();
     super.dispose();
   }
 
@@ -69,9 +68,9 @@ class _ViewSummariesViewState extends State<ViewSummariesView>
                         isOndashboard: false,
                       ),
                       Padding(
-                        padding: EdgeInsets.only(
-                          left: 10,
-                          top: context.percentHeight * 0.02,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.percentWidth * 5,
+                          vertical: context.percentHeight * 2,
                         ),
                         child: subText3(
                           'Summaries',
@@ -79,7 +78,6 @@ class _ViewSummariesViewState extends State<ViewSummariesView>
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: context.percentHeight * 0.02),
                       Expanded(
                         child: Obx(() {
                           if (controller.summariesList.isEmpty) {
@@ -104,11 +102,11 @@ class _ViewSummariesViewState extends State<ViewSummariesView>
                           }
                           return ListView.separated(
                             padding: EdgeInsets.symmetric(
-                              horizontal: context.percentWidth * 0.04,
+                              horizontal: context.percentWidth * 5,
                             ),
                             itemCount: controller.summariesList.length,
                             separatorBuilder: (context, index) =>
-                                SizedBox(height: context.percentHeight * 0.015),
+                                SizedBox(height: context.percentHeight * 2),
                             itemBuilder: (context, index) {
                               final summary = controller.summariesList[index];
                               return TweenAnimationBuilder<double>(
@@ -145,141 +143,115 @@ class _ViewSummariesViewState extends State<ViewSummariesView>
         : 'N/A';
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
       decoration: BoxDecoration(
-        //color: Colors.white70,
-        border: Border.all(color: AppColors.primary),
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppColors.primary.withOpacity(0.2),
+          width: 1,
+        ),
         boxShadow: [
-          // Dark shadow for depth (bottom-right)
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.1),
-            offset: const Offset(8, 8),
-            blurRadius: 12,
-            spreadRadius: 10,
-          ),
-          // Light shadow for raised effect (top-left)
-          BoxShadow(
-            color: Colors.white.withOpacity(0.9),
-            offset: const Offset(-4, -4),
-            blurRadius: 8,
-            spreadRadius: 1,
+            color: AppColors.primary.withOpacity(0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Icon container with neumorphic effect
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.white70,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
-                    offset: const Offset(2, 2),
-                    blurRadius: 4,
-                  ),
-                  BoxShadow(
-                    color: Colors.white.withOpacity(0.9),
-                    offset: const Offset(-2, -2),
-                    blurRadius: 4,
-                  ),
-                ],
-              ),
-              child: Icon(
-                Icons.description_outlined,
-                color: AppColors.primary,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 12),
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Title
-                  Text(
-                    "Summary",
-                    style: TextStyle(
-                      color: AppColors.headingTextColor,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                    ),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  // Description text
-                  Text(
-                    summary['summary_text'] ?? 'No summary available',
-                    style: TextStyle(
-                      color: AppColors.textColor,
-                      fontSize: 14,
-                      height: 1.5,
-                    ),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // Created date with icon
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_today,
-                        size: 14,
-                        color: AppColors.textColor.withOpacity(0.6),
+      child: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColors.primary,
+                            AppColors.primary.withOpacity(0.7),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      const SizedBox(width: 6),
-                      Text(
-                        createdDate,
+                      child: Icon(
+                        Icons.description_rounded,
+                        color: AppColors.white,
+                        size: context.percentWidth * 5,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        "Summary",
                         style: TextStyle(
-                          color: AppColors.textColor.withOpacity(0.7),
-                          fontSize: 12,
+                          color: AppColors.headingTextColor,
+                          fontWeight: FontWeight.w700,
+                          fontSize: context.percentWidth * 4.5,
                         ),
                       ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            // Edit button with neumorphic effect
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white70,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
-                    offset: const Offset(2, 2),
-                    blurRadius: 4,
-                  ),
-                  BoxShadow(
-                    color: Colors.white.withOpacity(0.9),
-                    offset: const Offset(-2, -2),
-                    blurRadius: 4,
-                  ),
-                ],
-              ),
-              child: IconButton(
-                onPressed: () => _showEditDialog(context, summary),
-                icon: Icon(
-                  Icons.edit_outlined,
-                  color: AppColors.primary,
-                  size: 20,
+                    ),
+                  ],
                 ),
-                padding: const EdgeInsets.all(8),
-                constraints: const BoxConstraints(),
+                const SizedBox(height: 16),
+                Text(
+                  summary['summary_text'] ?? 'No summary available',
+                  style: TextStyle(
+                    color: AppColors.textColor,
+                    fontSize: context.percentWidth * 3.75,
+                    height: 1.6,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.calendar_today_rounded,
+                      size: context.percentWidth * 3.5,
+                      color: AppColors.primary.withOpacity(0.7),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      createdDate,
+                      style: TextStyle(
+                        color: AppColors.textColor.withOpacity(0.7),
+                        fontSize: context.percentWidth * 3.25,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            top: 12,
+            right: 12,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => _showEditDialog(context, summary),
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.edit_rounded,
+                    color: AppColors.primary,
+                    size: context.percentWidth * 4.5,
+                  ),
+                ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

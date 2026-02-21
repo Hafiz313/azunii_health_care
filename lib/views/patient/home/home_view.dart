@@ -72,7 +72,9 @@ class HomeView extends StatelessWidget {
   Widget _buildHeader(BuildContext context) {
     final controller = Get.find<HomeController>();
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      padding: EdgeInsets.symmetric(
+          horizontal: context.screenWidth * 0.05,
+          vertical: context.screenHeight * 0.022),
       child: Column(
         children: [
           Row(
@@ -82,10 +84,10 @@ class HomeView extends StatelessWidget {
                 onTap: () => _scaffoldKey.currentState?.openDrawer(),
                 child: Icon(Icons.menu),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: context.screenWidth * 0.03),
               // Logo/Icon (R or ribbon icon)
 
-              const SizedBox(width: 12),
+              SizedBox(width: context.screenWidth * 0.03),
               // Welcome text
               Expanded(
                 child: Column(
@@ -115,7 +117,7 @@ class HomeView extends StatelessWidget {
                     onTap: () =>
                         Navigator.pushNamed(context, ProfileView.routeName),
                     child: CircleAvatar(
-                      radius: 18,
+                      radius: context.screenWidth * 0.045,
                       backgroundColor: AppColors.cardGray,
                       backgroundImage:
                           controller.userProfileImage.value.isNotEmpty
@@ -131,9 +133,9 @@ class HomeView extends StatelessWidget {
                   )),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: context.screenHeight * 0.01),
           Container(
-            height: 0.2,
+            height: context.screenHeight * 0.0002,
             color: AppColors.textColor,
           ),
         ],
@@ -144,7 +146,7 @@ class HomeView extends StatelessWidget {
   /// Quick Action Buttons in 2x2 Grid
   Widget _buildQuickActions(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: context.screenWidth * 0.05),
       child: Column(
         children: [
           Row(
@@ -168,7 +170,7 @@ class HomeView extends StatelessWidget {
                   },
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: context.screenWidth * 0.03),
               Expanded(
                 child: QuickActionCard(
                   icon: FaIcon(
@@ -190,7 +192,7 @@ class HomeView extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: context.screenHeight * 0.015),
           Row(
             children: [
               Expanded(
@@ -210,31 +212,31 @@ class HomeView extends StatelessWidget {
                                   )));
                     }),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: QuickActionCard(
-                  icon: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      FaIcon(
-                        FontAwesomeIcons.clipboardList,
-                        color: Colors.blue[400],
-                        size: context.percentWidth * 4.5,
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        child: FaIcon(
-                          FontAwesomeIcons.stethoscope,
-                          color: Colors.blue[600],
-                          size: context.percentWidth * 3,
-                        ),
-                      ),
-                    ],
-                  ),
-                  title: Lang.reviewMed,
-                  onTap: () => Get.find<HomeController>().onReviewMedTap(),
-                ),
-              ),
+              // const SizedBox(width: 12),
+              // Expanded(
+              //   child: QuickActionCard(
+              //     icon: Stack(
+              //       alignment: Alignment.center,
+              //       children: [
+              //         FaIcon(
+              //           FontAwesomeIcons.clipboardList,
+              //           color: Colors.blue[400],
+              //           size: context.percentWidth * 4.5,
+              //         ),
+              //         Positioned(
+              //           bottom: 0,
+              //           child: FaIcon(
+              //             FontAwesomeIcons.stethoscope,
+              //             color: Colors.blue[600],
+              //             size: context.percentWidth * 3,
+              //           ),
+              //         ),
+              //       ],
+              //     ),
+              //     title: Lang.reviewMed,
+              //     onTap: () => Get.find<HomeController>().onReviewMedTap(),
+              //   ),
+              // ),
             ],
           ),
         ],
@@ -245,7 +247,7 @@ class HomeView extends StatelessWidget {
   /// Medication Alert Section
   Widget _buildMedicationAlert(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: context.screenWidth * 0.05),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -255,7 +257,7 @@ class HomeView extends StatelessWidget {
             fontWeight: FontWeight.w500,
             context: context,
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: context.screenHeight * 0.01),
           MedicationAlertCard(
             message: Lang.medContraindication,
           ),
@@ -288,7 +290,7 @@ class HomeView extends StatelessWidget {
     ];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: context.screenWidth * 0.05),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -296,29 +298,46 @@ class HomeView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              headline6(
-                fontWeight: FontWeight.w500,
-                Lang.asOfToday,
-                color: AppColors.headingTextColor,
-                context: context,
+              Row(
+                children: [
+                  headline6(
+                    fontWeight: FontWeight.w500,
+                    Lang.asOfToday,
+                    color: AppColors.headingTextColor,
+                    context: context,
+                  ),
+                  SizedBox(width: context.screenWidth * 0.03),
+                  InkWell(
+                    onTap: controller.onViewAllMedicinesTap,
+                    child: subText5(
+                      Lang.viewAll,
+                      color: Colors.blue,
+                      align: TextAlign.start,
+                      context: context,
+                    ),
+                  ),
+                ],
               ),
               Row(
                 children: [
                   Obx(() => controller.selectedDate.value.isNotEmpty
                       ? Padding(
-                          padding: const EdgeInsets.only(right: 8),
+                          padding: EdgeInsets.only(
+                              right: context.screenWidth * 0.02),
                           child: InkWell(
                             onTap: controller.clearDateFilter,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(
+                                context.screenWidth * 0.05),
                             child: Container(
-                              padding: const EdgeInsets.all(6),
+                              padding:
+                                  EdgeInsets.all(context.screenWidth * 0.015),
                               decoration: BoxDecoration(
                                 color: AppColors.primary.withOpacity(0.1),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
                                 Icons.close,
-                                size: 16,
+                                size: context.screenWidth * 0.04,
                                 color: AppColors.primary,
                               ),
                             ),
@@ -335,14 +354,15 @@ class HomeView extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: context.screenHeight * 0.015),
           Obx(() => controller.medicinesList.isEmpty
               ? Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.all(context.screenWidth * 0.05),
                   decoration: BoxDecoration(
                     color: AppColors.cardGray.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius:
+                        BorderRadius.circular(context.screenWidth * 0.03),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -353,7 +373,7 @@ class HomeView extends StatelessWidget {
                         color: AppColors.textColor.withOpacity(0.5),
                         size: context.percentWidth * 8,
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: context.screenHeight * 0.01),
                       subText4(
                         'No medicines added yet',
                         color: AppColors.textColor,
@@ -368,7 +388,7 @@ class HomeView extends StatelessWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: controller.medicinesList.length,
                   separatorBuilder: (context, index) =>
-                      const SizedBox(height: 12),
+                      SizedBox(height: context.screenHeight * 0.015),
                   itemBuilder: (context, index) {
                     final medicine = controller.medicinesList[index];
                     print('medicine id :${medicine.id}');
@@ -390,7 +410,7 @@ class HomeView extends StatelessWidget {
                               isCompleted: medicine.status != 'active',
                               status: medicine.status == 'active'
                                   ? 'Active'
-                                  : 'Completed',
+                                  : 'In Active',
                               onTap: () =>
                                   controller.showMedicineDetails(medicine.id),
                             ),
@@ -410,7 +430,7 @@ class HomeView extends StatelessWidget {
     final controller = Get.find<HomeController>();
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: context.screenWidth * 0.05),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -433,14 +453,15 @@ class HomeView extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: context.screenHeight * 0.02),
           Obx(() => controller.visitsList.isEmpty
               ? Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.all(context.screenWidth * 0.05),
                   decoration: BoxDecoration(
                     color: AppColors.cardGray.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius:
+                        BorderRadius.circular(context.screenWidth * 0.03),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -451,7 +472,7 @@ class HomeView extends StatelessWidget {
                         color: AppColors.textColor.withOpacity(0.5),
                         size: context.percentWidth * 8,
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: context.screenHeight * 0.01),
                       subText4(
                         'No visits scheduled',
                         color: AppColors.textColor,
@@ -466,7 +487,7 @@ class HomeView extends StatelessWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: controller.visitsList.length,
                   separatorBuilder: (context, index) =>
-                      const SizedBox(height: 12),
+                      SizedBox(height: context.screenHeight * 0.015),
                   itemBuilder: (context, index) {
                     final visit = controller.visitsList[index];
                     return TweenAnimationBuilder<double>(
@@ -497,108 +518,112 @@ class HomeView extends StatelessWidget {
   }
 
   Widget _buildDrawer(BuildContext context) {
-    return Drawer(
-      backgroundColor: Colors.white,
-      child: Column(
-        children: [
-          // Logo at top
-          SizedBox(height: 20),
-          Container(
-            padding: const EdgeInsets.all(40),
-            child: Image.asset(
-              AppAssets.logoMain,
-              height: 80,
-            ),
-          ),
-          const SizedBox(height: 20),
-          // Menu options
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildDrawerItem(
-                  context,
-                  icon: Icons.person,
-                  title: 'Profile',
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const ProfileView(
-                                isOndashboard: false,
-                              )),
-                    );
-                  },
-                ),
-                _buildDrawerItem(
-                  context,
-                  icon: Icons.feedback,
-                  title: 'Feedback',
-                  onTap: () => Navigator.pushNamed(context, '/feedback'),
-                ),
-                // _buildDrawerItem(
-                //   context,
-                //   icon: Icons.settings,
-                //   title: 'Settings',
-                //   onTap: () => Navigator.pop(context),
-                // ),
-                _buildDrawerItem(
-                  context,
-                  icon: Icons.privacy_tip,
-                  title: 'Privacy Policy',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const PrivacyPolicyView()),
-                    );
-                  },
-                ),
-                _buildDrawerItem(
-                  context,
-                  icon: Icons.help,
-                  title: 'Help & Support',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const HelpSupportView()),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-          // Logout button at bottom
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _showLogoutDialog(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: subText4(
-                  'Logout',
-                  color: AppColors.white,
-                  fontWeight: FontWeight.w500,
-                  context: context,
+    return SizedBox(
+        width: context.screenWidth * 0.65,
+        child: Drawer(
+          backgroundColor: Colors.white,
+          child: Column(
+            children: [
+              // Logo at top
+              SizedBox(height: context.screenHeight * 0.025),
+              Container(
+                padding: EdgeInsets.all(context.screenWidth * 0.1),
+                child: Image.asset(
+                  AppAssets.logoMain,
+                  height: context.screenHeight * 0.1,
                 ),
               ),
-            ),
+              SizedBox(height: context.screenHeight * 0.025),
+              // Menu options
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildDrawerItem(
+                      context,
+                      icon: Icons.person,
+                      title: 'Profile',
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const ProfileView(
+                                    isOndashboard: false,
+                                  )),
+                        );
+                      },
+                    ),
+                    _buildDrawerItem(
+                      context,
+                      icon: Icons.feedback,
+                      title: 'Feedback',
+                      onTap: () => Navigator.pushNamed(context, '/feedback'),
+                    ),
+                    // _buildDrawerItem(
+                    //   context,
+                    //   icon: Icons.settings,
+                    //   title: 'Settings',
+                    //   onTap: () => Navigator.pop(context),
+                    // ),
+                    _buildDrawerItem(
+                      context,
+                      icon: Icons.privacy_tip,
+                      title: 'Privacy Policy',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const PrivacyPolicyView()),
+                        );
+                      },
+                    ),
+                    // _buildDrawerItem(
+                    //   context,
+                    //   icon: Icons.help,
+                    //   title: 'Help & Support',
+                    //   onTap: () {
+                    //     Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(
+                    //           builder: (context) => const HelpSupportView()),
+                    //     );
+                    //   },
+                    // ),
+                  ],
+                ),
+              ),
+              // Logout button at bottom
+              Padding(
+                padding: EdgeInsets.all(context.screenWidth * 0.05),
+                child: SizedBox(
+                  width: context.screenWidth * 0.4,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _showLogoutDialog(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      padding: EdgeInsets.symmetric(
+                          vertical: context.screenHeight * 0.015),
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(context.screenWidth * 0.02),
+                      ),
+                    ),
+                    child: subText4(
+                      'Logout',
+                      color: AppColors.white,
+                      fontWeight: FontWeight.w500,
+                      context: context,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+        ));
   }
 
   Widget _buildDrawerItem(
@@ -626,43 +651,105 @@ class HomeView extends StatelessWidget {
     final controller = Get.find<HomeController>();
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: subText4(
-            'Logout',
-            color: AppColors.headingTextColor,
-            fontWeight: FontWeight.w500,
-            context: context,
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
           ),
-          content: subText5(
-            'Are you sure you want to logout?',
-            color: AppColors.textColor,
-            context: context,
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.logout_rounded,
+                    color: Colors.red,
+                    size: context.percentWidth * 12,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Logout',
+                  style: TextStyle(
+                    fontSize: context.percentWidth * 5.5,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.headingTextColor,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Are you sure you want to logout?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: context.percentWidth * 3.75,
+                    color: AppColors.textColor,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: AppColors.primary),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontSize: context.percentWidth * 3.75,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          Navigator.pop(context);
+                          await controller.logout();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          'Logout',
+                          style: TextStyle(
+                            color: AppColors.white,
+                            fontSize: context.percentWidth * 3.75,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: subText5(
-                'Cancel',
-                color: AppColors.textColor,
-                context: context,
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                Navigator.pop(context);
-                await controller.logout();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-              ),
-              child: subText5(
-                'Logout',
-                color: AppColors.white,
-                context: context,
-              ),
-            ),
-          ],
         );
       },
     );

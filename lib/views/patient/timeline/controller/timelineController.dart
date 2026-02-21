@@ -9,16 +9,16 @@ class TimelineController extends BaseController {
   // Raw data from API
   final RxList<MedicineSchedule> _allSchedules = <MedicineSchedule>[].obs;
   final RxList<TimelineEvent> _allEvents = <TimelineEvent>[].obs;
-  
+
   // Filtered data for display
   final RxList<MedicineSchedule> scheduleList = <MedicineSchedule>[].obs;
   final RxList<TimelineEvent> eventsList = <TimelineEvent>[].obs;
   final RxList<dynamic> filteredList = <dynamic>[].obs;
-  
-  final Rx<DateTime?> selectedDate = Rx<DateTime?>(null);
+
+  final Rx<DateTime?> selectedDate = Rx<DateTime?>(DateTime.now());
   final RxInt currentPage = RxInt(1);
   final RxInt totalPages = RxInt(1);
-  final RxBool showAllDates = RxBool(true);
+  final RxBool showAllDates = RxBool(false);
 
   @override
   void onInit() {
@@ -26,16 +26,25 @@ class TimelineController extends BaseController {
     fetchTimeline(1);
   }
 
+  String _formatDateForApi(DateTime date) {
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  }
+
   Future<void> fetchTimeline(int page) async {
+    final dateParam = selectedDate.value != null && !showAllDates.value
+        ? _formatDateForApi(selectedDate.value!)
+        : null;
+
     final result = await safeApiCall(
-      () => _timelineRepository.getTimeline(page: page),
+      () => _timelineRepository.getTimeline(page: page, date: dateParam),
     );
 
     if (result != null) {
       _allSchedules.value = result.data.schedule;
       _allEvents.value = result.data.events;
       currentPage.value = result.data.meta.page;
-      totalPages.value = (result.data.meta.total / result.data.meta.perPage).ceil();
+      totalPages.value =
+          (result.data.meta.total / result.data.meta.perPage).ceil();
       _applyFilter();
     }
   }
@@ -43,13 +52,13 @@ class TimelineController extends BaseController {
   void filterByDate(DateTime? date) {
     selectedDate.value = date;
     showAllDates.value = date == null;
-    _applyFilter();
+    fetchTimeline(1);
   }
 
   void resetFilter() {
-    selectedDate.value = null;
-    showAllDates.value = true;
-    _applyFilter();
+    selectedDate.value = DateTime.now();
+    showAllDates.value = false;
+    fetchTimeline(1);
   }
 
   void _applyFilter() {
@@ -60,19 +69,19 @@ class TimelineController extends BaseController {
     } else {
       // Filter by selected date
       final filterDate = selectedDate.value!;
-      final filterDateStr = _formatDateForComparison(filterDate);
-      
+      //final filterDateStr = _formatDateForComparison(filterDate);
+
       // Filter schedules (they don't have date, so show all on any filter for now)
       // If schedules have a date field in the API response, filter them here
       scheduleList.value = _allSchedules.toList();
-      
+
       // Filter events by timestamp
       eventsList.value = _allEvents.where((event) {
         try {
           final eventDate = DateTime.parse(event.timestamp);
           return eventDate.year == filterDate.year &&
-                 eventDate.month == filterDate.month &&
-                 eventDate.day == filterDate.day;
+              eventDate.month == filterDate.month &&
+              eventDate.day == filterDate.day;
         } catch (e) {
           // If timestamp parsing fails, include the event
           return true;
@@ -93,11 +102,6 @@ class TimelineController extends BaseController {
       ...scheduleList,
       ...eventsList,
     ];
-    filteredList.value = combined;
-  }
-
-  String _formatDateForComparison(DateTime date) {
-    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    filteredList.value = combined.reversed.toList();
   }
 }
-

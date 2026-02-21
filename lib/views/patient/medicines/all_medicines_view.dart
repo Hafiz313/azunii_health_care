@@ -2,70 +2,83 @@ import 'package:Azunii_Health/views/patient/home/controller/home_controller.dart
 import 'package:Azunii_Health/views/widget/Common_widgets/customAppBar.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/date_picker_button.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/pagination_controls.dart';
-import 'package:Azunii_Health/views/widget/Common_widgets/appointment_card.dart';
+import 'package:Azunii_Health/views/widget/Common_widgets/today_task_card.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import '../../../consts/colors.dart';
+import '../../../utils/percentage_size_ext.dart';
 
-class AllVisitsView extends StatefulWidget {
-  static const String routeName = '/all-visits';
-  const AllVisitsView({super.key});
+class AllMedicinesView extends StatefulWidget {
+  static const String routeName = '/all-medicines';
+  const AllMedicinesView({super.key});
 
   @override
-  State<AllVisitsView> createState() => _AllVisitsViewState();
+  State<AllMedicinesView> createState() => _AllMedicinesViewState();
 }
 
-class _AllVisitsViewState extends State<AllVisitsView> {
+class _AllMedicinesViewState extends State<AllMedicinesView> {
   final controller = Get.find<HomeController>();
+
+  // Medicine colors and icons matching home screen
+  final medicineColors = [
+    const Color.fromARGB(255, 181, 218, 244),
+    AppColors.lightOrange,
+    AppColors.lightGreenCard,
+    AppColors.lightPurple,
+  ];
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.getAllVisitsPage(1);
+      controller.getAllMedicinesPage(1);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      body: SafeArea(
-        child: RefreshIndicator(
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: AppColors.white,
+        body: RefreshIndicator(
           color: AppColors.primary,
-          onRefresh: () => controller.getAllVisitsPage(
-            controller.allVisitsCurrentPage.value,
+          onRefresh: () => controller.getAllMedicinesPage(
+            controller.allMedCurrentPage.value,
           ),
           child: Column(
             children: [
-              // Custom App Bar
-              const CustomAppBar(title: 'All Visits', isOndashboard: false),
+              CustomAppBar(
+                title: 'All Medicines',
+                isOndashboard: false,
+              ),
               // Date filter bar
               _buildDateFilterBar(context),
               // List content
               Expanded(
                 child: Obx(() {
-                  if (controller.allVisitsLoading.value) {
+                  if (controller.allMedLoading.value) {
                     return const Center(
-                      child: CircularProgressIndicator(color: AppColors.primary),
+                      child:
+                          CircularProgressIndicator(color: AppColors.primary),
                     );
                   }
 
-                  final visits = controller.filteredAllVisitsList;
+                  final medicines = controller.filteredAllMedList;
 
-                  if (visits.isEmpty) {
+                  if (medicines.isEmpty) {
                     return Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
-                            Icons.calendar_today_outlined,
+                            Icons.medication_outlined,
                             size: 64,
                             color: AppColors.textColor.withOpacity(0.3),
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'No visits found',
+                            'No medicines found',
                             style: TextStyle(
                               color: AppColors.textColor.withOpacity(0.5),
                               fontSize: 16,
@@ -82,18 +95,22 @@ class _AllVisitsViewState extends State<AllVisitsView> {
                       horizontal: 16,
                       vertical: 8,
                     ),
-                    itemCount: visits.length,
+                    itemCount: medicines.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 10),
                     itemBuilder: (context, index) {
-                      final visit = visits[index];
+                      final medicine = medicines[index];
+                      final colorIndex = index % medicineColors.length;
 
-                      return AppointmentCard(
-                        date: visit.visitDate,
-                        doctor: visit.providerName,
-                        reason: visit.notes,
-                        specialty: visit.specialty,
+                      return TodayTaskCard(
+                        backgroundColor: medicineColors[colorIndex],
+                        icon: _getMedicineIcon(index, context),
+                        title: medicine.medicineName,
+                        isCompleted: medicine.status != 'active',
+                        status: medicine.status == 'active'
+                            ? 'Active'
+                            : 'In Active',
                         onTap: () =>
-                            controller.showAllVisitDetails(visit.id),
+                            controller.showAllMedicineDetails(medicine.id),
                       );
                     },
                   );
@@ -101,10 +118,10 @@ class _AllVisitsViewState extends State<AllVisitsView> {
               ),
               // Pagination controls
               Obx(() => PaginationControls(
-                    currentPage: controller.allVisitsCurrentPage.value,
-                    lastPage: controller.allVisitsLastPage.value,
+                    currentPage: controller.allMedCurrentPage.value,
+                    lastPage: controller.allMedLastPage.value,
                     onPageChanged: (page) {
-                      controller.getAllVisitsPage(page);
+                      controller.getAllMedicinesPage(page);
                     },
                   )),
             ],
@@ -121,7 +138,7 @@ class _AllVisitsViewState extends State<AllVisitsView> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Obx(() => Text(
-                'Total: ${controller.allVisitsTotal.value}',
+                'Total: ${controller.allMedTotal.value}',
                 style: const TextStyle(
                   color: AppColors.textColor,
                   fontSize: 14,
@@ -131,11 +148,11 @@ class _AllVisitsViewState extends State<AllVisitsView> {
               )),
           Row(
             children: [
-              Obx(() => controller.allVisitsSelectedDate.value.isNotEmpty
+              Obx(() => controller.allMedSelectedDate.value.isNotEmpty
                   ? Padding(
                       padding: const EdgeInsets.only(right: 4),
                       child: InkWell(
-                        onTap: controller.clearAllVisitsDateFilter,
+                        onTap: controller.clearAllMedDateFilter,
                         borderRadius: BorderRadius.circular(20),
                         child: Container(
                           padding: const EdgeInsets.all(6),
@@ -153,15 +170,29 @@ class _AllVisitsViewState extends State<AllVisitsView> {
                     )
                   : const SizedBox.shrink()),
               Obx(() => DatePickerButton(
-                    date: controller.allVisitsSelectedDate.value.isEmpty
+                    date: controller.allMedSelectedDate.value.isEmpty
                         ? 'Select Date'
-                        : controller.allVisitsSelectedDate.value,
-                    onTap: controller.onAllVisitsDatePickerTap,
+                        : controller.allMedSelectedDate.value,
+                    onTap: controller.onAllMedDatePickerTap,
                   )),
             ],
           ),
         ],
       ),
     );
+  }
+
+  Widget _getMedicineIcon(int index, BuildContext context) {
+    final icons = [
+      FaIcon(FontAwesomeIcons.pills,
+          color: Colors.blue[600], size: context.percentWidth * 5),
+      FaIcon(FontAwesomeIcons.capsules,
+          color: Colors.orange[600], size: context.percentWidth * 5),
+      FaIcon(FontAwesomeIcons.tablets,
+          color: AppColors.green, size: context.percentWidth * 5),
+      FaIcon(FontAwesomeIcons.syringe,
+          color: Colors.purple[600], size: context.percentWidth * 5),
+    ];
+    return icons[index % icons.length];
   }
 }

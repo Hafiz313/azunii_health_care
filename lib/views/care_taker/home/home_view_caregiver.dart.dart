@@ -3,6 +3,8 @@ import 'package:Azunii_Health/core/models/static_user_model.dart';
 import 'package:Azunii_Health/utils/percentage_size_ext.dart';
 import 'package:Azunii_Health/views/care_taker/home/controller/care-giver-controller.dart';
 import 'package:Azunii_Health/views/care_taker/home/select_patient_view.dart';
+import 'package:Azunii_Health/views/care_taker/settings/notification/notification_view.dart';
+import 'package:Azunii_Health/views/care_taker/settings/settings_view.dart';
 import 'package:Azunii_Health/views/patient/medicines/medicines_view.dart';
 import 'package:Azunii_Health/views/patient/visits/visits_view.dart';
 
@@ -51,13 +53,11 @@ class HomeView_caregiver extends StatelessWidget {
                 _buildHeader(context),
                 _buildPatientSwitcher(context),
                 _buildQuickActions(context),
-                const SizedBox(height: 13),
-                // _buildMedicationAlert(context),
-                // const SizedBox(height: 13),
+                SizedBox(height: context.screenHeight * 0.016),
                 _buildAsOfTodaySection(context),
-                const SizedBox(height: 13),
+                SizedBox(height: context.screenHeight * 0.016),
                 _buildFutureAppointmentsSection(context),
-                const SizedBox(height: 20),
+                SizedBox(height: context.screenHeight * 0.025),
               ],
             ),
           ),
@@ -66,38 +66,44 @@ class HomeView_caregiver extends StatelessWidget {
     );
   }
 
-  /// Top Header with logo, welcome text, and profile picture
   Widget _buildHeader(BuildContext context) {
     final controller = Get.find<HomeController_caregiver>();
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      padding: EdgeInsets.symmetric(
+          horizontal: context.screenWidth * 0.05,
+          vertical: context.screenHeight * 0.022),
       child: Container(
         decoration: BoxDecoration(
             border: Border(
-                bottom: BorderSide(color: AppColors.textColor, width: 0.1))),
+                bottom: BorderSide(
+                    color: AppColors.textColor,
+                    width: context.screenHeight * 0.0001))),
         child: Row(
           children: [
-            // Menu Icon
-            // GestureDetector(
-            //   onTap: () => _scaffoldKey.currentState?.openDrawer(),
-            //   child: Icon(Icons.menu),
-            // ),
-            const SizedBox(width: 4),
-
-            Obx(() => CircleAvatar(
-                  radius: 18,
-                  backgroundColor: AppColors.cardGray,
-                  backgroundImage: controller.userProfileImage.value.isNotEmpty
-                      ? NetworkImage(controller.userProfileImage.value)
-                      : const AssetImage(AppAssets.profile) as ImageProvider,
-                  onBackgroundImageError:
-                      controller.userProfileImage.value.isNotEmpty
-                          ? (exception, stackTrace) =>
-                              const AssetImage(AppAssets.profile)
-                          : null,
+            SizedBox(width: context.screenWidth * 0.01),
+            Obx(() => InkWell(
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Settingsview(
+                          isOnDashboard: false,
+                        ),
+                      )),
+                  child: CircleAvatar(
+                    radius: context.screenWidth * 0.045,
+                    backgroundColor: AppColors.cardGray,
+                    backgroundImage: controller
+                            .userProfileImage.value.isNotEmpty
+                        ? NetworkImage(controller.userProfileImage.value)
+                        : const AssetImage(AppAssets.profile) as ImageProvider,
+                    onBackgroundImageError:
+                        controller.userProfileImage.value.isNotEmpty
+                            ? (exception, stackTrace) =>
+                                const AssetImage(AppAssets.profile)
+                            : null,
+                  ),
                 )),
-            const SizedBox(width: 12),
-            // Welcome text
+            SizedBox(width: context.screenWidth * 0.03),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,12 +123,15 @@ class HomeView_caregiver extends StatelessWidget {
                 ],
               ),
             ),
-            // Profile picture
             GestureDetector(
-              onTap: () => Get.toNamed(ProfileView.routeName),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const NotificationView()),
+              ),
               child: Container(
-                width: MediaQuery.of(context).size.width * 0.11,
-                height: MediaQuery.of(context).size.width * 0.11,
+                width: context.screenWidth * 0.11,
+                height: context.screenWidth * 0.11,
                 decoration: const BoxDecoration(
                   color: AppColors.primary,
                   shape: BoxShape.circle,
@@ -130,8 +139,8 @@ class HomeView_caregiver extends StatelessWidget {
                 child: Center(
                   child: SvgPicture.asset(
                     AppAssets.notificationBing,
-                    width: 21,
-                    height: 21,
+                    width: context.screenWidth * 0.053,
+                    height: context.screenWidth * 0.053,
                     colorFilter: const ColorFilter.mode(
                       AppColors.white,
                       BlendMode.srcIn,
@@ -153,32 +162,36 @@ class HomeView_caregiver extends StatelessWidget {
       if (activePatient == null) return const SizedBox.shrink();
 
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        padding: EdgeInsets.symmetric(
+            horizontal: context.screenWidth * 0.05,
+            vertical: context.screenHeight * 0.015),
         child: Container(
-          padding: const EdgeInsets.all(12),
+          padding: EdgeInsets.all(context.screenWidth * 0.03),
           decoration: BoxDecoration(
             color: AppColors.primary.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(context.screenWidth * 0.03),
             border: Border.all(color: AppColors.primary.withOpacity(0.2)),
           ),
           child: Row(
             children: [
               CircleAvatar(
                 backgroundColor: AppColors.primary,
-                radius: 20,
+                radius: context.screenWidth * 0.05,
                 child: Text(
                   activePatient.patient.name[0].toUpperCase(),
-                  style: const TextStyle(
-                      color: AppColors.white, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      color: AppColors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: context.screenWidth * 0.04),
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: context.screenWidth * 0.03),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     subText5(
-                      fontSize: 11,
+                      fontSize: context.screenWidth * 0.028,
                       fontWeight: FontWeight.normal,
                       'Active Patient',
                       color: AppColors.textColor.withOpacity(0.7),
@@ -201,7 +214,7 @@ class HomeView_caregiver extends StatelessWidget {
                   );
                 },
                 child: subText5(
-                  fontSize: 12,
+                  fontSize: context.screenWidth * 0.03,
                   fontWeight: FontWeight.w600,
                   'Change',
                   color: AppColors.primary,
@@ -214,106 +227,66 @@ class HomeView_caregiver extends StatelessWidget {
     });
   }
 
-  /// Quick Action Buttons in 2x2 Grid
   Widget _buildQuickActions(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: context.screenWidth * 0.05),
       child: Column(
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: QuickActionCard(
-                  icon: FaIcon(
-                    FontAwesomeIcons.house,
-                    color: Colors.pink[300],
-                    size: 18,
-                  ),
-                  title: Lang.addVisit,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => AddVisitView(
-                                isOndashboard: false,
-                              )),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: QuickActionCard(
-                  icon: FaIcon(
-                    FontAwesomeIcons.pills,
-                    color: Colors.blue[400],
-                    size: 17,
-                  ),
-                  title: Lang.addMedication,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const AddMedicineView(
-                                isOndashboard: false,
-                              )),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: QuickActionCard(
-                  icon: FaIcon(
-                    FontAwesomeIcons.timeline,
-                    color: Colors.orange[400],
-                    size: 18,
-                  ),
-                  title: Lang.viewTimeline,
-                ),
-              ),
-            ],
-          ),
+          // Row(
+          //   children: [
+          //     Expanded(
+          //       child: QuickActionCard(
+          //         icon: FaIcon(
+          //           FontAwesomeIcons.house,
+          //           color: Colors.pink[300],
+          //           size: context.screenWidth * 0.045,
+          //         ),
+          //         title: Lang.addVisit,
+          //         onTap: () {
+          //           Navigator.push(
+          //             context,
+          //             MaterialPageRoute(
+          //                 builder: (context) => AddVisitView(
+          //                       isOndashboard: false,
+          //                     )),
+          //           );
+          //         },
+          //       ),
+          //     ),
+          //     SizedBox(width: context.screenWidth * 0.03),
+          //     Expanded(
+          //       child: QuickActionCard(
+          //         icon: FaIcon(
+          //           FontAwesomeIcons.pills,
+          //           color: Colors.blue[400],
+          //           size: context.screenWidth * 0.043,
+          //         ),
+          //         title: Lang.addMedication,
+          //         onTap: () {
+          //           Navigator.push(
+          //             context,
+          //             MaterialPageRoute(
+          //                 builder: (context) => const AddMedicineView(
+          //                       isOndashboard: false,
+          //                     )),
+          //           );
+          //         },
+          //       ),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
     );
   }
 
-  /// Medication Alert Section
-  // Widget _buildMedicationAlert(BuildContext context) {
-  //   return Padding(
-  //     padding: const EdgeInsets.symmetric(horizontal: 20),
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         headline6(
-  //           Lang.medicationAlert,
-  //           color: AppColors.headingTextColor,
-  //           fontWeight: FontWeight.w500,
-  //           //   textAlign: TextAlign.start,
-  //         ),
-  //         const SizedBox(height: 8),
-  //         MedicationAlertCard(
-  //           message: Lang.medContraindication,
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-  /// As of Today Section
   Widget _buildAsOfTodaySection(BuildContext context) {
     final controller = Get.find<HomeController_caregiver>();
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: context.screenWidth * 0.05),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header with date picker
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -324,15 +297,30 @@ class HomeView_caregiver extends StatelessWidget {
               ),
               Row(
                 children: [
-                  if (controller.selectedDateString.value.isNotEmpty)
-                    TextButton(
-                      onPressed: controller.clearDateFilter,
-                      child: subText5(
-                        fontSize: 12,
-                        'Clear Filter',
-                        color: AppColors.primary,
-                      ),
-                    ),
+                  Obx(() => controller.selectedDateString.value.isNotEmpty
+                      ? Padding(
+                          padding: EdgeInsets.only(
+                              right: context.screenWidth * 0.02),
+                          child: InkWell(
+                            onTap: controller.clearDateFilter,
+                            borderRadius: BorderRadius.circular(
+                                context.screenWidth * 0.05),
+                            child: Container(
+                              padding:
+                                  EdgeInsets.all(context.screenWidth * 0.015),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withOpacity(0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.close,
+                                size: context.screenWidth * 0.04,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink()),
                   Obx(() => DatePickerButton(
                         date: controller.selectedDateString.value.isEmpty
                             ? 'Select Date'
@@ -343,7 +331,7 @@ class HomeView_caregiver extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: context.screenHeight * 0.015),
           Obx(() {
             final controller = Get.find<HomeController_caregiver>();
             if (controller.isLoading.value) {
@@ -354,8 +342,9 @@ class HomeView_caregiver extends StatelessWidget {
                 child: Column(
                   children: [
                     Icon(Icons.medication_outlined,
-                        size: 48, color: AppColors.textColor.withOpacity(0.3)),
-                    const SizedBox(height: 8),
+                        size: context.screenWidth * 0.12,
+                        color: AppColors.textColor.withOpacity(0.3)),
+                    SizedBox(height: context.screenHeight * 0.01),
                     subText4(
                         controller.selectedDateString.value.isEmpty
                             ? 'No medications available'
@@ -369,13 +358,15 @@ class HomeView_caregiver extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: controller.filteredMedicines.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              separatorBuilder: (context, index) =>
+                  SizedBox(height: context.screenHeight * 0.015),
               itemBuilder: (context, index) {
                 final medicine = controller.filteredMedicines[index];
                 return TodayTaskCard(
                   backgroundColor: Colors.blue[100]!,
                   icon: FaIcon(FontAwesomeIcons.pills,
-                      color: Colors.blue[600], size: 24),
+                      color: Colors.blue[600],
+                      size: context.screenWidth * 0.06),
                   title: '${medicine.medicineName} - ${medicine.dosage}',
                   isCompleted: medicine.status == 'active',
                 );
@@ -387,16 +378,14 @@ class HomeView_caregiver extends StatelessWidget {
     );
   }
 
-  /// Future Appointments Section
   Widget _buildFutureAppointmentsSection(BuildContext context) {
     final controller = Get.find<HomeController_caregiver>();
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: context.screenWidth * 0.05),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -406,7 +395,7 @@ class HomeView_caregiver extends StatelessWidget {
               InkWell(
                 onTap: controller.onViewAllTap,
                 child: subText5(
-                  fontSize: 12,
+                  fontSize: context.screenWidth * 0.03,
                   Lang.viewAll,
                   color: AppColors.borderColor,
                   align: TextAlign.start,
@@ -414,7 +403,7 @@ class HomeView_caregiver extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: context.screenHeight * 0.02),
           Obx(() {
             final dashboard = controller.dashboardData.value;
             if (controller.isLoading.value) {
@@ -425,8 +414,9 @@ class HomeView_caregiver extends StatelessWidget {
                 child: Column(
                   children: [
                     Icon(Icons.event_note_outlined,
-                        size: 48, color: AppColors.textColor.withOpacity(0.3)),
-                    const SizedBox(height: 8),
+                        size: context.screenWidth * 0.12,
+                        color: AppColors.textColor.withOpacity(0.3)),
+                    SizedBox(height: context.screenHeight * 0.01),
                     subText4('No upcoming visits',
                         color: AppColors.textColor.withOpacity(0.6)),
                   ],
@@ -437,7 +427,8 @@ class HomeView_caregiver extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: dashboard.upcomingVisits.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              separatorBuilder: (context, index) =>
+                  SizedBox(height: context.screenHeight * 0.015),
               itemBuilder: (context, index) {
                 final visit = dashboard.upcomingVisits[index];
                 return AppointmentCard(
@@ -461,16 +452,14 @@ class HomeView_caregiver extends StatelessWidget {
         color: Colors.white,
         child: Column(
           children: [
-            // Logo at top
             Container(
-              padding: const EdgeInsets.all(40),
+              padding: EdgeInsets.all(context.screenWidth * 0.1),
               child: Image.asset(
                 AppAssets.logoMain,
-                height: 80,
+                height: context.screenHeight * 0.1,
               ),
             ),
-            const SizedBox(height: 20),
-            // Menu options
+            SizedBox(height: context.screenHeight * 0.025),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -502,9 +491,8 @@ class HomeView_caregiver extends StatelessWidget {
                 ],
               ),
             ),
-            // Logout button at bottom
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(context.screenWidth * 0.05),
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -515,9 +503,11 @@ class HomeView_caregiver extends StatelessWidget {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: EdgeInsets.symmetric(
+                        vertical: context.screenHeight * 0.015),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius:
+                          BorderRadius.circular(context.screenWidth * 0.02),
                     ),
                   ),
                   child: subText4(

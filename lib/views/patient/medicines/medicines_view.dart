@@ -72,6 +72,10 @@ class _AddMedicineViewState extends State<AddMedicineView> {
                             const SizedBox(height: 20),
                             _buildStatusDropdown(),
                             const SizedBox(height: 24),
+                            _buildFrequencyTypeSection(context),
+                            const SizedBox(height: 20),
+                            _buildDateFields(context),
+                            const SizedBox(height: 20),
                             _buildFrequencySection(context),
                             const SizedBox(height: 24),
                             _buildUploadSection(),
@@ -104,52 +108,47 @@ class _AddMedicineViewState extends State<AddMedicineView> {
   }
 
   Widget _buildDosageDropdown() {
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Obx(() => CustomDropdown(
-            label: Lang.dosage,
-            hintText: Lang.enterDosage,
-            items: controller.dosageList,
-            selectedValue: controller.selectedDosage.value.isEmpty
-                ? null
-                : controller.selectedDosage.value,
-            onChanged: controller.setDosage,
-            allowCustomValue: false,
-            prefixIcon: const Icon(
-              Icons.science_outlined,
-              color: AppColors.textColor,
-              size: 20,
-            ),
-          )),
-    );
+    return Obx(() => CustomDropdown(
+          label: Lang.dosage,
+          hintText: Lang.enterDosage,
+          items: controller.dosageList,
+          selectedValue: controller.selectedDosage.value.isEmpty
+              ? null
+              : controller.selectedDosage.value,
+          onChanged: controller.setDosage,
+          allowCustomValue: true,
+          prefixIcon: const Icon(
+            Icons.science_outlined,
+            color: AppColors.textColor,
+            size: 20,
+          ),
+        ));
   }
 
   Widget _buildStatusDropdown() {
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Obx(() => CustomDropdown(
-            label: Lang.status,
-            hintText: 'Select status',
-            items: const ['active', 'inactive'],
-            selectedValue: controller.selectedStatus.value.isEmpty
-                ? null
-                : controller.selectedStatus.value.toLowerCase(),
-            onChanged: controller.setStatus,
-            prefixIcon: const Icon(
-              Icons.medical_services_outlined,
-              color: AppColors.textColor,
-              size: 20,
-            ),
-          )),
-    );
+    return Obx(() => CustomDropdown(
+          label: Lang.status,
+          hintText: 'Select status',
+          items: const ['active', 'inactive'],
+          selectedValue: controller.selectedStatus.value.isEmpty
+              ? null
+              : controller.selectedStatus.value.toLowerCase(),
+          onChanged: controller.setStatus,
+          prefixIcon: const Icon(
+            Icons.medical_services_outlined,
+            color: AppColors.textColor,
+            size: 20,
+          ),
+        ));
   }
 
-  Widget _buildFrequencySection(BuildContext context) {
+  // Frequency Type Selection (Scheduled/Unscheduled)
+  Widget _buildFrequencyTypeSection(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Frequency Schedule',
+          'Frequency Type',
           style: TextStyle(
             color: AppColors.headingTextColor,
             fontFamily: 'Satoshi',
@@ -157,22 +156,231 @@ class _AddMedicineViewState extends State<AddMedicineView> {
             fontSize: context.percentHeight * 2.5,
           ),
         ),
-        const SizedBox(height: 16),
-        Obx(() => Column(
+        const SizedBox(height: 12),
+        Obx(() => Row(
               children: [
-                // Show all frequency rows above the button
-                ...controller.frequencyRows
-                    .asMap()
-                    .entries
-                    .map((entry) => _buildFrequencyRow(entry.key))
-                    .toList(),
-                if (controller.frequencyRows.isNotEmpty)
-                  const SizedBox(height: 12),
-                _buildAddFrequencyButton(context),
+                Expanded(
+                  child: _buildFrequencyTypeOption(
+                    context,
+                    'Unscheduled',
+                    'As needed',
+                    'unscheduled',
+                    Icons.event_busy,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildFrequencyTypeOption(
+                    context,
+                    'Scheduled',
+                    'Regular times',
+                    'scheduled',
+                    Icons.event_available,
+                  ),
+                ),
               ],
             )),
       ],
     );
+  }
+
+  // Frequency Type Option Card
+  Widget _buildFrequencyTypeOption(
+    BuildContext context,
+    String title,
+    String subtitle,
+    String value,
+    IconData icon,
+  ) {
+    final isSelected = controller.frequencyType.value == value;
+    return GestureDetector(
+      onTap: () => controller.setFrequencyType(value),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.primary.withOpacity(0.1)
+              : AppColors.cardsColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.dividerGray,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? AppColors.primary : AppColors.textColor,
+              size: 32,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: TextStyle(
+                color:
+                    isSelected ? AppColors.primary : AppColors.headingTextColor,
+                fontFamily: 'Satoshi',
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: TextStyle(
+                color: AppColors.textColor,
+                fontFamily: 'Satoshi',
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Date Fields (Start Date and End Date)
+  Widget _buildDateFields(BuildContext context) {
+    return Obx(() => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Start Date (Required)
+            _buildDateField(
+              context,
+              'Start Date *',
+              controller.startDateController,
+              true,
+            ),
+            // End Date (Optional) - Only show for scheduled
+            if (controller.frequencyType.value == 'scheduled') ...[
+              const SizedBox(height: 16),
+              _buildDateField(
+                context,
+                'End Date (Optional)',
+                controller.endDateController,
+                false,
+              ),
+            ],
+          ],
+        ));
+  }
+
+  // Single Date Field
+  Widget _buildDateField(
+    BuildContext context,
+    String label,
+    TextEditingController controller,
+    bool isRequired,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: AppColors.headingTextColor,
+            fontFamily: 'Satoshi',
+            fontWeight: FontWeight.w500,
+            fontSize: 14,
+          ),
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: () async {
+            FocusScope.of(context).unfocus();
+            // For end date, enforce firstDate = start date
+            DateTime firstDate = DateTime(2020);
+            if (!isRequired && this.controller.startDateController.text.isNotEmpty) {
+              try {
+                firstDate = DateTime.parse(this.controller.startDateController.text.trim());
+              } catch (_) {}
+            }
+            final DateTime? picked = await showDatePicker(
+              context: context,
+              initialDate: firstDate.isAfter(DateTime.now()) ? firstDate : DateTime.now(),
+              firstDate: firstDate,
+              lastDate: DateTime(2030),
+            );
+            if (picked != null) {
+              controller.text =
+                  '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+              // Recalculate available frequencies when dates change
+              this.controller.recalculateFrequencies();
+            }
+          },
+          child: AbsorbPointer(
+            child: TextFormField(
+              controller: controller,
+              decoration: InputDecoration(
+                hintText: 'Select date',
+                hintStyle: TextStyle(
+                  color: AppColors.textColor.withOpacity(0.5),
+                  fontFamily: 'Satoshi',
+                ),
+                suffixIcon: Icon(
+                  Icons.calendar_today,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+                filled: true,
+                fillColor: AppColors.cardsColor,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: AppColors.dividerGray),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: AppColors.dividerGray),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: AppColors.primary, width: 2),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFrequencySection(BuildContext context) {
+    return Obx(() {
+      // Hide frequency section for unscheduled
+      if (controller.frequencyType.value == 'unscheduled') {
+        return const SizedBox.shrink();
+      }
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Frequency Schedule',
+            style: TextStyle(
+              color: AppColors.headingTextColor,
+              fontFamily: 'Satoshi',
+              fontWeight: FontWeight.w600,
+              fontSize: context.percentHeight * 2.5,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Column(
+            children: [
+              // Show all frequency rows above the button
+              ...controller.frequencyRows
+                  .asMap()
+                  .entries
+                  .map((entry) => _buildFrequencyRow(entry.key))
+                  .toList(),
+              if (controller.frequencyRows.isNotEmpty)
+                const SizedBox(height: 12),
+              _buildAddFrequencyButton(context),
+            ],
+          ),
+        ],
+      );
+    });
   }
 
   Widget _buildFrequencyRow(int index) {
@@ -207,40 +415,104 @@ class _AddMedicineViewState extends State<AddMedicineView> {
   }
 
   Widget _buildFrequencyDropdown(int index) {
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Obx(() => CustomDropdown(
-            label: 'Frequency',
-            hintText: 'Select ',
-            items: controller.frequencyList,
-            selectedValue: controller.frequencyRows[index].frequency.value.isEmpty
-                ? null
-                : controller.frequencyRows[index].frequency.value,
-            onChanged: (value) => controller.setFrequencyForRow(index, value),
-            prefixIcon: const Icon(
-              Icons.schedule,
-              color: AppColors.textColor,
-              size: 18,
-            ),
-          )),
-    );
+    return Obx(() => CustomDropdown(
+          label: 'Frequency',
+          hintText: 'Select',
+          items: controller.frequencyList,
+          selectedValue: controller.frequencyRows[index].frequency.value.isEmpty
+              ? null
+              : controller.frequencyRows[index].frequency.value,
+          onChanged: (value) => controller.setFrequencyForRow(index, value),
+          prefixIcon: const Icon(
+            Icons.schedule,
+            color: AppColors.textColor,
+            size: 18,
+          ),
+        ));
   }
 
   Widget _buildTimePicker(int index) {
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Obx(() {
-        final timeText = controller.frequencyRows[index].timeController.text;
-        return CustomTimePicker(
-          label: 'Time',
-          selectedTime: timeText.isEmpty ? null : timeText,
-          onTimeSelected: (time) {
-            controller.frequencyRows[index].timeController.text = time;
-            controller.frequencyRows.refresh();
-          },
-        );
-      }),
-    );
+    return Obx(() {
+      final timeText = controller.frequencyRows[index].timeController.text;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Time',
+            style: TextStyle(
+              color: AppColors.headingTextColor,
+              fontFamily: 'Satoshi',
+              fontWeight: FontWeight.w400,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 8),
+          InkWell(
+            onTap: () async {
+              FocusScope.of(context).unfocus();
+              final TimeOfDay? picked = await showTimePicker(
+                context: context,
+                initialTime: TimeOfDay.now(),
+              );
+              if (picked != null) {
+                final formattedTime =
+                    '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+                // Check if this time is already used by another row
+                if (controller.isTimeAlreadyUsed(index, formattedTime)) {
+                  Get.snackbar(
+                    'Duplicate Time',
+                    'This time is already selected in another frequency row',
+                    snackPosition: SnackPosition.BOTTOM,
+                    backgroundColor: Colors.red.shade100,
+                    colorText: Colors.red.shade900,
+                    margin: const EdgeInsets.all(12),
+                  );
+                  return;
+                }
+                controller.frequencyRows[index].timeController.text =
+                    formattedTime;
+                controller.frequencyRows.refresh();
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: AppColors.cardsColor,
+                border: Border.all(width: 0.3, color: AppColors.primary),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.access_time,
+                    color: AppColors.textColor,
+                    size: 18,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      timeText.isEmpty ? 'Select ' : timeText,
+                      style: TextStyle(
+                        color: timeText.isEmpty
+                            ? AppColors.textColor
+                            : AppColors.blackColor,
+                        fontFamily: 'Satoshi',
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                  const Icon(
+                    Icons.arrow_drop_down,
+                    color: AppColors.textColor,
+                    size: 18,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    });
   }
 
   Widget _buildRemoveButton(int index) {

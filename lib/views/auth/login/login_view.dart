@@ -111,7 +111,7 @@ class _LoginViewState extends State<LoginView> {
                         fontWeight: FontWeight.w400,
                         context: context,
                       ),
-                      SizedBox(width: context.percentWidth * 5),
+                      SizedBox(width: context.percentWidth * 1),
                       InkWell(
                           onTap: () {
                             Navigator.pushReplacementNamed(
@@ -128,10 +128,10 @@ class _LoginViewState extends State<LoginView> {
                   SizedBox(
                     height: context.percentHeight * 3,
                   ),
-                  LoginWidgets.buildSocialButtons(context),
+                  //zivn   LoginWidgets.buildSocialButtons(context),
                   SizedBox(height: context.percentHeight * 2),
                   // FCM Test Button
-                                  ],
+                ],
               ),
             ],
           )

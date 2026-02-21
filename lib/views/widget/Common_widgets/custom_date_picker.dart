@@ -84,10 +84,24 @@ class CustomDatePicker extends StatelessWidget {
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    FocusScope.of(context).unfocus();
+    final now = DateTime.now();
+    final firstDate = DateTime(now.year, now.month, now.day);
+    
+    // Ensure initialDate is not before firstDate
+    DateTime initialDate = firstDate;
+    if (selectedDate != null) {
+      // Compare dates without time component
+      final selectedDateOnly = DateTime(selectedDate!.year, selectedDate!.month, selectedDate!.day);
+      if (!selectedDateOnly.isBefore(firstDate)) {
+        initialDate = selectedDateOnly;
+      }
+    }
+    
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: selectedDate ?? DateTime.now(),
-      firstDate: DateTime.now(),
+      initialDate: initialDate,
+      firstDate: firstDate,
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
     if (picked != null) {

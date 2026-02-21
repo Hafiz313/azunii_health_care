@@ -19,48 +19,51 @@ class DatePickerButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 5,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: AppColors.dividerGray,
-            width: 1,
+      child: Padding(
+        padding: EdgeInsets.all(10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 5,
           ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SvgPicture.asset(
-              AppAssets.calander,
-              width: 13,
-              height: 13,
-              colorFilter: const ColorFilter.mode(
-                AppColors.textColor,
-                BlendMode.srcIn,
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: AppColors.dividerGray,
+              width: 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SvgPicture.asset(
+                AppAssets.calander,
+                width: 13,
+                height: 13,
+                colorFilter: const ColorFilter.mode(
+                  AppColors.textColor,
+                  BlendMode.srcIn,
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              date,
-              style: TextStyle(
-                fontSize: context.percentHeight * 1.5,
-                fontWeight: FontWeight.normal,
-                color: AppColors.headingTextColor,
-                fontFamily: 'Satoshi',
+              const SizedBox(width: 8),
+              Text(
+                date,
+                style: TextStyle(
+                  fontSize: context.percentHeight * 1.5,
+                  fontWeight: FontWeight.normal,
+                  color: AppColors.headingTextColor,
+                  fontFamily: 'Satoshi',
+                ),
               ),
-            ),
-            const SizedBox(width: 4),
-            const Icon(
-              Icons.arrow_drop_down,
-              size: 20,
-              color: AppColors.textColor,
-            ),
-          ],
+              const SizedBox(width: 4),
+              const Icon(
+                Icons.arrow_drop_down,
+                size: 20,
+                color: AppColors.textColor,
+              ),
+            ],
+          ),
         ),
       ),
     );

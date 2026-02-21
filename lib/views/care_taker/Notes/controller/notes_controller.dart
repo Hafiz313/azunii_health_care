@@ -8,12 +8,16 @@ import '../../../../core/models/notes_model.dart';
 import '../../../../core/repositories/notes_repo.dart';
 import '../../../../core/services/caregiver_state.dart';
 import '../../../widget/Common_widgets/custom_snackbar.dart';
+import '../../dashboard/controller/caretaker_home_controller.dart';
 
 class NotesController extends BaseController {
   final TextEditingController noteController = TextEditingController();
   final RxString selectedCategory = ''.obs;
   final NotesRepository _notesRepository = NotesRepository();
   final CaregiverState _state = CaregiverState();
+  
+  // Track the current patient ID to detect changes
+  final RxInt currentPatientId = RxInt(0);
 
   final List<String> categories = [
     Lang.generalHealth,
@@ -28,20 +32,77 @@ class NotesController extends BaseController {
   @override
   void onInit() {
     super.onInit();
-    fetchNotes();
+    
+    // Listen to text changes for character counter
+    noteController.addListener(() {
+      update();
+    });
+    
+    // Listen to active patient changes
+    ever(_state.activePatientId, (patientId) {
+      if (patientId != null && patientId != currentPatientId.value) {
+        print('🔄 [Notes] Patient changed from ${currentPatientId.value} to $patientId - Fetching notes...');
+        currentPatientId.value = patientId;
+        // Clear form when patient changes
+        noteController.clear();
+        selectedCategory.value = '';
+        fetchNotes();
+      }
+    });
+    
+    // Listen to dashboard page changes
+    try {
+      if (Get.isRegistered<CareTakerHomeController>()) {
+        final dashboardController = Get.find<CareTakerHomeController>();
+        ever(dashboardController.refreshTrigger, (_) {
+          // Check if we're on the notes page (index 2)
+          if (dashboardController.currentIndex.value == 2) {
+            print('📄 [Notes] Notes page became visible - Refreshing...');
+            fetchNotes();
+          }
+        });
+      }
+    } catch (e) {
+      print('⚠️ [Notes] Dashboard controller not found: $e');
+    }
+    
+    // Initial load if patient is already selected
+    final patientId = _state.activePatientId.value;
+    if (patientId != null) {
+      print('📋 [Notes] Initial patient ID: $patientId');
+      currentPatientId.value = patientId;
+      fetchNotes();
+    }
   }
 
   Future<void> fetchNotes() async {
     final patientId = _state.activePatientId.value;
+    
+    print('🔍 [Notes] fetchNotes called - Patient ID: $patientId');
+    
     if (patientId == null) {
-      print('❌ No active patient selected');
+      print('❌ [Notes] No active patient selected');
+      // Clear notes if no patient is selected
+      previousNotes.value = [];
+      currentPatientId.value = 0;
       return;
     }
 
-    final result = await safeApiCall(
-        () => _notesRepository.getNotesList(patientId));
+    // Update current patient ID
+    currentPatientId.value = patientId;
+    
+    // Clear previous notes before fetching new ones
+    previousNotes.value = [];
+    
+    print('📡 [Notes] Fetching notes for patient ID: $patientId');
+
+    final result =
+        await safeApiCall(() => _notesRepository.getNotesList(patientId));
     if (result != null) {
+      print('✅ [Notes] Received ${result.length} notes');
       previousNotes.value = result;
+    } else {
+      print('❌ [Notes] Failed to fetch notes');
     }
   }
 
@@ -63,6 +124,11 @@ class NotesController extends BaseController {
 
     if (noteController.text.trim().isEmpty) {
       CustomSnackbar.show('Please write a note', isSuccess: false);
+      return;
+    }
+
+    if (noteController.text.length > 500) {
+      CustomSnackbar.show('Note cannot exceed 500 characters', isSuccess: false);
       return;
     }
 
@@ -95,9 +161,42 @@ class NotesController extends BaseController {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Category: ${note.category}'),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Category: ',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    note.category,
+                  ),
+                ),
+              ],
+            ),
+
             const SizedBox(height: 8),
-            Text('Note: ${note.note}'),
+
+            /// Note Row
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Note: ',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    note.note,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
         actions: [

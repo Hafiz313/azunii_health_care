@@ -19,7 +19,9 @@ class AddCaregiverView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(AdvocacyController());
-    return Obx(() => OverlayLoader(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Obx(() => OverlayLoader(
           isLoading: controller.isLoading.value,
           child: Scaffold(
             backgroundColor: AppColors.white,
@@ -37,7 +39,8 @@ class AddCaregiverView extends StatelessWidget {
               ),
             ),
           ),
-        ));
+        )),
+    );
   }
 
   /// Add Caregiver Content

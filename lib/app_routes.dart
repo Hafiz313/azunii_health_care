@@ -11,7 +11,8 @@ import 'package:Azunii_Health/views/care_taker/feedback/feedback_view.dart';
 import 'package:Azunii_Health/views/care_taker/home/home_view_caregiver.dart.dart';
 import 'package:Azunii_Health/views/care_taker/home/select_patient_view.dart';
 import 'package:Azunii_Health/views/care_taker/settings/settings_view.dart';
-import 'package:Azunii_Health/views/care_taker/home/all_visits_view.dart' as caregiver;
+import 'package:Azunii_Health/views/care_taker/home/all_visits_view.dart'
+    as caregiver;
 
 import 'package:Azunii_Health/views/patient/advocacy/add_caregiver_view.dart';
 import 'package:Azunii_Health/views/patient/dashboard/patient_dashboard.dart';
@@ -22,6 +23,7 @@ import 'package:Azunii_Health/views/patient/privacy/privacy_policy_view.dart';
 import 'package:Azunii_Health/views/patient/support/help_support_view.dart';
 import 'package:Azunii_Health/views/patient/summary/view_summaries_view.dart';
 import 'package:Azunii_Health/views/patient/visits/all_visits_view.dart';
+import 'package:Azunii_Health/views/patient/medicines/all_medicines_view.dart';
 import 'package:Azunii_Health/views/patient/visits/edit_visits_view.dart';
 import 'package:Azunii_Health/views/patient/visits/visits_view.dart';
 import 'package:Azunii_Health/views/splash/splash_view.dart';
@@ -52,9 +54,11 @@ class AppRoutes {
   static const privacyPolicy = PrivacyPolicyView.routeName;
   static const helpSupport = HelpSupportView.routeName;
   static const allVisits = AllVisitsView.routeName;
+  static const allMedicines = AllMedicinesView.routeName;
   static const caregiverAllVisits = caregiver.AllVisitsView.routeName;
   static const viewSummaries = ViewSummariesView.routeName;
- // static const fcmTest = FCMTestScreen.routeName;
+  static const allMedicinesView = AllMedicinesView.routeName;
+  // static const fcmTest = FCMTestScreen.routeName;
 
   static final List<GetPage> pages = [
     GetPage(name: splash, page: () => SplashView()),
@@ -80,9 +84,11 @@ class AppRoutes {
     GetPage(name: privacyPolicy, page: () => const PrivacyPolicyView()),
     GetPage(name: helpSupport, page: () => const HelpSupportView()),
     GetPage(name: allVisits, page: () => const AllVisitsView()),
+    GetPage(name: allMedicines, page: () => const AllMedicinesView()),
     GetPage(name: viewSummaries, page: () => const ViewSummariesView()),
-    GetPage(name: caregiverAllVisits, page: () => const caregiver.AllVisitsView()),
+    GetPage(
+        name: caregiverAllVisits, page: () => const caregiver.AllVisitsView()),
     GetPage(name: '/caregiver-all-notes', page: () => const AllNotesView()),
-   
+    GetPage(name: allMedicinesView, page: () => const AllMedicinesView()),
   ];
 }

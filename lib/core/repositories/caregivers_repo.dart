@@ -111,4 +111,17 @@ class CaregiversRepository {
       rethrow;
     }
   }
+
+  // Get FAQs
+  Future<Map<String, dynamic>> getFAQs() async {
+    try {
+      debugPrint('\n❓ GET FAQs Request ❓');
+      final response = await ApiClient.getWithAuth(Apis.faqCaregiver);
+      debugPrint('📄 FAQs Response: Retrieved FAQs list\n');
+      return response;
+    } catch (e) {
+      debugPrint('❌ Get FAQs Error: $e');
+      rethrow;
+    }
+  }
 }

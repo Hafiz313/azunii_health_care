@@ -12,6 +12,7 @@ import '../../widget/Common_widgets/overlayloader.dart';
 import '../../widget/Common_widgets/timeline_task_card.dart';
 import 'widgets/visitcardwidget.dart';
 import 'controller/timelineController.dart';
+import '../../widget/Common_widgets/pagination_controls.dart';
 
 class TimelineView extends GetView<TimelineController> {
   final bool? isOndashboard;
@@ -62,7 +63,7 @@ class TimelineView extends GetView<TimelineController> {
   Widget build(BuildContext context) {
     // Initialize controller to ensure onInit is called
     final controller = Get.put(TimelineController());
-    
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: Obx(() => OverlayLoader(
@@ -72,7 +73,7 @@ class TimelineView extends GetView<TimelineController> {
                 children: [
                   CustomAppBar(
                     title: Lang.timeline,
-                    isOndashboard: true,
+                    isOndashboard: isOndashboard ?? true,
                   ),
                   Expanded(
                     child: RefreshIndicator(
@@ -121,8 +122,8 @@ class TimelineView extends GetView<TimelineController> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 subText5(
-                  controller.showAllDates.value 
-                      ? Lang.asOfToday 
+                  controller.showAllDates.value
+                      ? Lang.asOfToday
                       : 'Filtered by date',
                   fontWeight: FontWeight.w600,
                   color: AppColors.headingTextColor,
@@ -137,12 +138,12 @@ class TimelineView extends GetView<TimelineController> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: controller.showAllDates.value 
-                              ? AppColors.cardGray 
+                          color: controller.showAllDates.value
+                              ? AppColors.cardGray
                               : AppColors.primary.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
-                          border: controller.showAllDates.value 
-                              ? null 
+                          border: controller.showAllDates.value
+                              ? null
                               : Border.all(color: AppColors.primary, width: 1),
                         ),
                         child: Row(
@@ -152,8 +153,8 @@ class TimelineView extends GetView<TimelineController> {
                               width: 16,
                               height: 16,
                               colorFilter: ColorFilter.mode(
-                                controller.showAllDates.value 
-                                    ? AppColors.textColor 
+                                controller.showAllDates.value
+                                    ? AppColors.textColor
                                     : AppColors.primary,
                                 BlendMode.srcIn,
                               ),
@@ -165,8 +166,8 @@ class TimelineView extends GetView<TimelineController> {
                                   ? _formatDate(controller.selectedDate.value!)
                                   : 'Select Date',
                               fontSize: 13,
-                              color: controller.showAllDates.value 
-                                  ? AppColors.headingTextColor 
+                              color: controller.showAllDates.value
+                                  ? AppColors.headingTextColor
                                   : AppColors.primary,
                             ),
                           ],
@@ -183,7 +184,8 @@ class TimelineView extends GetView<TimelineController> {
                           decoration: BoxDecoration(
                             color: Colors.red.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.red.withOpacity(0.3)),
+                            border:
+                                Border.all(color: Colors.red.withOpacity(0.3)),
                           ),
                           child: const Icon(
                             Icons.close,
@@ -246,7 +248,9 @@ class TimelineView extends GetView<TimelineController> {
                   final icon = _cardIcons[random.nextInt(_cardIcons.length)];
                   return Padding(
                     padding: EdgeInsets.only(
-                      bottom: entry.key != controller.scheduleList.length - 1 ? 10 : 0,
+                      bottom: entry.key != controller.scheduleList.length - 1
+                          ? 10
+                          : 0,
                     ),
                     child: TimelineTaskCard(
                       item: entry.value,
@@ -259,7 +263,7 @@ class TimelineView extends GetView<TimelineController> {
             ),
             const SizedBox(height: 24),
           ],
-          
+
           // Activity History Section (Events)
           if (controller.eventsList.isNotEmpty) ...[
             _buildSectionHeader(
@@ -350,7 +354,7 @@ class TimelineView extends GetView<TimelineController> {
 
   Widget _buildEventItem(TimelineEvent event, bool isLast) {
     final eventStyle = _getEventStyle(event.type);
-    
+
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -385,9 +389,9 @@ class TimelineView extends GetView<TimelineController> {
                 ),
             ],
           ),
-          
+
           const SizedBox(width: 12),
-          
+
           // Event content
           Expanded(
             child: Container(
@@ -416,7 +420,8 @@ class TimelineView extends GetView<TimelineController> {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
                           color: eventStyle['color'].withOpacity(0.15),
                           borderRadius: BorderRadius.circular(12),
@@ -503,7 +508,7 @@ class TimelineView extends GetView<TimelineController> {
       final dt = DateTime.parse(timestamp);
       final now = DateTime.now();
       final diff = now.difference(dt);
-      
+
       if (diff.inDays == 0) {
         return 'Today at ${_formatTime12Hour(dt)}';
       } else if (diff.inDays == 1) {
@@ -528,53 +533,10 @@ class TimelineView extends GetView<TimelineController> {
     return Obx(() {
       if (controller.totalPages.value <= 1) return const SizedBox.shrink();
 
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ...List.generate(
-            controller.totalPages.value > 5 ? 5 : controller.totalPages.value,
-            (index) {
-              final page = index + 1;
-              final isSelected = controller.currentPage.value == page;
-              return GestureDetector(
-                onTap: () => controller.goToPage(page),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: isSelected ? AppColors.primary : AppColors.cardGray,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: subText5(
-                    page.toString(),
-                    fontSize: 13,
-                    color: isSelected
-                        ? AppColors.white
-                        : AppColors.headingTextColor,
-                  ),
-                ),
-              );
-            },
-          ),
-          if (controller.currentPage.value < controller.totalPages.value)
-            GestureDetector(
-              onTap: () =>
-                  controller.goToPage(controller.currentPage.value + 1),
-              child: Container(
-                margin: const EdgeInsets.only(left: 4),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: AppColors.cardGray,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(Icons.arrow_forward_ios,
-                    size: 14, color: AppColors.textColor),
-              ),
-            ),
-        ],
+      return PaginationControls(
+        currentPage: controller.currentPage.value,
+        lastPage: controller.totalPages.value,
+        onPageChanged: (page) => controller.goToPage(page),
       );
     });
   }

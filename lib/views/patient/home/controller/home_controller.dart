@@ -1,3 +1,4 @@
+import 'package:Azunii_Health/app_routes.dart';
 import 'package:Azunii_Health/core/controllers/base_controller.dart';
 import 'package:Azunii_Health/core/models/static_user_model.dart';
 import 'package:Azunii_Health/core/repositories/auth_repository.dart';
@@ -39,6 +40,26 @@ class HomeController extends BaseController {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
+
+  // ==========================================
+  // All Medicines Screen - Pagination State
+  // ==========================================
+  final RxList<Medicine> allMedPageList = <Medicine>[].obs;
+  final RxInt allMedCurrentPage = 1.obs;
+  final RxInt allMedLastPage = 1.obs;
+  final RxInt allMedTotal = 0.obs;
+  final RxString allMedSelectedDate = ''.obs;
+  final RxBool allMedLoading = false.obs;
+
+  // ==========================================
+  // All Visits Screen - Pagination State
+  // ==========================================
+  final RxList<VisitModel> allVisitsPageList = <VisitModel>[].obs;
+  final RxInt allVisitsCurrentPage = 1.obs;
+  final RxInt allVisitsLastPage = 1.obs;
+  final RxInt allVisitsTotal = 0.obs;
+  final RxString allVisitsSelectedDate = ''.obs;
+  final RxBool allVisitsLoading = false.obs;
 
   @override
   void onInit() {
@@ -325,7 +346,7 @@ class HomeController extends BaseController {
       //   await LocalStorageService.logout();
       //   Get.offAllNamed(LoginView.routeName);
       // }
-      
+
       // For now, show a message that this feature will be available soon
       Get.snackbar(
         'Coming Soon',
@@ -336,6 +357,223 @@ class HomeController extends BaseController {
     } catch (e) {
       setLoading(false);
       print('Delete account error: $e');
+    }
+  }
+
+  // ==========================================
+  // All Medicines Screen Methods
+  // ==========================================
+
+  /// Fetch a specific page of medicines for the All Medicines screen
+  Future<void> getAllMedicinesPage(int page) async {
+    allMedLoading.value = true;
+    try {
+      final result =
+          await safeApiCall(() => _medicineRepository.getMedicinesPage(page));
+      if (result != null) {
+        allMedPageList.value = result.medicines;
+        allMedCurrentPage.value = result.currentPage;
+        allMedLastPage.value = result.lastPage;
+        allMedTotal.value = result.total;
+      }
+    } finally {
+      allMedLoading.value = false;
+    }
+  }
+
+  /// Date picker for All Medicines screen
+  void onAllMedDatePickerTap() async {
+    DateTime initialDate;
+    try {
+      if (allMedSelectedDate.value.isEmpty) {
+        initialDate = DateTime.now();
+      } else {
+        final parts = allMedSelectedDate.value.split('-');
+        initialDate = DateTime(
+            int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
+      }
+    } catch (e) {
+      initialDate = DateTime.now();
+    }
+
+    final DateTime? picked = await showDatePicker(
+      context: Get.context!,
+      initialDate: initialDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+    );
+
+    if (picked != null) {
+      allMedSelectedDate.value =
+          '${picked.day.toString().padLeft(2, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.year}';
+    }
+  }
+
+  /// Clear date filter for All Medicines screen
+  void clearAllMedDateFilter() {
+    allMedSelectedDate.value = '';
+    // Reload unfiltered data
+    getAllMedicinesPage(allMedCurrentPage.value);
+  }
+
+  /// Get filtered list for display (used in UI)
+  List<Medicine> get filteredAllMedList {
+    if (allMedSelectedDate.value.isEmpty) return allMedPageList;
+
+    try {
+      final parts = allMedSelectedDate.value.split('-');
+      final selectedDateTime = DateTime(
+          int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
+
+      return allMedPageList.where((medicine) {
+        try {
+          final updatedAt = DateTime.parse(medicine.updatedAt);
+          return updatedAt.year == selectedDateTime.year &&
+              updatedAt.month == selectedDateTime.month &&
+              updatedAt.day == selectedDateTime.day;
+        } catch (e) {
+          return false;
+        }
+      }).toList();
+    } catch (e) {
+      return allMedPageList;
+    }
+  }
+
+  /// Show medicine details from All Medicines screen
+  Future<void> showAllMedicineDetails(int medicineId) async {
+    final medicine =
+        allMedPageList.firstWhereOrNull((med) => med.id == medicineId);
+    if (medicine != null) {
+      DetailsDialogs.showMedicineDetailsDialog(
+        medicine,
+        onEdit: editAllMedicine,
+        onImagePreview: DetailsDialogs.showImagePreview,
+      );
+    }
+  }
+
+  /// Edit medicine from All Medicines screen
+  Future<void> editAllMedicine(int medicineId) async {
+    final medicine =
+        allMedPageList.firstWhereOrNull((med) => med.id == medicineId);
+    if (medicine != null) {
+      Get.to(
+          () => EditMedicineView(
+                isOndashboard: false,
+                medicineId: medicineId,
+              ),
+          arguments: {'medicine': medicine});
+    }
+  }
+
+  /// Navigate to All Medicines screen
+  void onViewAllMedicinesTap() {
+    Get.toNamed(AppRoutes.allMedicinesView);
+  }
+
+  // ==========================================
+  // All Visits Screen Methods
+  // ==========================================
+
+  /// Fetch a specific page of visits for the All Visits screen
+  Future<void> getAllVisitsPage(int page) async {
+    allVisitsLoading.value = true;
+    try {
+      final result =
+          await safeApiCall(() => _visitsRepository.getVisitsPage(page));
+      if (result != null) {
+        allVisitsPageList.value = result.visits;
+        allVisitsCurrentPage.value = result.data.currentPage;
+        allVisitsLastPage.value = result.data.lastPage;
+        allVisitsTotal.value = result.data.total;
+      }
+    } finally {
+      allVisitsLoading.value = false;
+    }
+  }
+
+  /// Date picker for All Visits screen
+  void onAllVisitsDatePickerTap() async {
+    DateTime initialDate;
+    try {
+      if (allVisitsSelectedDate.value.isEmpty) {
+        initialDate = DateTime.now();
+      } else {
+        final parts = allVisitsSelectedDate.value.split('-');
+        initialDate = DateTime(
+            int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
+      }
+    } catch (e) {
+      initialDate = DateTime.now();
+    }
+
+    final DateTime? picked = await showDatePicker(
+      context: Get.context!,
+      initialDate: initialDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+    );
+
+    if (picked != null) {
+      allVisitsSelectedDate.value =
+          '${picked.day.toString().padLeft(2, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.year}';
+    }
+  }
+
+  /// Clear date filter for All Visits screen
+  void clearAllVisitsDateFilter() {
+    allVisitsSelectedDate.value = '';
+    getAllVisitsPage(allVisitsCurrentPage.value);
+  }
+
+  /// Get filtered list for display (used in UI)
+  List<VisitModel> get filteredAllVisitsList {
+    if (allVisitsSelectedDate.value.isEmpty) return allVisitsPageList;
+
+    try {
+      final parts = allVisitsSelectedDate.value.split('-');
+      final selectedDateTime = DateTime(
+          int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
+
+      return allVisitsPageList.where((visit) {
+        try {
+          final visitDate = DateTime.parse(visit.visitDate);
+          return visitDate.year == selectedDateTime.year &&
+              visitDate.month == selectedDateTime.month &&
+              visitDate.day == selectedDateTime.day;
+        } catch (e) {
+          return false;
+        }
+      }).toList();
+    } catch (e) {
+      return allVisitsPageList;
+    }
+  }
+
+  /// Show visit details from All Visits screen
+  Future<void> showAllVisitDetails(int visitId) async {
+    final result =
+        await safeApiCall(() => _visitsRepository.getVisitDetails(visitId));
+    if (result != null) {
+      DetailsDialogs.showVisitDetailsDialog(
+        result.data,
+        onEdit: editAllVisit,
+        onImagePreview: DetailsDialogs.showImagePreview,
+      );
+    }
+  }
+
+  /// Edit visit from All Visits screen
+  Future<void> editAllVisit(int visitId) async {
+    final visit = allVisitsPageList.firstWhereOrNull((v) => v.id == visitId);
+    if (visit != null) {
+      Get.to(
+          () => EditVisitsView(
+                isOndashboard: false,
+                visitId: visitId,
+              ),
+          arguments: {'visit': visit});
     }
   }
 

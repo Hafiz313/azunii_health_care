@@ -20,38 +20,41 @@ class Notesview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(NotesController());
-    return Obx(() => OverlayLoader(
-          isLoading: controller.isLoading.value,
-          child: Scaffold(
-            backgroundColor: AppColors.white,
-            body: SafeArea(
-              child: Column(
-                children: [
-                  CustomAppBar(
-                    title: Lang.caregiverNotes,
-                  ),
-                  Expanded(
-                    child: RefreshIndicator(
-                    onRefresh: controller.fetchNotes,
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: context.screenWidth * 0.05),
-                          _buildAddNotesSection(context, controller),
-                          SizedBox(height: context.screenWidth * 0.06),
-                          _buildPreviousNotesSection(context, controller),
-                          SizedBox(height: context.screenWidth * 0.05),
-                        ],
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Obx(() => OverlayLoader(
+            isLoading: controller.isLoading.value,
+            child: Scaffold(
+              backgroundColor: AppColors.white,
+              body: SafeArea(
+                child: Column(
+                  children: [
+                    CustomAppBar(
+                      title: Lang.caregiverNotes,
+                    ),
+                    Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: controller.fetchNotes,
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: context.screenWidth * 0.05),
+                              _buildAddNotesSection(context, controller),
+                              SizedBox(height: context.screenWidth * 0.06),
+                              _buildPreviousNotesSection(context, controller),
+                              SizedBox(height: context.screenWidth * 0.05),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ));
+          )),
+    );
   }
 
   Widget _buildAddNotesSection(
@@ -82,16 +85,30 @@ class Notesview extends StatelessWidget {
                 ),
               )),
           SizedBox(height: context.screenWidth * 0.04),
-          CustomTxtField(
-            title: Lang.yourNote,
-            textEditingController: controller.noteController,
-            hintTxt: Lang.writeYourNote,
-            maxLines: 6,
-            // prefixIcon: const Icon(
-            //   Icons.note_outlined,
-            //   color: AppColors.textColor,
-            //   size: 20,
-            // ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomTxtField(
+                title: Lang.yourNote,
+                textEditingController: controller.noteController,
+                hintTxt: Lang.writeYourNote,
+                maxLines: 6,
+                maxLength: 500,
+              ),
+              SizedBox(height: context.screenWidth * 0.02),
+              // GetBuilder<NotesController>(
+              //   builder: (ctrl) => Align(
+              //     alignment: Alignment.centerRight,
+              //     child: subText5(
+              //       '${ctrl.noteController.text.length}/500',
+              //       fontSize: 12,
+              //       color: ctrl.noteController.text.length > 500
+              //           ? Colors.red
+              //           : AppColors.textColor.withOpacity(0.6),
+              //     ),
+              //   ),
+              // ),
+            ],
           ),
           SizedBox(height: context.screenWidth * 0.06),
           SizedBox(
@@ -219,7 +236,7 @@ class Notesview extends StatelessWidget {
                   subText4(
                     note.category,
                     color: AppColors.headingTextColor,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w800,
                     align: TextAlign.start,
                   ),
                 ],
