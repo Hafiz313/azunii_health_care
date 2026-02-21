@@ -298,25 +298,11 @@ class HomeView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  headline6(
-                    fontWeight: FontWeight.w500,
-                    Lang.asOfToday,
-                    color: AppColors.headingTextColor,
-                    context: context,
-                  ),
-                  SizedBox(width: context.screenWidth * 0.03),
-                  InkWell(
-                    onTap: controller.onViewAllMedicinesTap,
-                    child: subText5(
-                      Lang.viewAll,
-                      color: Colors.blue,
-                      align: TextAlign.start,
-                      context: context,
-                    ),
-                  ),
-                ],
+              headline6(
+                fontWeight: FontWeight.w500,
+                Lang.asOfToday,
+                color: AppColors.headingTextColor,
+                context: context,
               ),
               Row(
                 children: [
@@ -354,6 +340,30 @@ class HomeView extends StatelessWidget {
               ),
             ],
           ),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(),
+              // headline6(
+              //   fontWeight: FontWeight.w500,
+              //   Lang.asOfToday,
+              //   color: AppColors.headingTextColor,
+              //   context: context,
+              // ),
+              SizedBox(width: context.screenWidth * 0.03),
+              InkWell(
+                onTap: controller.onViewAllMedicinesTap,
+                child: subText5(
+                  Lang.viewAll,
+                  color: Colors.blue,
+                  align: TextAlign.start,
+                  context: context,
+                ),
+              ),
+            ],
+          ),
+
           SizedBox(height: context.screenHeight * 0.015),
           Obx(() => controller.medicinesList.isEmpty
               ? Container(

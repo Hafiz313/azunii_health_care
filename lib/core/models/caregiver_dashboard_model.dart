@@ -36,7 +36,7 @@ class UpcomingVisit {
   final String notes;
   final String? attachment;
   final Creator createdBy;
-  final Creator? updatedBy;
+  final Creator updatedBy;
   final String createdAt;
   final String updatedAt;
 
@@ -49,7 +49,7 @@ class UpcomingVisit {
     required this.notes,
     this.attachment,
     required this.createdBy,
-    this.updatedBy,
+    required this.updatedBy,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -63,11 +63,25 @@ class UpcomingVisit {
       visitDate: json['visit_date'] ?? '',
       notes: json['notes'] ?? '',
       attachment: json['attachment'],
-      createdBy: Creator.fromJson(json['created_by'] ?? {}),
-      updatedBy: json['updated_by'] != null ? Creator.fromJson(json['updated_by']) : null,
+      createdBy: _parseCreator(json['created_by']),
+      updatedBy: _parseCreator(json['updated_by']),
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',
     );
+  }
+
+  static Creator _parseCreator(dynamic value) {
+    if (value == null) {
+      return Creator(id: 0, name: '', email: '');
+    }
+    if (value is Map<String, dynamic>) {
+      return Creator.fromJson(value);
+    }
+    if (value is String) {
+      // If it's a string ID, create a minimal Creator object
+      return Creator(id: int.tryParse(value) ?? 0, name: '', email: '');
+    }
+    return Creator(id: 0, name: '', email: '');
   }
 }
 
@@ -84,7 +98,7 @@ class MedicineQuery {
   final String? interactionDetails;
   final String? attachment;
   final Creator createdBy;
-  final Creator? updatedBy;
+  final Creator updatedBy;
   final String createdAt;
   final String updatedAt;
   final List<Frequency> frequencies;
@@ -102,7 +116,7 @@ class MedicineQuery {
     this.interactionDetails,
     this.attachment,
     required this.createdBy,
-    this.updatedBy,
+    required this.updatedBy,
     required this.createdAt,
     required this.updatedAt,
     required this.frequencies,
@@ -121,8 +135,8 @@ class MedicineQuery {
       interactionMessage: json['interaction_message'],
       interactionDetails: json['interaction_details'],
       attachment: json['attachment'],
-      createdBy: Creator.fromJson(json['created_by'] ?? {}),
-      updatedBy: json['updated_by'] != null ? Creator.fromJson(json['updated_by']) : null,
+      createdBy: _parseCreator(json['created_by']),
+      updatedBy: _parseCreator(json['updated_by']),
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',
       frequencies: (json['frequencies'] as List?)
@@ -130,6 +144,20 @@ class MedicineQuery {
               .toList() ??
           [],
     );
+  }
+
+  static Creator _parseCreator(dynamic value) {
+    if (value == null) {
+      return Creator(id: 0, name: '', email: '');
+    }
+    if (value is Map<String, dynamic>) {
+      return Creator.fromJson(value);
+    }
+    if (value is String) {
+      // If it's a string ID, create a minimal Creator object
+      return Creator(id: int.tryParse(value) ?? 0, name: '', email: '');
+    }
+    return Creator(id: 0, name: '', email: '');
   }
 }
 

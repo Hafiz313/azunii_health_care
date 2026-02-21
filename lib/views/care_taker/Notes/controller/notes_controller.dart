@@ -18,6 +18,9 @@ class NotesController extends BaseController {
   
   // Track the current patient ID to detect changes
   final RxInt currentPatientId = RxInt(0);
+  
+  // Track if we're currently fetching to prevent duplicate calls
+  bool _isFetching = false;
 
   final List<String> categories = [
     Lang.generalHealth,
@@ -34,19 +37,45 @@ class NotesController extends BaseController {
     super.onInit();
     
     // Listen to text changes for character counter
-    noteController.addListener(() {
-      update();
-    });
+    // Check if controller is not disposed before adding listener
+    if (!noteController.hasListeners) {
+      noteController.addListener(() {
+        if (!noteController.text.isEmpty || noteController.text.isEmpty) {
+          update();
+        }
+      });
+    }
     
     // Listen to active patient changes
     ever(_state.activePatientId, (patientId) {
       if (patientId != null && patientId != currentPatientId.value) {
-        print('🔄 [Notes] Patient changed from ${currentPatientId.value} to $patientId - Fetching notes...');
+        print('🔄 [Notes] Patient changed from ${currentPatientId.value} to $patientId');
         currentPatientId.value = patientId;
-        // Clear form when patient changes
-        noteController.clear();
+        // Clear form when patient changes - check if not disposed
+        try {
+          if (noteController.text.isNotEmpty) {
+            noteController.clear();
+          }
+        } catch (e) {
+          print('⚠️ [Notes] Controller already disposed: $e');
+        }
         selectedCategory.value = '';
-        fetchNotes();
+        
+        // Only fetch if we're on the notes page
+        try {
+          if (Get.isRegistered<CareTakerHomeController>()) {
+            final dashboardController = Get.find<CareTakerHomeController>();
+            if (dashboardController.currentIndex.value == 2) {
+              print('📄 [Notes] On notes page - Fetching notes...');
+              fetchNotes();
+            } else {
+              print('📄 [Notes] Not on notes page - Skipping auto-fetch');
+            }
+          }
+        } catch (e) {
+          print('⚠️ [Notes] Dashboard controller not found, fetching anyway: $e');
+          fetchNotes();
+        }
       }
     });
     
@@ -66,16 +95,22 @@ class NotesController extends BaseController {
       print('⚠️ [Notes] Dashboard controller not found: $e');
     }
     
-    // Initial load if patient is already selected
+    // Initial load only if patient is already selected AND we're on notes page
     final patientId = _state.activePatientId.value;
     if (patientId != null) {
       print('📋 [Notes] Initial patient ID: $patientId');
       currentPatientId.value = patientId;
-      fetchNotes();
+      // Don't auto-fetch on init, wait for page to be visible
     }
   }
 
   Future<void> fetchNotes() async {
+    // Prevent duplicate calls
+    if (_isFetching) {
+      print('⏳ [Notes] Already fetching, skipping duplicate call');
+      return;
+    }
+    
     final patientId = _state.activePatientId.value;
     
     print('🔍 [Notes] fetchNotes called - Patient ID: $patientId');
@@ -96,8 +131,11 @@ class NotesController extends BaseController {
     
     print('📡 [Notes] Fetching notes for patient ID: $patientId');
 
+    _isFetching = true;
     final result =
         await safeApiCall(() => _notesRepository.getNotesList(patientId));
+    _isFetching = false;
+    
     if (result != null) {
       print('✅ [Notes] Received ${result.length} notes');
       previousNotes.value = result;
@@ -122,12 +160,22 @@ class NotesController extends BaseController {
       return;
     }
 
-    if (noteController.text.trim().isEmpty) {
+    // Check if controller is disposed before accessing text
+    String noteText;
+    try {
+      noteText = noteController.text.trim();
+    } catch (e) {
+      print('⚠️ [Notes] Controller disposed, cannot save note: $e');
+      CustomSnackbar.show('Error: Please try again', isSuccess: false);
+      return;
+    }
+
+    if (noteText.isEmpty) {
       CustomSnackbar.show('Please write a note', isSuccess: false);
       return;
     }
 
-    if (noteController.text.length > 500) {
+    if (noteText.length > 500) {
       CustomSnackbar.show('Note cannot exceed 500 characters', isSuccess: false);
       return;
     }
@@ -135,13 +183,17 @@ class NotesController extends BaseController {
     final note = NotesModel(
       patientId: patientId,
       category: selectedCategory.value,
-      note: noteController.text.trim(),
+      note: noteText,
     );
 
     final result = await safeApiCall(() => _notesRepository.storeNote(note));
 
     if (result != null) {
-      noteController.clear();
+      try {
+        noteController.clear();
+      } catch (e) {
+        print('⚠️ [Notes] Could not clear controller: $e');
+      }
       selectedCategory.value = '';
       CustomSnackbar.show('Note saved successfully!', isSuccess: true);
       await fetchNotes();
@@ -216,7 +268,12 @@ class NotesController extends BaseController {
 
   @override
   void onClose() {
-    noteController.dispose();
+    // Only dispose if not already disposed
+    try {
+      noteController.dispose();
+    } catch (e) {
+      print('⚠️ [Notes] Controller already disposed in onClose: $e');
+    }
     super.onClose();
   }
 }

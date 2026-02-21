@@ -60,14 +60,14 @@ class CareTakerBottomNav extends StatelessWidget {
               Obx(() => BottomNavItem1(
                     svgIcon: AppAssets.access,
                     label: 'FAQs',
-                    isSelected: controller.currentIndex.value == 4,
-                    onTap: () => controller.changePage(4),
+                    isSelected: controller.currentIndex.value == 3,
+                    onTap: () => controller.changePage(3),
                   )),
               Obx(() => BottomNavItem1(
                     svgIcon: AppAssets.person,
                     label: 'Profile',
-                    isSelected: controller.currentIndex.value == 5,
-                    onTap: () => controller.changePage(5),
+                    isSelected: controller.currentIndex.value == 4,
+                    onTap: () => controller.changePage(4),
                   )),
             ],
           ),

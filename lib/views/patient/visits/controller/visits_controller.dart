@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/controllers/base_controller.dart';
 import '../../../../core/models/visit_model.dart';
@@ -63,17 +64,43 @@ class VisitsController extends BaseController {
 
   Future<void> _pickImage(ImageSource source) async {
     try {
-      // Request permissions
+      // Request appropriate permission
+      PermissionStatus status;
       if (source == ImageSource.camera) {
-        final cameraStatus = await Permission.camera.request();
-        if (!cameraStatus.isGranted) {
-          Get.snackbar('Permission Denied', 'Camera permission is required');
+        status = await Permission.camera.request();
+        if (!status.isGranted) {
+          if (status.isPermanentlyDenied) {
+            Get.snackbar('Permission Denied',
+                'Camera permission permanently denied. Please enable it in app settings.');
+            await openAppSettings();
+          } else {
+            Get.snackbar('Permission Denied', 'Camera permission is required');
+          }
           return;
         }
       } else {
-        final storageStatus = await Permission.storage.request();
-        if (!storageStatus.isGranted) {
-          Get.snackbar('Permission Denied', 'Storage permission is required');
+        // On Android 13+ (API 33), Permission.storage is ignored.
+        // Use Permission.photos instead.
+        if (Platform.isAndroid) {
+          final androidInfo = await DeviceInfoPlugin().androidInfo;
+          if (androidInfo.version.sdkInt >= 33) {
+            status = await Permission.photos.request();
+          } else {
+            status = await Permission.storage.request();
+          }
+        } else {
+          status = await Permission.photos.request();
+        }
+
+        if (!status.isGranted) {
+          if (status.isPermanentlyDenied) {
+            Get.snackbar('Permission Denied',
+                'Gallery permission permanently denied. Please enable it in app settings.');
+            await openAppSettings();
+          } else {
+            Get.snackbar(
+                'Permission Denied', 'Gallery permission is required');
+          }
           return;
         }
       }
@@ -159,17 +186,15 @@ class VisitsController extends BaseController {
         await safeApiCall(() => _VisitsRepository.updateVisit(updateRequest));
 
     if (result != null) {
-      _showBottomSnackBar('Visit updated successfully!', isSuccess: true);
-
-      // Navigate back first, then clear fields
-      await Future.delayed(const Duration(milliseconds: 800));
-      
+      // Navigate back first, then show snackbar
+      // Using Navigator.pop to avoid Get.back() closing the snackbar overlay
       if (Get.isRegistered<VisitsController>()) {
-        Get.back();
-        // Clear fields after navigation
-        await Future.delayed(const Duration(milliseconds: 100));
         clearAllFields();
+        Get.back();
       }
+      
+      // Show success snackbar after navigation
+      _showBottomSnackBar('Visit updated successfully!', isSuccess: true);
     }
   }
 

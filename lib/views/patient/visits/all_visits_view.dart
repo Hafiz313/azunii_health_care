@@ -3,6 +3,7 @@ import 'package:Azunii_Health/views/widget/Common_widgets/customAppBar.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/date_picker_button.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/pagination_controls.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/appointment_card.dart';
+import 'package:Azunii_Health/views/widget/Common_widgets/overlayloader.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../consts/colors.dart';
@@ -28,7 +29,9 @@ class _AllVisitsViewState extends State<AllVisitsView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Obx(() => OverlayLoader(
+      isLoading: controller.isLoading.value,
+      child: Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
         child: RefreshIndicator(
@@ -111,7 +114,8 @@ class _AllVisitsViewState extends State<AllVisitsView> {
           ),
         ),
       ),
-    );
+      ),
+    ));
   }
 
   Widget _buildDateFilterBar(BuildContext context) {

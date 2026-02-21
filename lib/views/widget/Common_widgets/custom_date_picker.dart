@@ -84,7 +84,7 @@ class CustomDatePicker extends StatelessWidget {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    FocusScope.of(context).unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
     final now = DateTime.now();
     final firstDate = DateTime(now.year, now.month, now.day);
     
@@ -104,6 +104,10 @@ class CustomDatePicker extends StatelessWidget {
       firstDate: firstDate,
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
+    // Prevent focus restoration after date picker closes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusManager.instance.primaryFocus?.unfocus();
+    });
     if (picked != null) {
       onChanged(picked);
     }

@@ -16,6 +16,9 @@ class MedicationController extends BaseController {
   
   // Track the current patient ID to detect changes
   final RxInt currentPatientId = RxInt(0);
+  
+  // Track if we're currently fetching to prevent duplicate calls
+  bool _isFetching = false;
 
   @override
   void onInit() {
@@ -24,11 +27,26 @@ class MedicationController extends BaseController {
     // Listen to active patient changes
     ever(_state.activePatientId, (patientId) {
       if (patientId != null && patientId != currentPatientId.value) {
-        print('🔄 Patient changed from ${currentPatientId.value} to $patientId - Fetching medications...');
+        print('🔄 Patient changed from ${currentPatientId.value} to $patientId');
         currentPatientId.value = patientId;
         // Clear date filter when patient changes
         selectedDate.value = null;
-        getMedications();
+        
+        // Only fetch if we're on the medication page
+        try {
+          if (Get.isRegistered<CareTakerHomeController>()) {
+            final dashboardController = Get.find<CareTakerHomeController>();
+            if (dashboardController.currentIndex.value == 1) {
+              print('📄 On medication page - Fetching medications...');
+              getMedications();
+            } else {
+              print('📄 Not on medication page - Skipping auto-fetch');
+            }
+          }
+        } catch (e) {
+          print('⚠️ Dashboard controller not found, fetching anyway: $e');
+          getMedications();
+        }
       }
     });
     
@@ -48,16 +66,22 @@ class MedicationController extends BaseController {
       print('⚠️ Dashboard controller not found: $e');
     }
     
-    // Initial load if patient is already selected
+    // Initial load only if patient is already selected AND we're on medication page
     final patientId = _state.activePatientId.value;
     if (patientId != null) {
       print('📋 Initial patient ID: $patientId');
       currentPatientId.value = patientId;
-      getMedications();
+      // Don't auto-fetch on init, wait for page to be visible
     }
   }
 
   Future<void> getMedications() async {
+    // Prevent duplicate calls
+    if (_isFetching) {
+      print('⏳ [Medication] Already fetching, skipping duplicate call');
+      return;
+    }
+    
     final patientId = _state.activePatientId.value;
     
     print('🔍 getMedications called - Patient ID: $patientId');
@@ -80,7 +104,9 @@ class MedicationController extends BaseController {
     
     print('📡 Fetching medications for patient ID: $patientId');
 
+    _isFetching = true;
     final result = await safeApiCall(() => _repository.getMedicinesList());
+    _isFetching = false;
     
     if (result != null) {
       print('✅ Received ${result.data.medicines.length} medications');

@@ -19,7 +19,7 @@ class Notesview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(NotesController());
+    final controller = Get.put(NotesController(), permanent: true);
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Obx(() => OverlayLoader(

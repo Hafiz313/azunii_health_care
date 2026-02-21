@@ -151,19 +151,37 @@ class CaregiverCard extends StatelessWidget {
                 align: TextAlign.start,
                 fontWeight: FontWeight.w500,
               ),
-              Expanded(
-                child: SizedBox(
-                  height: 28,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    separatorBuilder: (_, __) => const SizedBox(width: 6),
-                    itemCount: permissions.length,
-                    itemBuilder: (context, index) {
-                      return _PermissionChip(permission: permissions[index]);
-                    },
-                  ),
-                ),
-              ),
+              permissions.isEmpty
+                  ? Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.lightRed,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: subText5(
+                        fontSize: 11,
+                        'No permissions granted',
+                        color: AppColors.redColor,
+                        align: TextAlign.center,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    )
+                  : Expanded(
+                      child: SizedBox(
+                        height: 28,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(width: 6),
+                          itemCount: permissions.length,
+                          itemBuilder: (context, index) {
+                            return _PermissionChip(
+                                permission: permissions[index]);
+                          },
+                        ),
+                      ),
+                    ),
             ],
           ),
 

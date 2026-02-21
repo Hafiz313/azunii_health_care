@@ -84,6 +84,7 @@ class AllVisitsView extends StatelessWidget {
                         doctor: visit.providerName,
                         reason: visit.notes,
                         specialty: visit.specialty,
+                        onTap: () => controller.showVisitDetails(visit.id),
                       );
                     },
                   );

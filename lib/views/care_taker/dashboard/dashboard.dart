@@ -25,7 +25,9 @@ class CareTakerDashboard extends StatelessWidget {
       const Notesview(),
       //const FeedbackView(),
       const FAQsView(),
-      const Settingsview(),
+      const Settingsview(
+        isOnDashboard: true,
+      ),
     ];
 
     return PopScope(

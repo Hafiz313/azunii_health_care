@@ -42,10 +42,13 @@ class CustomDropdown extends StatelessWidget {
         InkWell(
           onTap: () {
             // Unfocus any active text fields before showing picker
-            FocusScope.of(context).unfocus();
+            FocusManager.instance.primaryFocus?.unfocus();
             _showPicker(context).then((_) {
-              // Re-unfocus after sheet closes to prevent focus returning to text field
-              FocusScope.of(context).unfocus();
+              // Use post-frame callback to catch focus restoration that
+              // happens after the bottom sheet fully closes
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                FocusManager.instance.primaryFocus?.unfocus();
+              });
             });
           },
           child: Container(

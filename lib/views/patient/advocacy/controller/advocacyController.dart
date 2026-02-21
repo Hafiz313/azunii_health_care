@@ -63,100 +63,259 @@ class AdvocacyController extends BaseController {
   }
 
   void _showCaregiverDetailsDialog(CaregiverDetail caregiver) {
+    final permissions = <String>[];
+    if (caregiver.canView == '1') permissions.add('View Records');
+    if (caregiver.canAddNotes == '1') permissions.add('Add Notes');
+
     Get.dialog(
       Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Caregiver Details',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.headingTextColor,
-                ),
-              ),
-              const SizedBox(height: 20),
-              _buildDetailRow('Full Name', caregiver.name),
-              _buildDetailRow('Email', caregiver.email),
-              if (caregiver.phone != null)
-                _buildDetailRow('Phone', caregiver.phone!),
-              if (caregiver.gender != null)
-                _buildDetailRow('Gender', caregiver.gender!),
-              _buildDetailRow('Relationship', caregiver.relationship),
-              _buildDetailRow(
-                  'Can View', caregiver.canView == '1' ? 'Yes' : 'No'),
-              _buildDetailRow(
-                  'Can Add Notes', caregiver.canAddNotes == '1' ? 'Yes' : 'No'),
-              _buildDetailRow('Status', caregiver.status),
-              _buildDetailRow('Added Date', caregiver.createdAt.split('T')[0]),
-              const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Get.back(),
-                    child: Text('Close'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Profile header
+                CircleAvatar(
+                  radius: 32,
+                  backgroundColor: AppColors.primary,
+                  child: Text(
+                    caregiver.name.isNotEmpty
+                        ? caregiver.name[0].toUpperCase()
+                        : '?',
+                    style: const TextStyle(
+                      color: AppColors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 28,
+                    ),
                   ),
-                  const SizedBox(width: 0),
-                  SizedBox(
-                    child: ElevatedButton(
-                      onPressed: () => showUpdatePermissionsDialog(caregiver),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  caregiver.name,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.headingTextColor,
+                    fontFamily: 'Satoshi',
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  caregiver.relationship,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textColor,
+                    fontFamily: 'Satoshi',
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Details section
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.cardGray,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: [
+                      _buildDetailRow(Icons.email_outlined, 'Email', caregiver.email),
+                      if (caregiver.phone != null) ...[
+                        const SizedBox(height: 12),
+                        _buildDetailRow(Icons.phone_outlined, 'Phone', caregiver.phone!),
+                      ],
+                      if (caregiver.gender != null) ...[
+                        const SizedBox(height: 12),
+                        _buildDetailRow(Icons.person_outline, 'Gender', caregiver.gender!),
+                      ],
+                      const SizedBox(height: 12),
+                      _buildDetailRow(Icons.calendar_today_outlined, 'Added', caregiver.createdAt.split('T')[0]),
+                      const SizedBox(height: 12),
+                      _buildDetailRow(
+                        Icons.circle,
+                        'Status',
+                        caregiver.status,
+                        valueColor: caregiver.status.toLowerCase() == 'active'
+                            ? AppColors.green
+                            : AppColors.textColor,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Permissions section
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.cardGray,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Permissions',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.headingTextColor,
+                          fontFamily: 'Satoshi',
                         ),
                       ),
-                      child: Center(
+                      const SizedBox(height: 10),
+                      _buildPermissionBadge(
+                        'View Records',
+                        caregiver.canView == '1',
+                      ),
+                      const SizedBox(height: 8),
+                      _buildPermissionBadge(
+                        'Add Notes',
+                        caregiver.canAddNotes == '1',
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Action buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Get.back(),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          side: BorderSide(color: AppColors.dividerGray),
+                        ),
                         child: Text(
-                          'Update Permissions',
-                          style:
-                              TextStyle(color: AppColors.white, fontSize: 11),
+                          'Close',
+                          style: TextStyle(
+                            color: AppColors.headingTextColor,
+                            fontFamily: 'Satoshi',
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => showUpdatePermissionsDialog(caregiver),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          'Edit Permissions',
+                          style: TextStyle(
+                            color: AppColors.white,
+                            fontFamily: 'Satoshi',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              label,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: AppColors.textColor,
+  Widget _buildDetailRow(IconData icon, String label, String value, {Color? valueColor}) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(
+          icon,
+          size: 16,
+          color: AppColors.textColor,
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textColor,
+                  fontFamily: 'Satoshi',
+                ),
               ),
-            ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: valueColor ?? AppColors.headingTextColor,
+                  fontFamily: 'Satoshi',
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+              ),
+            ],
           ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              value,
-              style: TextStyle(color: AppColors.textColor),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 2,
-            ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPermissionBadge(String label, bool isGranted) {
+    return Row(
+      children: [
+        Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            color: isGranted ? AppColors.lightGreen : AppColors.lightRed,
+            borderRadius: BorderRadius.circular(6),
           ),
-        ],
-      ),
+          child: Icon(
+            isGranted ? Icons.check_rounded : Icons.close_rounded,
+            size: 16,
+            color: isGranted ? AppColors.green : AppColors.redColor,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            color: AppColors.headingTextColor,
+            fontFamily: 'Satoshi',
+          ),
+        ),
+        const Spacer(),
+        Text(
+          isGranted ? 'Allowed' : 'Denied',
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: isGranted ? AppColors.green : AppColors.redColor,
+            fontFamily: 'Satoshi',
+          ),
+        ),
+      ],
     );
   }
 
@@ -167,66 +326,134 @@ class AdvocacyController extends BaseController {
 
     Get.dialog(
       Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Update Permissions',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.headingTextColor,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Update access permissions for ${caregiver.name}',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textColor,
-                ),
-              ),
-              const SizedBox(height: 24),
-              Obx(() => SwitchListTile(
-                    title: Text('Can View Records'),
-                    subtitle: Text('Allow caregiver to view patient records'),
-                    value: updateViewPermission.value,
-                    onChanged: (value) => updateViewPermission.value = value,
-                    activeColor: AppColors.primary,
-                  )),
-              const SizedBox(height: 12),
-              Obx(() => SwitchListTile(
-                    title: Text('Can Add Notes'),
-                    subtitle: Text('Allow caregiver to add notes'),
-                    value: updateAddNotesPermission.value,
-                    onChanged: (value) =>
-                        updateAddNotesPermission.value = value,
-                    activeColor: AppColors.primary,
-                  )),
-              const SizedBox(height: 24),
+              // Header with icon
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton(
-                    onPressed: () => Get.back(),
-                    child: Text('Cancel'),
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppColors.lightBlue,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.security_outlined,
+                      color: AppColors.primary,
+                      size: 22,
+                    ),
                   ),
-                  const SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: () => updateCaregiverPermissions(caregiver.id),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Update Permissions',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.headingTextColor,
+                            fontFamily: 'Satoshi',
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          caregiver.name,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textColor,
+                            fontFamily: 'Satoshi',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              
+              // Permission toggles
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.cardGray,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  children: [
+                    Obx(() => _buildPermissionToggle(
+                      icon: Icons.visibility_outlined,
+                      title: 'View Records',
+                      subtitle: 'Access patient records',
+                      value: updateViewPermission.value,
+                      onChanged: (v) => updateViewPermission.value = v,
+                    )),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Divider(height: 1, color: AppColors.dividerGray),
+                    ),
+                    Obx(() => _buildPermissionToggle(
+                      icon: Icons.note_add_outlined,
+                      title: 'Add Notes',
+                      subtitle: 'Create patient notes',
+                      value: updateAddNotesPermission.value,
+                      onChanged: (v) => updateAddNotesPermission.value = v,
+                    )),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Action buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Get.back(),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        side: BorderSide(color: AppColors.dividerGray),
+                      ),
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: AppColors.headingTextColor,
+                          fontFamily: 'Satoshi',
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
-                    child: Text(
-                      'Update',
-                      style: TextStyle(color: AppColors.white),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => updateCaregiverPermissions(caregiver.id),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        'Save Changes',
+                        style: TextStyle(
+                          color: AppColors.white,
+                          fontFamily: 'Satoshi',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -238,7 +465,56 @@ class AdvocacyController extends BaseController {
     );
   }
 
+  Widget _buildPermissionToggle({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: AppColors.primary),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.headingTextColor,
+                  fontFamily: 'Satoshi',
+                ),
+              ),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textColor,
+                  fontFamily: 'Satoshi',
+                ),
+              ),
+            ],
+          ),
+        ),
+        Switch(
+          value: value,
+          onChanged: onChanged,
+          activeColor: AppColors.primary,
+        ),
+      ],
+    );
+  }
+
   Future<void> updateCaregiverPermissions(int caregiverId) async {
+    // Close update permissions dialog
+    Get.back();
+    // Close details dialog
+    Get.back();
+
     final result = await safeApiCall(
       () => _caregiversRepository.updateCaregiverAccess(
         caregiverId: caregiverId,
@@ -248,10 +524,6 @@ class AdvocacyController extends BaseController {
     );
 
     if (result != null) {
-      // Close update dialog
-      Get.back();
-      // Close details dialog
-      Get.back();
       // Refresh caregivers list
       await fetchCaregivers();
       // Show success message

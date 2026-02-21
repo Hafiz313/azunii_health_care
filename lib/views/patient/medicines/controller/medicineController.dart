@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../../../core/controllers/base_controller.dart';
 import '../../../../core/models/Medicine_model.dart';
@@ -221,19 +222,46 @@ class MedicineController extends BaseController {
 
   Future<void> _pickImage(ImageSource source) async {
     try {
-      // Request permissions
+      // Request appropriate permission
+      PermissionStatus status;
       if (source == ImageSource.camera) {
-        final cameraStatus = await Permission.camera.request();
-        if (!cameraStatus.isGranted) {
-          CustomSnackbar.show('Camera permission is required',
-              isSuccess: false);
+        status = await Permission.camera.request();
+        if (!status.isGranted) {
+          if (status.isPermanentlyDenied) {
+            CustomSnackbar.show(
+                'Camera permission permanently denied. Please enable it in app settings.',
+                isSuccess: false);
+            await openAppSettings();
+          } else {
+            CustomSnackbar.show('Camera permission is required',
+                isSuccess: false);
+          }
           return;
         }
       } else {
-        final storageStatus = await Permission.storage.request();
-        if (!storageStatus.isGranted) {
-          CustomSnackbar.show('Storage permission is required',
-              isSuccess: false);
+        // On Android 13+ (API 33), Permission.storage is ignored.
+        // Use Permission.photos instead.
+        if (Platform.isAndroid) {
+          final androidInfo = await DeviceInfoPlugin().androidInfo;
+          if (androidInfo.version.sdkInt >= 33) {
+            status = await Permission.photos.request();
+          } else {
+            status = await Permission.storage.request();
+          }
+        } else {
+          status = await Permission.photos.request();
+        }
+
+        if (!status.isGranted) {
+          if (status.isPermanentlyDenied) {
+            CustomSnackbar.show(
+                'Gallery permission permanently denied. Please enable it in app settings.',
+                isSuccess: false);
+            await openAppSettings();
+          } else {
+            CustomSnackbar.show('Gallery permission is required',
+                isSuccess: false);
+          }
           return;
         }
       }

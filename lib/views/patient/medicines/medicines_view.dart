@@ -194,7 +194,10 @@ class _AddMedicineViewState extends State<AddMedicineView> {
   ) {
     final isSelected = controller.frequencyType.value == value;
     return GestureDetector(
-      onTap: () => controller.setFrequencyType(value),
+      onTap: () {
+        FocusScope.of(context).unfocus();
+        controller.setFrequencyType(value);
+      },
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -288,7 +291,7 @@ class _AddMedicineViewState extends State<AddMedicineView> {
         const SizedBox(height: 8),
         GestureDetector(
           onTap: () async {
-            FocusScope.of(context).unfocus();
+            FocusManager.instance.primaryFocus?.unfocus();
             // For end date, enforce firstDate = start date
             DateTime firstDate = DateTime(2020);
             if (!isRequired && this.controller.startDateController.text.isNotEmpty) {
@@ -302,6 +305,10 @@ class _AddMedicineViewState extends State<AddMedicineView> {
               firstDate: firstDate,
               lastDate: DateTime(2030),
             );
+            // Prevent focus restoration after date picker closes
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              FocusManager.instance.primaryFocus?.unfocus();
+            });
             if (picked != null) {
               controller.text =
                   '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
@@ -449,11 +456,15 @@ class _AddMedicineViewState extends State<AddMedicineView> {
           const SizedBox(height: 8),
           InkWell(
             onTap: () async {
-              FocusScope.of(context).unfocus();
+              FocusManager.instance.primaryFocus?.unfocus();
               final TimeOfDay? picked = await showTimePicker(
                 context: context,
                 initialTime: TimeOfDay.now(),
               );
+              // Prevent focus restoration after time picker closes
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                FocusManager.instance.primaryFocus?.unfocus();
+              });
               if (picked != null) {
                 final formattedTime =
                     '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';

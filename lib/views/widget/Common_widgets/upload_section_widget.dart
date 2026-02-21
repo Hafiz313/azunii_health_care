@@ -78,7 +78,10 @@ class UploadSectionWidget extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           InkWell(
-            onTap: onTap,
+            onTap: () {
+              FocusScope.of(context).unfocus();
+              onTap();
+            },
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(

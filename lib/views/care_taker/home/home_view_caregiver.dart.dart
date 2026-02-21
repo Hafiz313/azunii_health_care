@@ -369,6 +369,7 @@ class HomeView_caregiver extends StatelessWidget {
                       size: context.screenWidth * 0.06),
                   title: '${medicine.medicineName} - ${medicine.dosage}',
                   isCompleted: medicine.status == 'active',
+                  onTap: () => controller.showMedicineDetails(medicine.id),
                 );
               },
             );
@@ -436,6 +437,7 @@ class HomeView_caregiver extends StatelessWidget {
                   doctor: visit.providerName,
                   reason: visit.notes,
                   specialty: visit.specialty,
+                  onTap: () => controller.showVisitDetails(visit.id),
                 );
               },
             );
