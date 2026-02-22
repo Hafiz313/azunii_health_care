@@ -152,6 +152,9 @@ class HomeController_caregiver extends BaseController {
     } catch (e) {
       setLoading(false);
       print('❌ Dashboard load error: $e');
+      // Clear dashboard data on error (e.g., permission denied)
+      dashboardData.value = null;
+      filteredMedicines.value = [];
     }
   }
 

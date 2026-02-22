@@ -53,8 +53,8 @@ class TodayTaskCard extends StatelessWidget {
               status ?? (isCompleted ? 'Active' : 'InActive'),
               fontSize: 12,
               color: isCompleted
-                  ? const Color.fromARGB(255, 255, 0, 0)
-                  : AppColors.primary,
+                  ? AppColors.primary
+                  : const Color.fromARGB(255, 255, 0, 0),
               align: TextAlign.start,
             ),
           ],
