@@ -76,7 +76,7 @@ class SignUpView extends StatelessWidget {
                     },
                   ),
                   SizedBox(
-                    height: context.screenHeight * 0.005,
+                    height: context.screenHeight * 0.015,
                   ),
                   CustomTxtField(
                     title: Lang.email,
@@ -95,7 +95,7 @@ class SignUpView extends StatelessWidget {
                     },
                   ),
                   SizedBox(
-                    height: context.screenHeight * 0.005,
+                    height: context.screenHeight * 0.015,
                   ),
                   CustomTxtField(
                     title: Lang.password,
@@ -129,7 +129,7 @@ class SignUpView extends StatelessWidget {
                     },
                   ),
                   SizedBox(
-                    height: context.screenHeight * 0.005,
+                    height: context.screenHeight * 0.015,
                   ),
                   CustomTxtField(
                     title: Lang.verifyPassword,
@@ -161,7 +161,7 @@ class SignUpView extends StatelessWidget {
                     },
                   ),
                   SizedBox(
-                    height: context.screenHeight * 0.005,
+                    height: context.screenHeight * 0.015,
                   ),
                   // Obx(() => CustomDropdown(
                   //       hintText: 'Select Role',
