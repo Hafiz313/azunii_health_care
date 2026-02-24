@@ -74,9 +74,15 @@ class _AddVisitViewState extends State<AddVisitView> {
 
   @override
   void deactivate() {
-    // Clear form data when widget is removed from tree (e.g., switching tabs in PageView)
+    // Defer clearing to after the build phase — PageView deactivates widgets
+    // during build, and modifying Rx values synchronously causes
+    // "setState() called during build" exceptions
     if (Get.isRegistered<VisitsController>()) {
-      controller.clearAllFields();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (Get.isRegistered<VisitsController>()) {
+          controller.clearAllFields();
+        }
+      });
     }
     super.deactivate();
   }
