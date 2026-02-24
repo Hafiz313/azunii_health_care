@@ -48,12 +48,6 @@ class _AllVisitsViewState extends State<AllVisitsView> {
               // List content
               Expanded(
                 child: Obx(() {
-                  if (controller.allVisitsLoading.value) {
-                    return const Center(
-                      child: CircularProgressIndicator(color: AppColors.primary),
-                    );
-                  }
-
                   final visits = controller.filteredAllVisitsList;
 
                   if (visits.isEmpty) {
@@ -102,14 +96,20 @@ class _AllVisitsViewState extends State<AllVisitsView> {
                   );
                 }),
               ),
-              // Pagination controls
-              Obx(() => PaginationControls(
-                    currentPage: controller.allVisitsCurrentPage.value,
-                    lastPage: controller.allVisitsLastPage.value,
-                    onPageChanged: (page) {
-                      controller.getAllVisitsPage(page);
-                    },
-                  )),
+              // Pagination controls - hide when date filter is active
+              Obx(() {
+                // Hide pagination when date filter is active
+                if (controller.allVisitsSelectedDate.value.isNotEmpty) {
+                  return const SizedBox.shrink();
+                }
+                return PaginationControls(
+                  currentPage: controller.allVisitsCurrentPage.value,
+                  lastPage: controller.allVisitsLastPage.value,
+                  onPageChanged: (page) {
+                    controller.getAllVisitsPage(page);
+                  },
+                );
+              }),
             ],
           ),
         ),

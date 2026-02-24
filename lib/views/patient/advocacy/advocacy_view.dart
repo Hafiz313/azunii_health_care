@@ -55,12 +55,14 @@ class AdvocacyView extends GetView<AdvocacyController> {
                 const SizedBox(height: 20),
                 _buildAddCaregiverButton(),
                 const SizedBox(height: 24),
-                subText2(
-                  'Caregiver Access',
-                  color: AppColors.headingTextColor,
-                  align: TextAlign.start,
-                  fontWeight: FontWeight.w600,
-                ),
+                Obx(() => controller.caregivers.length > 0
+                    ? subText2(
+                        'Caregiver Access',
+                        color: AppColors.headingTextColor,
+                        align: TextAlign.start,
+                        fontWeight: FontWeight.w600,
+                      )
+                    : const SizedBox.shrink()),
                 const SizedBox(height: 16),
               ],
             ),
@@ -165,7 +167,8 @@ class AdvocacyView extends GetView<AdvocacyController> {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
             child: Column(
@@ -234,7 +237,8 @@ class AdvocacyView extends GetView<AdvocacyController> {
                       child: ElevatedButton(
                         onPressed: () async {
                           Navigator.of(context).pop();
-                          await controller.deleteCaregiver(caregiver.caregiver.id);
+                          await controller
+                              .deleteCaregiver(caregiver.caregiver.id);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.redColor,

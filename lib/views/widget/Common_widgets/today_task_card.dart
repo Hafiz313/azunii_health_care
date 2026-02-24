@@ -9,6 +9,7 @@ class TodayTaskCard extends StatelessWidget {
   final String title;
   final bool isCompleted;
   final String? status;
+  final Color? color;
   final VoidCallback? onTap;
 
   const TodayTaskCard({
@@ -17,6 +18,7 @@ class TodayTaskCard extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.isCompleted,
+    this.color,
     this.status,
     this.onTap,
   });
@@ -50,10 +52,9 @@ class TodayTaskCard extends StatelessWidget {
             ),
             subText5(
               fontWeight: FontWeight.w500,
-              status ?? (isCompleted ? 'Active' : 'InActive'),
+              status ?? (isCompleted ? 'Active' : 'In Active'),
               fontSize: 12,
-              color: isCompleted                  
-                  ? Color.fromARGB(255, 255, 0, 0): AppColors.primary,
+              color: isCompleted ? color ?? Colors.green : color ?? Colors.red,
               align: TextAlign.start,
             ),
           ],

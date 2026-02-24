@@ -299,9 +299,28 @@ class _AddMedicineViewState extends State<AddMedicineView> {
                 firstDate = DateTime.parse(this.controller.startDateController.text.trim());
               } catch (_) {}
             }
+            
+            // Use selected date if available, otherwise use firstDate or today
+            DateTime initialDate = DateTime.now();
+            if (controller.text.isNotEmpty) {
+              try {
+                final selectedDate = DateTime.parse(controller.text.trim());
+                // Ensure selected date is not before firstDate
+                if (!selectedDate.isBefore(firstDate)) {
+                  initialDate = selectedDate;
+                } else if (firstDate.isAfter(DateTime.now())) {
+                  initialDate = firstDate;
+                }
+              } catch (_) {
+                initialDate = firstDate.isAfter(DateTime.now()) ? firstDate : DateTime.now();
+              }
+            } else {
+              initialDate = firstDate.isAfter(DateTime.now()) ? firstDate : DateTime.now();
+            }
+            
             final DateTime? picked = await showDatePicker(
               context: context,
-              initialDate: firstDate.isAfter(DateTime.now()) ? firstDate : DateTime.now(),
+              initialDate: initialDate,
               firstDate: firstDate,
               lastDate: DateTime(2030),
             );

@@ -13,6 +13,7 @@ import 'package:intl/intl.dart';
 
 class VisitsController extends BaseController {
   final VisitsRepository _VisitsRepository = VisitsRepository();
+  bool _isDisposed = false;
   final TextEditingController providerNameController = TextEditingController();
   final TextEditingController notesController = TextEditingController();
 
@@ -234,17 +235,11 @@ class VisitsController extends BaseController {
 
     if (result != null) {
       _showBottomSnackBar('Visit saved successfully!', isSuccess: true);
-
-      // Navigate back first, then clear fields
-      await Future.delayed(const Duration(milliseconds: 800));
-      
-      if (Get.isRegistered<VisitsController>()) {
-        Get.back();
-        // Clear fields after navigation
-        await Future.delayed(const Duration(milliseconds: 100));
-        clearAllFields();
-      }
     }
+
+    // Always clear fields after API call (success or failure)
+    // This screen lives in a PageView, so no Get.back()
+    clearAllFields();
   }
 
   void _showBottomSnackBar(String message, {bool isSuccess = false}) {
@@ -252,8 +247,13 @@ class VisitsController extends BaseController {
   }
 
   void clearAllFields() {
-    providerNameController.clear();
-    notesController.clear();
+    if (_isDisposed) return; // Guard against use after dispose
+    try {
+      providerNameController.clear();
+      notesController.clear();
+    } catch (_) {
+      // TextEditingControllers may already be disposed
+    }
     selectedSpecialty.value = '';
     selectedDate.value = null;
     selectedImage.value = null;
@@ -264,7 +264,7 @@ class VisitsController extends BaseController {
 
   @override
   void onClose() {
-    clearAllFields();
+    _isDisposed = true;
     providerNameController.dispose();
     notesController.dispose();
     super.onClose();

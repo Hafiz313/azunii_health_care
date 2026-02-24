@@ -20,7 +20,7 @@ class DatePickerButton extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.symmetric(horizontal: 0, vertical: 5),
         child: Container(
           padding: const EdgeInsets.symmetric(
             horizontal: 12,

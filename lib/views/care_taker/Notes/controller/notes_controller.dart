@@ -8,7 +8,6 @@ import '../../../../core/models/notes_model.dart';
 import '../../../../core/repositories/notes_repo.dart';
 import '../../../../core/services/caregiver_state.dart';
 import '../../../widget/Common_widgets/custom_snackbar.dart';
-import '../../dashboard/controller/caretaker_home_controller.dart';
 
 class NotesController extends BaseController {
   final TextEditingController noteController = TextEditingController();
@@ -21,6 +20,9 @@ class NotesController extends BaseController {
   
   // Track if we're currently fetching to prevent duplicate calls
   bool _isFetching = false;
+  
+  // Dirty flag: set to true when patient changes, cleared after fetch
+  bool _needsRefresh = true;
 
   final List<String> categories = [
     Lang.generalHealth,
@@ -46,12 +48,12 @@ class NotesController extends BaseController {
       });
     }
     
-    // Listen to active patient changes
+    // Listen to active patient changes — only mark as needing refresh, don't call API
     ever(_state.activePatientId, (patientId) {
       if (patientId != null && patientId != currentPatientId.value) {
         print('🔄 [Notes] Patient changed from ${currentPatientId.value} to $patientId');
         currentPatientId.value = patientId;
-        // Clear form when patient changes - check if not disposed
+        // Clear form when patient changes
         try {
           if (noteController.text.isNotEmpty) {
             noteController.clear();
@@ -60,48 +62,28 @@ class NotesController extends BaseController {
           print('⚠️ [Notes] Controller already disposed: $e');
         }
         selectedCategory.value = '';
-        
-        // Only fetch if we're on the notes page
-        try {
-          if (Get.isRegistered<CareTakerHomeController>()) {
-            final dashboardController = Get.find<CareTakerHomeController>();
-            if (dashboardController.currentIndex.value == 2) {
-              print('📄 [Notes] On notes page - Fetching notes...');
-              fetchNotes();
-            } else {
-              print('📄 [Notes] Not on notes page - Skipping auto-fetch');
-            }
-          }
-        } catch (e) {
-          print('⚠️ [Notes] Dashboard controller not found, fetching anyway: $e');
-          fetchNotes();
-        }
+        // Clear stale notes data
+        previousNotes.value = [];
+        // Mark as needing refresh — actual API call happens when tab becomes visible
+        _needsRefresh = true;
+        print('📌 [Notes] Marked as needing refresh');
       }
     });
     
-    // Listen to dashboard page changes
-    try {
-      if (Get.isRegistered<CareTakerHomeController>()) {
-        final dashboardController = Get.find<CareTakerHomeController>();
-        ever(dashboardController.refreshTrigger, (_) {
-          // Check if we're on the notes page (index 2)
-          if (dashboardController.currentIndex.value == 2) {
-            print('📄 [Notes] Notes page became visible - Refreshing...');
-            fetchNotes();
-          }
-        });
-      }
-    } catch (e) {
-      print('⚠️ [Notes] Dashboard controller not found: $e');
-    }
-    
-    // Initial load only if patient is already selected AND we're on notes page
+    // Initial load only if patient is already selected
     final patientId = _state.activePatientId.value;
     if (patientId != null) {
       print('📋 [Notes] Initial patient ID: $patientId');
       currentPatientId.value = patientId;
-      // Don't auto-fetch on init, wait for page to be visible
+      _needsRefresh = true; // Will fetch when notes tab is first visited
     }
+  }
+
+  /// Called by CareTakerHomeController when notes tab (index 2) becomes visible
+  /// Always fetches fresh data to ensure the screen is up to date
+  void refreshIfNeeded() {
+    print('🔄 [Notes] Tab became visible - Fetching fresh data...');
+    fetchNotes();
   }
 
   Future<void> fetchNotes() async {
@@ -135,6 +117,7 @@ class NotesController extends BaseController {
     final result =
         await safeApiCall(() => _notesRepository.getNotesList(patientId));
     _isFetching = false;
+    _needsRefresh = false; // Reset flag regardless of result
     
     if (result != null) {
       print('✅ [Notes] Received ${result.length} notes');

@@ -67,17 +67,20 @@ class _ViewSummariesViewState extends State<ViewSummariesView>
                         title: 'All Summaries',
                         isOndashboard: false,
                       ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: context.percentWidth * 5,
-                          vertical: context.percentHeight * 2,
-                        ),
-                        child: subText3(
-                          'Summaries',
-                          color: AppColors.headingTextColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      // Only show "Summaries" heading if list is not empty
+                      Obx(() => controller.summariesList.isNotEmpty
+                          ? Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: context.percentWidth * 5,
+                                vertical: context.percentHeight * 2,
+                              ),
+                              child: subText3(
+                                'Summaries',
+                                color: AppColors.headingTextColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )
+                          : const SizedBox.shrink()),
                       Expanded(
                         child: Obx(() {
                           if (controller.summariesList.isEmpty) {

@@ -88,11 +88,12 @@ class CustomDatePicker extends StatelessWidget {
     final now = DateTime.now();
     final firstDate = DateTime(now.year, now.month, now.day);
     
-    // Ensure initialDate is not before firstDate
+    // Use selected date if available, otherwise use today
     DateTime initialDate = firstDate;
     if (selectedDate != null) {
       // Compare dates without time component
       final selectedDateOnly = DateTime(selectedDate!.year, selectedDate!.month, selectedDate!.day);
+      // Use selected date even if it's today or in the future
       if (!selectedDateOnly.isBefore(firstDate)) {
         initialDate = selectedDateOnly;
       }

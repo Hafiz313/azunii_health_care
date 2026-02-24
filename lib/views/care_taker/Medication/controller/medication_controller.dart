@@ -5,7 +5,6 @@ import '../../../../core/repositories/caregiver_medicine_repo.dart';
 import '../../../../core/models/caregiver_medicine_list_model.dart';
 import '../../../../core/controllers/base_controller.dart';
 import '../../../../core/services/caregiver_state.dart';
-import '../../dashboard/controller/caretaker_home_controller.dart';
 
 class MedicationController extends BaseController {
   final Rx<DateTime?> selectedDate = Rx<DateTime?>(null);
@@ -19,60 +18,43 @@ class MedicationController extends BaseController {
   
   // Track if we're currently fetching to prevent duplicate calls
   bool _isFetching = false;
+  
+  // Dirty flag: set to true when patient changes, cleared after fetch
+  bool _needsRefresh = true;
 
   @override
   void onInit() {
     super.onInit();
     
-    // Listen to active patient changes
+    // Listen to active patient changes — only mark as needing refresh, don't call API
     ever(_state.activePatientId, (patientId) {
       if (patientId != null && patientId != currentPatientId.value) {
-        print('🔄 Patient changed from ${currentPatientId.value} to $patientId');
+        print('🔄 [Medication] Patient changed from ${currentPatientId.value} to $patientId');
         currentPatientId.value = patientId;
-        // Clear date filter when patient changes
+        // Clear date filter and stale data when patient changes
         selectedDate.value = null;
-        
-        // Only fetch if we're on the medication page
-        try {
-          if (Get.isRegistered<CareTakerHomeController>()) {
-            final dashboardController = Get.find<CareTakerHomeController>();
-            if (dashboardController.currentIndex.value == 1) {
-              print('📄 On medication page - Fetching medications...');
-              getMedications();
-            } else {
-              print('📄 Not on medication page - Skipping auto-fetch');
-            }
-          }
-        } catch (e) {
-          print('⚠️ Dashboard controller not found, fetching anyway: $e');
-          getMedications();
-        }
+        allMedications.value = [];
+        filteredMedications.value = [];
+        // Mark as needing refresh — actual API call happens when tab becomes visible
+        _needsRefresh = true;
+        print('📌 [Medication] Marked as needing refresh');
       }
     });
     
-    // Listen to dashboard page changes
-    try {
-      if (Get.isRegistered<CareTakerHomeController>()) {
-        final dashboardController = Get.find<CareTakerHomeController>();
-        ever(dashboardController.refreshTrigger, (_) {
-          // Check if we're on the medication page (index 1)
-          if (dashboardController.currentIndex.value == 1) {
-            print('📄 Medication page became visible - Refreshing...');
-            getMedications();
-          }
-        });
-      }
-    } catch (e) {
-      print('⚠️ Dashboard controller not found: $e');
-    }
-    
-    // Initial load only if patient is already selected AND we're on medication page
+    // Initial load only if patient is already selected
     final patientId = _state.activePatientId.value;
     if (patientId != null) {
-      print('📋 Initial patient ID: $patientId');
+      print('📋 [Medication] Initial patient ID: $patientId');
       currentPatientId.value = patientId;
-      // Don't auto-fetch on init, wait for page to be visible
+      _needsRefresh = true; // Will fetch when medication tab is first visited
     }
+  }
+
+  /// Called by CareTakerHomeController when medication tab (index 1) becomes visible
+  /// Always fetches fresh data to ensure the screen is up to date
+  void refreshIfNeeded() {
+    print('🔄 [Medication] Tab became visible - Fetching fresh data...');
+    getMedications();
   }
 
   Future<void> getMedications() async {
@@ -107,6 +89,7 @@ class MedicationController extends BaseController {
     _isFetching = true;
     final result = await safeApiCall(() => _repository.getMedicinesList());
     _isFetching = false;
+    _needsRefresh = false; // Reset flag regardless of result
     
     if (result != null) {
       print('✅ Received ${result.data.medicines.length} medications');
@@ -128,33 +111,140 @@ class MedicationController extends BaseController {
       return;
     }
 
-    final selectedDateTime = selectedDate.value!;
+    final selectedFilterDate = selectedDate.value!;
+    print('📅 Filtering caregiver medications for date: ${selectedFilterDate.toString()}');
     
     filteredMedications.value = allMedications.where((medication) {
-      try {
-        // Parse start date
-        if (medication.startDate == null || medication.startDate!.isEmpty) {
-          return false; // Skip if no start date
-        }
-        
-        final startDate = DateTime.parse(medication.startDate!);
-        
-        // If medication has an end date
-        if (medication.endDate != null && medication.endDate!.isNotEmpty) {
-          final endDate = DateTime.parse(medication.endDate!);
-          
-          // Check if selected date is between start and end date (inclusive)
-          return (selectedDateTime.isAfter(startDate.subtract(const Duration(days: 1))) &&
-                  selectedDateTime.isBefore(endDate.add(const Duration(days: 1))));
-        } else {
-          // If no end date, medication is ongoing - check if selected date is on or after start date
-          return selectedDateTime.isAfter(startDate.subtract(const Duration(days: 1)));
-        }
-      } catch (e) {
-        print('Error filtering medication: $e');
+      return _shouldIncludeMedication(medication, selectedFilterDate);
+    }).toList();
+
+    print('✅ Filtered medications count: ${filteredMedications.length}');
+  }
+
+  /// Determines if a medication should be included based on the selected filter date
+  bool _shouldIncludeMedication(CaregiverMedicineItem medication, DateTime selectedFilterDate) {
+    try {
+      print('\n🔍 Checking medication: ${medication.medicineName}');
+      
+      // Parse start_date (required field)
+      if (medication.startDate == null || medication.startDate!.isEmpty) {
+        print('  ❌ No start date, excluding');
         return false;
       }
-    }).toList();
+      
+      final startDate = DateTime.parse(medication.startDate!);
+      print('  📅 Start date: ${startDate.toString()}');
+      
+      // Parse end_date (optional field, null means ongoing)
+      DateTime? endDate;
+      if (medication.endDate != null && medication.endDate!.isNotEmpty) {
+        endDate = DateTime.parse(medication.endDate!);
+        print('  📅 End date: ${endDate.toString()}');
+      } else {
+        print('  📅 End date: null (ongoing)');
+      }
+
+      // Check if medication has any frequencies
+      if (medication.frequencies.isEmpty) {
+        print('  ❌ No frequencies, excluding');
+        return false;
+      }
+
+      // Check each frequency - if ANY matches, include the medication
+      for (var freq in medication.frequencies) {
+        final frequencyValue = freq.frequency.toLowerCase().trim();
+        print('  🔄 Checking frequency: $frequencyValue');
+
+        // 🔹 A) as_per_needed - ALWAYS include
+        if (frequencyValue == 'as_per_needed') {
+          print('    ✅ as_per_needed - ALWAYS INCLUDE');
+          return true;
+        }
+
+        // 1️⃣ Global Date Rule - Apply to all except as_per_needed
+        // Check if selectedFilterDate is before start_date
+        if (selectedFilterDate.isBefore(DateTime(startDate.year, startDate.month, startDate.day))) {
+          print('    ❌ Selected date is before start date, skip this frequency');
+          continue; // Try next frequency
+        }
+
+        // Check if selectedFilterDate is after end_date (if end_date exists)
+        if (endDate != null) {
+          if (selectedFilterDate.isAfter(DateTime(endDate.year, endDate.month, endDate.day))) {
+            print('    ❌ Selected date is after end date, skip this frequency');
+            continue; // Try next frequency
+          }
+        }
+
+        print('    ✅ Date is within valid range');
+
+        // 2️⃣ Frequency Rules
+        // 🔹 B) Daily
+        if (frequencyValue == 'daily') {
+          print('    ✅ Daily frequency - INCLUDE');
+          return true;
+        }
+
+        // 🔹 C) Every other day
+        if (frequencyValue == 'every other day') {
+          final differenceInDays = selectedFilterDate.difference(
+            DateTime(startDate.year, startDate.month, startDate.day)
+          ).inDays;
+          print('    📊 Every other day - Difference: $differenceInDays days');
+          
+          if (differenceInDays % 2 == 0) {
+            print('    ✅ Every other day matches (day $differenceInDays) - INCLUDE');
+            return true;
+          } else {
+            print('    ❌ Every other day does not match (day $differenceInDays)');
+            continue; // Try next frequency
+          }
+        }
+
+        // 🔹 D) Weekly
+        if (frequencyValue == 'weekly') {
+          final differenceInDays = selectedFilterDate.difference(
+            DateTime(startDate.year, startDate.month, startDate.day)
+          ).inDays;
+          print('    📊 Weekly - Difference: $differenceInDays days');
+          
+          if (differenceInDays % 7 == 0) {
+            print('    ✅ Weekly matches (day $differenceInDays) - INCLUDE');
+            return true;
+          } else {
+            print('    ❌ Weekly does not match (day $differenceInDays)');
+            continue; // Try next frequency
+          }
+        }
+
+        // 🔹 E) Monthly (30-day interval)
+        if (frequencyValue == 'monthly') {
+          final differenceInDays = selectedFilterDate.difference(
+            DateTime(startDate.year, startDate.month, startDate.day)
+          ).inDays;
+          print('    📊 Monthly - Difference: $differenceInDays days');
+          
+          if (differenceInDays % 30 == 0) {
+            print('    ✅ Monthly matches (day $differenceInDays) - INCLUDE');
+            return true;
+          } else {
+            print('    ❌ Monthly does not match (day $differenceInDays)');
+            continue; // Try next frequency
+          }
+        }
+
+        // Unknown frequency type
+        print('    ⚠️ Unknown frequency type: $frequencyValue');
+      }
+
+      // No frequency matched
+      print('  ❌ No frequency matched - EXCLUDE');
+      return false;
+      
+    } catch (e) {
+      print('  ❌ Error checking medication: $e');
+      return false;
+    }
   }
 
   Future<void> selectDate(BuildContext context) async {

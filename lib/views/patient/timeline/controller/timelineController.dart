@@ -10,14 +10,15 @@ class TimelineController extends BaseController {
   final RxList<MedicineSchedule> _allSchedules = <MedicineSchedule>[].obs;
   final RxList<TimelineEvent> _allEvents = <TimelineEvent>[].obs;
 
-  // Filtered data for display
+  // Separated & reversed lists for display
   final RxList<MedicineSchedule> scheduleList = <MedicineSchedule>[].obs;
-  final RxList<TimelineEvent> eventsList = <TimelineEvent>[].obs;
-  final RxList<dynamic> filteredList = <dynamic>[].obs;
+  final RxList<TimelineEvent> visitsList = <TimelineEvent>[].obs;
+  final RxList<TimelineEvent> medicineUpdatesList = <TimelineEvent>[].obs;
 
   final Rx<DateTime?> selectedDate = Rx<DateTime?>(DateTime.now());
   final RxInt currentPage = RxInt(1);
   final RxInt totalPages = RxInt(1);
+  final RxInt totalItems = RxInt(0);
   final RxBool showAllDates = RxBool(false);
 
   @override
@@ -43,9 +44,10 @@ class TimelineController extends BaseController {
       _allSchedules.value = result.data.schedule;
       _allEvents.value = result.data.events;
       currentPage.value = result.data.meta.page;
+      totalItems.value = result.data.meta.total;
       totalPages.value =
           (result.data.meta.total / result.data.meta.perPage).ceil();
-      _applyFilter();
+      _separateAndReverse();
     }
   }
 
@@ -61,34 +63,24 @@ class TimelineController extends BaseController {
     fetchTimeline(1);
   }
 
-  void _applyFilter() {
-    if (showAllDates.value || selectedDate.value == null) {
-      // Show all data
-      scheduleList.value = _allSchedules.toList();
-      eventsList.value = _allEvents.toList();
-    } else {
-      // Filter by selected date
-      final filterDate = selectedDate.value!;
-      //final filterDateStr = _formatDateForComparison(filterDate);
+  void _separateAndReverse() {
+    // Reverse schedules for latest-first
+    scheduleList.value = _allSchedules.reversed.toList();
 
-      // Filter schedules (they don't have date, so show all on any filter for now)
-      // If schedules have a date field in the API response, filter them here
-      scheduleList.value = _allSchedules.toList();
+    // Separate events into visits and medicine updates, reverse both
+    final visits = <TimelineEvent>[];
+    final medUpdates = <TimelineEvent>[];
 
-      // Filter events by timestamp
-      eventsList.value = _allEvents.where((event) {
-        try {
-          final eventDate = DateTime.parse(event.timestamp);
-          return eventDate.year == filterDate.year &&
-              eventDate.month == filterDate.month &&
-              eventDate.day == filterDate.day;
-        } catch (e) {
-          // If timestamp parsing fails, include the event
-          return true;
-        }
-      }).toList();
+    for (final event in _allEvents) {
+      if (event.type == 'visit') {
+        visits.add(event);
+      } else {
+        medUpdates.add(event);
+      }
     }
-    _updateFilteredList();
+
+    visitsList.value = visits.reversed.toList();
+    medicineUpdatesList.value = medUpdates.reversed.toList();
   }
 
   void goToPage(int page) {
@@ -97,11 +89,13 @@ class TimelineController extends BaseController {
     }
   }
 
-  void _updateFilteredList() {
-    final combined = <dynamic>[
-      ...scheduleList,
-      ...eventsList,
-    ];
-    filteredList.value = combined.reversed.toList();
+  bool get shouldShowPagination => totalItems.value >= 10;
+
+  bool get isFilterChanged {
+    if (selectedDate.value == null) return false;
+    final now = DateTime.now();
+    return selectedDate.value!.year != now.year ||
+        selectedDate.value!.month != now.month ||
+        selectedDate.value!.day != now.day;
   }
 }

@@ -287,6 +287,7 @@ class HomeView_caregiver extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header with date picker
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -331,6 +332,29 @@ class HomeView_caregiver extends StatelessWidget {
               ),
             ],
           ),
+
+          // View All button row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const SizedBox(),
+              SizedBox(width: context.screenWidth * 0.03),
+              InkWell(
+                onTap: () {
+                  // Navigate to medication caretaker view with isOndashboard: false
+                  Get.toNamed('/medication-caregiver',
+                      arguments: {'isOndashboard': false});
+                },
+                child: subText5(
+                  Lang.viewAll,
+                  color: Colors.black,
+                  align: TextAlign.start,
+                  context: context,
+                ),
+              ),
+            ],
+          ),
+
           SizedBox(height: context.screenHeight * 0.015),
           Obx(() {
             final controller = Get.find<HomeController_caregiver>();
@@ -368,7 +392,10 @@ class HomeView_caregiver extends StatelessWidget {
                       color: Colors.blue[600],
                       size: context.screenWidth * 0.06),
                   title: '${medicine.medicineName} - ${medicine.dosage}',
-                  isCompleted: medicine.status == 'active',
+                  isCompleted: medicine.status != 'active',
+                  color:
+                      medicine.status == 'active' ? Colors.green : Colors.red,
+                  status: medicine.status == 'active' ? 'Active' : 'Inactive',
                   onTap: () => controller.showMedicineDetails(medicine.id),
                 );
               },
@@ -406,11 +433,11 @@ class HomeView_caregiver extends StatelessWidget {
           ),
           SizedBox(height: context.screenHeight * 0.02),
           Obx(() {
-            final dashboard = controller.dashboardData.value;
+            final sortedVisits = controller.sortedVisits;
             if (controller.isLoading.value) {
               return const Center(child: CircularProgressIndicator());
             }
-            if (dashboard == null || dashboard.upcomingVisits.isEmpty) {
+            if (sortedVisits.isEmpty) {
               return Center(
                 child: Column(
                   children: [
@@ -427,11 +454,11 @@ class HomeView_caregiver extends StatelessWidget {
             return ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: dashboard.upcomingVisits.length,
+              itemCount: sortedVisits.length,
               separatorBuilder: (context, index) =>
                   SizedBox(height: context.screenHeight * 0.015),
               itemBuilder: (context, index) {
-                final visit = dashboard.upcomingVisits[index];
+                final visit = sortedVisits[index];
                 return AppointmentCard(
                   date: visit.visitDate,
                   doctor: visit.providerName,

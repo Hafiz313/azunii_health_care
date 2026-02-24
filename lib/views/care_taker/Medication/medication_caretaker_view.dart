@@ -8,13 +8,15 @@ import '../../widget/text.dart';
 import '../../widget/buttons.dart';
 import '../../widget/Common_widgets/customAppBar.dart';
 import '../../widget/Common_widgets/overlayloader.dart';
+import '../../widget/Common_widgets/date_picker_button.dart';
 import 'controller/medication_controller.dart';
 import '../../../core/models/caregiver_medicine_list_model.dart';
 
 class Medication_caretaker extends StatefulWidget {
   static const String routeName = '/medication-caregiver';
+  final bool isOndashboard;
 
-  const Medication_caretaker({super.key});
+  const Medication_caretaker({super.key, this.isOndashboard = true});
 
   @override
   State<Medication_caretaker> createState() => _Medication_caretakerState();
@@ -22,15 +24,28 @@ class Medication_caretaker extends StatefulWidget {
 
 class _Medication_caretakerState extends State<Medication_caretaker> {
   late final MedicationController controller;
+  late final bool isOndashboard;
 
   @override
   void initState() {
     super.initState();
+    // Get isOndashboard from widget parameter or arguments, default to true
+    final args = Get.arguments as Map<String, dynamic>?;
+    isOndashboard = args?['isOndashboard'] ?? widget.isOndashboard;
+    
     // Use existing controller or create new one
     if (Get.isRegistered<MedicationController>()) {
       controller = Get.find<MedicationController>();
     } else {
       controller = Get.put(MedicationController());
+    }
+    
+    // If not on dashboard (direct navigation), fetch data immediately
+    if (!isOndashboard) {
+      print('🚀 [Medication] Direct navigation detected - fetching data');
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        controller.getMedications();
+      });
     }
   }
 
@@ -51,6 +66,7 @@ class _Medication_caretakerState extends State<Medication_caretaker> {
                 children: [
                   CustomAppBar(
                     title: Lang.medication,
+                    isOndashboard: isOndashboard,
                     onIconTap: () {},
                   ),
                   Expanded(
@@ -80,49 +96,61 @@ class _Medication_caretakerState extends State<Medication_caretaker> {
 
   Widget _buildHeader(BuildContext context, MedicationController controller) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           headline6(
-            Lang.completed,
+            Lang.medication,
             color: AppColors.headingTextColor,
             fontWeight: FontWeight.w500,
           ),
-          GestureDetector(
-            onTap: () => controller.selectDate(context),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                border: Border.all(color: AppColors.dividerGray),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.calendar_today,
-                    size: 14,
-                    color: AppColors.textColor,
-                  ),
-                  const SizedBox(width: 8),
-                  Obx(() => subText5(
-                        fontSize: 12,
-                        fontWeight: FontWeight.normal,
-                        controller.selectedDate.value == null
-                            ? 'All'
-                            : '${controller.selectedDate.value!.day.toString().padLeft(2, '0')}-${controller.selectedDate.value!.month.toString().padLeft(2, '0')}-${controller.selectedDate.value!.year}',
-                        color: AppColors.textColor,
-                      )),
-                  const SizedBox(width: 4),
-                  const Icon(
-                    Icons.keyboard_arrow_down,
-                    size: 16,
-                    color: AppColors.textColor,
-                  ),
-                ],
-              ),
-            ),
+          Row(
+            children: [
+              // Clear filter button - only show when date is selected
+              Obx(() => controller.selectedDate.value != null
+                  ? Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: InkWell(
+                        onTap: () {
+                          controller.selectedDate.value = null;
+                          controller.filterMedicationsByDate();
+                        },
+                        borderRadius: BorderRadius.circular(20),
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.close,
+                            size: 16,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ),
+                    )
+                  : const SizedBox.shrink()),
+              // Date picker button using reusable widget
+              Obx(() => DatePickerButton(
+                    date: controller.selectedDate.value == null
+                        ? 'Select Date'
+                        : '${controller.selectedDate.value!.day.toString().padLeft(2, '0')}-${controller.selectedDate.value!.month.toString().padLeft(2, '0')}-${controller.selectedDate.value!.year}',
+                    onTap: () async {
+                      final DateTime? picked = await showDatePicker(
+                        context: context,
+                        initialDate: controller.selectedDate.value ?? DateTime.now(),
+                        firstDate: DateTime(2020),
+                        lastDate: DateTime(2030),
+                      );
+                      if (picked != null) {
+                        controller.selectedDate.value = picked;
+                        controller.filterMedicationsByDate();
+                      }
+                    },
+                  )),
+            ],
           ),
         ],
       ),

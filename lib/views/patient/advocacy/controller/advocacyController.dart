@@ -94,6 +94,7 @@ class AdvocacyController extends BaseController {
                 const SizedBox(height: 12),
                 Text(
                   caregiver.name,
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -104,6 +105,7 @@ class AdvocacyController extends BaseController {
                 const SizedBox(height: 4),
                 Text(
                   caregiver.relationship,
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
                     color: AppColors.textColor,
@@ -122,17 +124,21 @@ class AdvocacyController extends BaseController {
                   ),
                   child: Column(
                     children: [
-                      _buildDetailRow(Icons.email_outlined, 'Email', caregiver.email),
+                      _buildDetailRow(
+                          Icons.email_outlined, 'Email', caregiver.email),
                       if (caregiver.phone != null) ...[
                         const SizedBox(height: 12),
-                        _buildDetailRow(Icons.phone_outlined, 'Phone', caregiver.phone!),
+                        _buildDetailRow(
+                            Icons.phone_outlined, 'Phone', caregiver.phone!),
                       ],
                       if (caregiver.gender != null) ...[
                         const SizedBox(height: 12),
-                        _buildDetailRow(Icons.person_outline, 'Gender', caregiver.gender!),
+                        _buildDetailRow(
+                            Icons.person_outline, 'Gender', caregiver.gender!),
                       ],
                       const SizedBox(height: 12),
-                      _buildDetailRow(Icons.calendar_today_outlined, 'Added', caregiver.createdAt.split('T')[0]),
+                      _buildDetailRow(Icons.calendar_today_outlined, 'Added',
+                          caregiver.createdAt.split('T')[0]),
                       const SizedBox(height: 12),
                       _buildDetailRow(
                         Icons.circle,
@@ -238,7 +244,8 @@ class AdvocacyController extends BaseController {
     );
   }
 
-  Widget _buildDetailRow(IconData icon, String label, String value, {Color? valueColor}) {
+  Widget _buildDetailRow(IconData icon, String label, String value,
+      {Color? valueColor}) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -265,7 +272,7 @@ class AdvocacyController extends BaseController {
               Text(
                 value,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 12,
                   fontWeight: FontWeight.w500,
                   color: valueColor ?? AppColors.headingTextColor,
                   fontFamily: 'Satoshi',
@@ -378,7 +385,7 @@ class AdvocacyController extends BaseController {
                 ],
               ),
               const SizedBox(height: 24),
-              
+
               // Permission toggles
               Container(
                 padding: const EdgeInsets.all(16),
@@ -389,23 +396,23 @@ class AdvocacyController extends BaseController {
                 child: Column(
                   children: [
                     Obx(() => _buildPermissionToggle(
-                      icon: Icons.visibility_outlined,
-                      title: 'View Records',
-                      subtitle: 'Access patient records',
-                      value: updateViewPermission.value,
-                      onChanged: (v) => updateViewPermission.value = v,
-                    )),
+                          icon: Icons.visibility_outlined,
+                          title: 'View Records',
+                          subtitle: 'Access patient records',
+                          value: updateViewPermission.value,
+                          onChanged: (v) => updateViewPermission.value = v,
+                        )),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       child: Divider(height: 1, color: AppColors.dividerGray),
                     ),
                     Obx(() => _buildPermissionToggle(
-                      icon: Icons.note_add_outlined,
-                      title: 'Add Notes',
-                      subtitle: 'Create patient notes',
-                      value: updateAddNotesPermission.value,
-                      onChanged: (v) => updateAddNotesPermission.value = v,
-                    )),
+                          icon: Icons.note_add_outlined,
+                          title: 'Add Notes',
+                          subtitle: 'Create patient notes',
+                          value: updateAddNotesPermission.value,
+                          onChanged: (v) => updateAddNotesPermission.value = v,
+                        )),
                   ],
                 ),
               ),

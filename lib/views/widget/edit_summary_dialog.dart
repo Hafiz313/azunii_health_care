@@ -27,6 +27,7 @@ class _EditSummaryDialogState extends State<EditSummaryDialog>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
+  String? _errorText;
 
   @override
   void initState() {
@@ -45,6 +46,28 @@ class _EditSummaryDialogState extends State<EditSummaryDialog>
     );
 
     _animationController.forward();
+  }
+
+  void _validateAndUpdate() {
+    final text = widget.controller.text.trim();
+    
+    if (text.isEmpty) {
+      setState(() {
+        _errorText = 'Summary cannot be empty';
+      });
+      return;
+    }
+    
+    if (text.length < 10) {
+      setState(() {
+        _errorText = 'Summary must be at least 10 characters long';
+      });
+      return;
+    }
+    
+    // Validation passed
+    widget.onUpdate();
+    Navigator.pop(context);
   }
 
   @override
@@ -132,7 +155,9 @@ class _EditSummaryDialogState extends State<EditSummaryDialog>
                         color: AppColors.cardGray.withOpacity(0.3),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: AppColors.primary.withOpacity(0.2),
+                          color: _errorText != null 
+                              ? Colors.red 
+                              : AppColors.primary.withOpacity(0.2),
                         ),
                       ),
                       child: CustomTxtField(
@@ -141,6 +166,16 @@ class _EditSummaryDialogState extends State<EditSummaryDialog>
                         maxLines: 6,
                       ),
                     ),
+                    if (_errorText != null) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        _errorText!,
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: context.percentWidth * 3,
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 20),
                     // Buttons
                     Row(
@@ -165,10 +200,7 @@ class _EditSummaryDialogState extends State<EditSummaryDialog>
                         ),
                         const SizedBox(width: 8),
                         ElevatedButton(
-                          onPressed: () {
-                            widget.onUpdate();
-                            Navigator.pop(context);
-                          },
+                          onPressed: _validateAndUpdate,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
                             shape: RoundedRectangleBorder(

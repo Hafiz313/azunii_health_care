@@ -116,14 +116,20 @@ class _AllMedicinesViewState extends State<AllMedicinesView> {
                   );
                 }),
               ),
-              // Pagination controls
-              Obx(() => PaginationControls(
-                    currentPage: controller.allMedCurrentPage.value,
-                    lastPage: controller.allMedLastPage.value,
-                    onPageChanged: (page) {
-                      controller.getAllMedicinesPage(page);
-                    },
-                  )),
+              // Pagination controls - hide when date filter is active
+              Obx(() {
+                // Hide pagination when date filter is active
+                if (controller.allMedSelectedDate.value.isNotEmpty) {
+                  return const SizedBox.shrink();
+                }
+                return PaginationControls(
+                  currentPage: controller.allMedCurrentPage.value,
+                  lastPage: controller.allMedLastPage.value,
+                  onPageChanged: (page) {
+                    controller.getAllMedicinesPage(page);
+                  },
+                );
+              }),
             ],
           ),
         ),

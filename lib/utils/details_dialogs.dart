@@ -216,11 +216,16 @@ class DetailsDialogs {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  ...medicine.frequencies.map((freq) => _buildDetailRow(
-                      '${freq.frequency}',
-                      freq.frequency.toLowerCase() == 'as_per_needed'
-                          ? 'When Required'
-                          : convertTo12HourFormat(freq.time))),
+                  ...medicine.frequencies.map((freq) {
+                    // Format frequency label
+                    String frequencyLabel = _formatFrequencyLabel(freq.frequency);
+                    // Format time value
+                    String timeValue = freq.frequency.toLowerCase() == 'as_per_needed'
+                        ? 'When Required'
+                        : convertTo12HourFormat(freq.time);
+                    
+                    return _buildDetailRow(frequencyLabel, timeValue);
+                  }),
                 ],
                 if (medicine.attachment != null &&
                     medicine.attachment!.isNotEmpty) ...[
@@ -475,6 +480,27 @@ class DetailsDialogs {
       return '$hour:$minute $period';
     } catch (e) {
       return time24;
+    }
+  }
+
+  /// Formats frequency label for display
+  /// Example: "daily" -> "Daily", "as_per_needed" -> "As Per Needed", "monthly" -> "Monthly"
+  static String _formatFrequencyLabel(String frequency) {
+    final lowerFreq = frequency.toLowerCase().trim();
+    
+    if (lowerFreq == 'as_per_needed') {
+      return 'As Per Needed';
+    } else if (lowerFreq == 'daily') {
+      return 'Daily';
+    } else if (lowerFreq == 'weekly') {
+      return 'Weekly';
+    } else if (lowerFreq == 'monthly') {
+      return 'Monthly';
+    } else if (lowerFreq == 'every other day') {
+      return 'Every Other Day';
+    } else {
+      // Capitalize first letter for any other frequency
+      return frequency[0].toUpperCase() + frequency.substring(1);
     }
   }
 }

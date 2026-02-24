@@ -73,6 +73,15 @@ class _AddVisitViewState extends State<AddVisitView> {
   }
 
   @override
+  void deactivate() {
+    // Clear form data when widget is removed from tree (e.g., switching tabs in PageView)
+    if (Get.isRegistered<VisitsController>()) {
+      controller.clearAllFields();
+    }
+    super.deactivate();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return PopScope(
         canPop: true,

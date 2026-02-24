@@ -50,34 +50,57 @@ class TimelineData {
 class MedicineSchedule {
   final String type;
   final int medicineId;
-  final int frequencyId;
   final String medicineName;
   final String dosage;
-  final String frequency;
-  final String time;
+  final String startDate;
+  final String endDate;
   final String status;
+  final List<ScheduleFrequency> frequencies;
 
   MedicineSchedule({
     required this.type,
     required this.medicineId,
-    required this.frequencyId,
     required this.medicineName,
     required this.dosage,
-    required this.frequency,
-    required this.time,
+    required this.startDate,
+    required this.endDate,
     required this.status,
+    required this.frequencies,
   });
 
   factory MedicineSchedule.fromJson(Map<String, dynamic> json) {
     return MedicineSchedule(
       type: json['type'] ?? '',
       medicineId: json['medicine_id'] ?? 0,
-      frequencyId: json['frequency_id'] ?? 0,
       medicineName: json['medicine_name'] ?? '',
       dosage: json['dosage'] ?? '',
+      startDate: json['start_date'] ?? '',
+      endDate: json['end_date'] ?? '',
+      status: json['status'] ?? '',
+      frequencies: (json['frequencies'] as List<dynamic>?)
+              ?.map((item) => ScheduleFrequency.fromJson(item))
+              .toList() ??
+          [],
+    );
+  }
+}
+
+class ScheduleFrequency {
+  final int frequencyId;
+  final String frequency;
+  final String time;
+
+  ScheduleFrequency({
+    required this.frequencyId,
+    required this.frequency,
+    required this.time,
+  });
+
+  factory ScheduleFrequency.fromJson(Map<String, dynamic> json) {
+    return ScheduleFrequency(
+      frequencyId: json['frequency_id'] ?? 0,
       frequency: json['frequency'] ?? '',
       time: json['time'] ?? '',
-      status: json['status'] ?? '',
     );
   }
 }

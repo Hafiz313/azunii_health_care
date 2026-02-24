@@ -419,8 +419,8 @@ class HomeView extends StatelessWidget {
                               title: medicine.medicineName,
                               isCompleted: medicine.status != 'active',
                               status: medicine.status == 'active'
-                                  ? 'Active'
-                                  : 'In Active',
+                                  ? 'In Active'
+                                  : 'Active',
                               onTap: () =>
                                   controller.showMedicineDetails(medicine.id),
                             ),

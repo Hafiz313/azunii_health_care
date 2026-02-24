@@ -49,20 +49,27 @@ class MedicineController extends BaseController {
     final start = _parseDate(startDateController.text.trim());
     final end = _parseDate(endDateController.text.trim());
 
+    // If either date is missing, show all options
     if (start == null || end == null) {
-      // No valid date range → show all options
       return ['Daily', 'Every other day', 'Weekly', 'Monthly'];
     }
 
     final days = end.difference(start).inDays;
 
-    if (days < 3) {
+    // 0-1 days: Only Daily
+    if (days < 2) {
       return ['Daily'];
-    } else if (days < 7) {
+    } 
+    // 2-6 days: Daily + Every other day
+    else if (days < 7) {
       return ['Daily', 'Every other day'];
-    } else if (days <= 30) {
+    } 
+    // 7-29 days: Daily + Every other day + Weekly
+    else if (days < 30) {
       return ['Daily', 'Every other day', 'Weekly'];
-    } else {
+    } 
+    // 30+ days: All options
+    else {
       return ['Daily', 'Every other day', 'Weekly', 'Monthly'];
     }
   }
@@ -81,10 +88,21 @@ class MedicineController extends BaseController {
     if (frequencyRows.isEmpty) {
       addFrequencyRow();
     }
+    
+    // Listen to frequency type changes to ensure proper setup
+    ever(frequencyType, (type) {
+      if (type == 'unscheduled' && frequencyRows.isEmpty) {
+        final row = MedicineFrequencyInput();
+        row.frequency.value = 'as_per_needed';
+        row.timeController.text = '00:00';
+        frequencyRows.add(row);
+      }
+    });
   }
 
   // Set frequency type (scheduled/unscheduled)
   void setFrequencyType(String type) {
+    print('🔄 Setting frequency type to: $type');
     frequencyType.value = type;
     if (type == 'unscheduled') {
       // Clear end date immediately — it must NOT persist or be sent to API
@@ -98,6 +116,13 @@ class MedicineController extends BaseController {
       row.frequency.value = 'as_per_needed';
       row.timeController.text = '00:00'; // Dummy time for unscheduled
       frequencyRows.add(row);
+      frequencyRows.refresh(); // Force UI update
+      print('✅ Set unscheduled with as_per_needed frequency');
+      print('📋 Frequency rows count: ${frequencyRows.length}');
+      if (frequencyRows.isNotEmpty) {
+        print('📋 First row frequency: ${frequencyRows[0].frequency.value}');
+        print('📋 First row time: ${frequencyRows[0].timeController.text}');
+      }
     } else {
       // Reset to scheduled with one empty row
       for (var row in frequencyRows) {
@@ -105,6 +130,7 @@ class MedicineController extends BaseController {
       }
       frequencyRows.clear();
       addFrequencyRow();
+      print('✅ Set scheduled with empty frequency row');
     }
   }
 
@@ -400,14 +426,39 @@ class MedicineController extends BaseController {
           return;
         }
       }
+    } else {
+      // For unscheduled, ensure we have the as_per_needed frequency
+      if (frequencyRows.isEmpty) {
+        print('⚠️ No frequency rows for unscheduled, creating one');
+        final row = MedicineFrequencyInput();
+        row.frequency.value = 'as_per_needed';
+        row.timeController.text = '00:00';
+        frequencyRows.add(row);
+      }
+    }
+
+    // Debug: Log frequency rows before building (storeMedicine)
+    print('🔍 STORE DEBUG: About to build frequencies');
+    print('🔍 Frequency Type: ${frequencyType.value}');
+    print('🔍 Frequency Rows Count: ${frequencyRows.length}');
+    for (int i = 0; i < frequencyRows.length; i++) {
+      print('🔍 Row $i - Frequency Value: "${frequencyRows[i].frequency.value}"');
+      print('🔍 Row $i - Time: "${frequencyRows[i].timeController.text}"');
     }
 
     // Build frequencies list
     final frequencies = frequencyRows
-        .map((row) => MedicineFrequency(
-              frequency: row.frequency.value,
-              time: row.timeController.text.trim(),
-            ))
+        .map((row) {
+          // For unscheduled, ensure frequency is 'as_per_needed'
+          String freqValue = row.frequency.value;
+          if (frequencyType.value == 'unscheduled' && freqValue.isEmpty) {
+            freqValue = 'as_per_needed';
+          }
+          return MedicineFrequency(
+            frequency: freqValue,
+            time: row.timeController.text.trim(),
+          );
+        })
         .toList();
 
     // Force clear end date for unscheduled — never send it to API
@@ -527,14 +578,39 @@ class MedicineController extends BaseController {
           return;
         }
       }
+    } else {
+      // For unscheduled, ensure we have the as_per_needed frequency
+      if (frequencyRows.isEmpty) {
+        print('⚠️ No frequency rows for unscheduled, creating one');
+        final row = MedicineFrequencyInput();
+        row.frequency.value = 'as_per_needed';
+        row.timeController.text = '00:00';
+        frequencyRows.add(row);
+      }
+    }
+
+    // Debug: Log frequency rows before building (updateMedicine)
+    print('🔍 UPDATE DEBUG: About to build frequencies');
+    print('🔍 Frequency Type: ${frequencyType.value}');
+    print('🔍 Frequency Rows Count: ${frequencyRows.length}');
+    for (int i = 0; i < frequencyRows.length; i++) {
+      print('🔍 Row $i - Frequency Value: "${frequencyRows[i].frequency.value}"');
+      print('🔍 Row $i - Time: "${frequencyRows[i].timeController.text}"');
     }
 
     // Build frequencies list
     final frequencies = frequencyRows
-        .map((row) => MedicineFrequency(
-              frequency: row.frequency.value,
-              time: row.timeController.text.trim(),
-            ))
+        .map((row) {
+          // For unscheduled, ensure frequency is 'as_per_needed'
+          String freqValue = row.frequency.value;
+          if (frequencyType.value == 'unscheduled' && freqValue.isEmpty) {
+            freqValue = 'as_per_needed';
+          }
+          return MedicineFrequency(
+            frequency: freqValue,
+            time: row.timeController.text.trim(),
+          );
+        })
         .toList();
 
     // Force clear end date for unscheduled — never send it to API

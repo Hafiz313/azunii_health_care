@@ -160,6 +160,13 @@ class HomeController extends BaseController {
     if (result != null) {
       allMedicinesList.value = result;
       print('✅ allMedicinesList updated: ${allMedicinesList.length} medicines');
+      
+      // Debug: Log all medicines with their status
+      print('📋 All medicines from API:');
+      for (int i = 0; i < result.length; i++) {
+        print('  [$i] ${result[i].medicineName} - Status: ${result[i].status} - Updated: ${result[i].updatedAt}');
+      }
+      
       filterMedicinesByDate();
     } else {
       print('❌ API returned null');
@@ -178,35 +185,36 @@ class HomeController extends BaseController {
     }
 
     if (selectedDate.value.isEmpty) {
-      medicinesList.value = allMedicinesList;
-      print('✅ No filter: showing all medicines (${medicinesList.length})');
+      // Show first 5 medicines as they come from API (no sorting)
+      medicinesList.value = allMedicinesList.take(5).toList();
+      print('✅ No filter: showing first 5 medicines (${medicinesList.length})');
+      
+      // Debug: Log the 5 medicines being shown
+      print('📋 Medicines being displayed:');
+      for (int i = 0; i < medicinesList.length; i++) {
+        print('  [$i] ${medicinesList[i].medicineName} - Status: ${medicinesList[i].status}');
+      }
+      
       return;
     }
 
     try {
+      // Parse selected date (format: DD-MM-YYYY)
       final parts = selectedDate.value.split('-');
-      final selectedDateTime = DateTime(
-          int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
+      final selectedFilterDate = DateTime(
+        int.parse(parts[2]), // year
+        int.parse(parts[1]), // month
+        int.parse(parts[0]), // day
+      );
 
-      print('📅 Filtering for date: ${selectedDateTime.toString()}');
+      print('📅 Filtering for date: ${selectedFilterDate.toString()}');
 
       final filtered = allMedicinesList.where((medicine) {
-        try {
-          final updatedAt = DateTime.parse(medicine.updatedAt);
-          print(
-              '  Medicine: ${medicine.medicineName}, updatedAt: ${updatedAt.toString()}');
-          final matches = updatedAt.year == selectedDateTime.year &&
-              updatedAt.month == selectedDateTime.month &&
-              updatedAt.day == selectedDateTime.day;
-          print('    Matches: $matches');
-          return matches;
-        } catch (e) {
-          print('  ❌ Error parsing date for ${medicine.medicineName}: $e');
-          return false;
-        }
+        return _shouldIncludeMedicine(medicine, selectedFilterDate);
       }).toList();
 
-      medicinesList.value = filtered;
+      // Show first 5 filtered medicines (no sorting by updated_at)
+      medicinesList.value = filtered.take(5).toList();
       print('✅ Filtered medicinesList count: ${medicinesList.length}');
     } catch (e) {
       print('❌ Error in filterMedicinesByDate: $e');
@@ -215,11 +223,151 @@ class HomeController extends BaseController {
     }
   }
 
+  /// Determines if a medicine should be included based on the selected filter date
+  bool _shouldIncludeMedicine(Medicine medicine, DateTime selectedFilterDate) {
+    try {
+      print('\n🔍 Checking medicine: ${medicine.medicineName}');
+      
+      // Parse start_date (required field)
+      if (medicine.startDate == null || medicine.startDate!.isEmpty) {
+        print('  ❌ No start date, excluding');
+        return false;
+      }
+      
+      final startDate = DateTime.parse(medicine.startDate!);
+      print('  📅 Start date: ${startDate.toString()}');
+      
+      // Parse end_date (optional field, null means ongoing)
+      DateTime? endDate;
+      if (medicine.endDate != null && medicine.endDate!.isNotEmpty) {
+        endDate = DateTime.parse(medicine.endDate!);
+        print('  📅 End date: ${endDate.toString()}');
+      } else {
+        print('  📅 End date: null (ongoing)');
+      }
+
+      // Check if medicine has any frequencies
+      if (medicine.frequencies.isEmpty) {
+        print('  ❌ No frequencies, excluding');
+        return false;
+      }
+
+      // Check each frequency - if ANY matches, include the medicine
+      for (var freq in medicine.frequencies) {
+        final frequencyValue = freq.frequency.toLowerCase().trim();
+        print('  🔄 Checking frequency: $frequencyValue');
+
+        // 🔹 A) as_per_needed - ALWAYS include
+        if (frequencyValue == 'as_per_needed') {
+          print('    ✅ as_per_needed - ALWAYS INCLUDE');
+          return true;
+        }
+
+        // 1️⃣ Global Date Rule - Apply to all except as_per_needed
+        // Check if selectedFilterDate is before start_date
+        if (selectedFilterDate.isBefore(DateTime(startDate.year, startDate.month, startDate.day))) {
+          print('    ❌ Selected date is before start date, skip this frequency');
+          continue; // Try next frequency
+        }
+
+        // Check if selectedFilterDate is after end_date (if end_date exists)
+        if (endDate != null) {
+          if (selectedFilterDate.isAfter(DateTime(endDate.year, endDate.month, endDate.day))) {
+            print('    ❌ Selected date is after end date, skip this frequency');
+            continue; // Try next frequency
+          }
+        }
+
+        print('    ✅ Date is within valid range');
+
+        // 2️⃣ Frequency Rules
+        // 🔹 B) Daily
+        if (frequencyValue == 'daily') {
+          print('    ✅ Daily frequency - INCLUDE');
+          return true;
+        }
+
+        // 🔹 C) Every other day
+        if (frequencyValue == 'every other day') {
+          final differenceInDays = selectedFilterDate.difference(
+            DateTime(startDate.year, startDate.month, startDate.day)
+          ).inDays;
+          print('    📊 Every other day - Difference: $differenceInDays days');
+          
+          if (differenceInDays % 2 == 0) {
+            print('    ✅ Every other day matches (day $differenceInDays) - INCLUDE');
+            return true;
+          } else {
+            print('    ❌ Every other day does not match (day $differenceInDays)');
+            continue; // Try next frequency
+          }
+        }
+
+        // 🔹 D) Weekly
+        if (frequencyValue == 'weekly') {
+          final differenceInDays = selectedFilterDate.difference(
+            DateTime(startDate.year, startDate.month, startDate.day)
+          ).inDays;
+          print('    📊 Weekly - Difference: $differenceInDays days');
+          
+          if (differenceInDays % 7 == 0) {
+            print('    ✅ Weekly matches (day $differenceInDays) - INCLUDE');
+            return true;
+          } else {
+            print('    ❌ Weekly does not match (day $differenceInDays)');
+            continue; // Try next frequency
+          }
+        }
+
+        // 🔹 E) Monthly (30-day interval)
+        if (frequencyValue == 'monthly') {
+          final differenceInDays = selectedFilterDate.difference(
+            DateTime(startDate.year, startDate.month, startDate.day)
+          ).inDays;
+          print('    📊 Monthly - Difference: $differenceInDays days');
+          
+          if (differenceInDays % 30 == 0) {
+            print('    ✅ Monthly matches (day $differenceInDays) - INCLUDE');
+            return true;
+          } else {
+            print('    ❌ Monthly does not match (day $differenceInDays)');
+            continue; // Try next frequency
+          }
+        }
+
+        // Unknown frequency type
+        print('    ⚠️ Unknown frequency type: $frequencyValue');
+      }
+
+      // No frequency matched
+      print('  ❌ No frequency matched - EXCLUDE');
+      return false;
+      
+    } catch (e) {
+      print('  ❌ Error checking medicine: $e');
+      return false;
+    }
+  }
+
   Future<void> getVisits() async {
     final result = await safeApiCall(() => _visitsRepository.getVisitsList());
 
     if (result != null) {
-      visitsList.value = result;
+      // Take first 5 visits as they come from API
+      final first5 = result.take(5).toList();
+      
+      // Sort these 5 by visit_date in ascending order for display
+      first5.sort((a, b) {
+        try {
+          final dateA = DateTime.parse(a.visitDate);
+          final dateB = DateTime.parse(b.visitDate);
+          return dateA.compareTo(dateB); // Ascending order by visit date
+        } catch (e) {
+          return 0;
+        }
+      });
+      
+      visitsList.value = first5;
     }
   }
 
@@ -421,19 +569,16 @@ class HomeController extends BaseController {
     if (allMedSelectedDate.value.isEmpty) return allMedPageList;
 
     try {
+      // Parse selected date (format: DD-MM-YYYY)
       final parts = allMedSelectedDate.value.split('-');
-      final selectedDateTime = DateTime(
-          int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
+      final selectedFilterDate = DateTime(
+        int.parse(parts[2]), // year
+        int.parse(parts[1]), // month
+        int.parse(parts[0]), // day
+      );
 
       return allMedPageList.where((medicine) {
-        try {
-          final updatedAt = DateTime.parse(medicine.updatedAt);
-          return updatedAt.year == selectedDateTime.year &&
-              updatedAt.month == selectedDateTime.month &&
-              updatedAt.day == selectedDateTime.day;
-        } catch (e) {
-          return false;
-        }
+        return _shouldIncludeMedicine(medicine, selectedFilterDate);
       }).toList();
     } catch (e) {
       return allMedPageList;
@@ -529,14 +674,26 @@ class HomeController extends BaseController {
 
   /// Get filtered list for display (used in UI)
   List<VisitModel> get filteredAllVisitsList {
-    if (allVisitsSelectedDate.value.isEmpty) return allVisitsPageList;
+    if (allVisitsSelectedDate.value.isEmpty) {
+      // Sort by date in ascending order (earliest first)
+      final sorted = allVisitsPageList.toList()..sort((a, b) {
+        try {
+          final dateA = DateTime.parse(a.visitDate);
+          final dateB = DateTime.parse(b.visitDate);
+          return dateA.compareTo(dateB);
+        } catch (e) {
+          return 0;
+        }
+      });
+      return sorted;
+    }
 
     try {
       final parts = allVisitsSelectedDate.value.split('-');
       final selectedDateTime = DateTime(
           int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
 
-      return allVisitsPageList.where((visit) {
+      final filtered = allVisitsPageList.where((visit) {
         try {
           final visitDate = DateTime.parse(visit.visitDate);
           return visitDate.year == selectedDateTime.year &&
@@ -546,6 +703,19 @@ class HomeController extends BaseController {
           return false;
         }
       }).toList();
+      
+      // Sort filtered results by date in ascending order
+      filtered.sort((a, b) {
+        try {
+          final dateA = DateTime.parse(a.visitDate);
+          final dateB = DateTime.parse(b.visitDate);
+          return dateA.compareTo(dateB);
+        } catch (e) {
+          return 0;
+        }
+      });
+      
+      return filtered;
     } catch (e) {
       return allVisitsPageList;
     }

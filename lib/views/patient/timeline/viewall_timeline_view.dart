@@ -5,19 +5,17 @@ import 'package:get/get.dart';
 import 'dart:math';
 import '../../../consts/colors.dart';
 import '../../../consts/assets.dart';
-import '../../../consts/lang.dart';
 import '../../../core/models/timeline_model.dart';
 import '../../widget/text.dart';
 import '../../widget/Common_widgets/overlayloader.dart';
 import '../../widget/Common_widgets/timeline_task_card.dart';
+import '../../widget/Common_widgets/pagination_controls.dart';
 import 'widgets/visitcardwidget.dart';
 import 'widgets/timeline_details_dialogs.dart';
 import 'controller/timelineController.dart';
-import 'viewall_timeline_view.dart';
 
-class TimelineView extends GetView<TimelineController> {
-  final bool? isOndashboard;
-  const TimelineView({super.key, this.isOndashboard = false});
+class ViewAllTimelineView extends StatelessWidget {
+  const ViewAllTimelineView({super.key});
 
   static final List<Color> _cardColors = [
     Color(0xFF80C680),
@@ -62,7 +60,8 @@ class TimelineView extends GetView<TimelineController> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(TimelineController());
+    // Re-use the existing controller
+    final controller = Get.find<TimelineController>();
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -72,8 +71,8 @@ class TimelineView extends GetView<TimelineController> {
               child: Column(
                 children: [
                   CustomAppBar(
-                    title: Lang.timeline,
-                    isOndashboard: isOndashboard ?? true,
+                    title: 'Full Timeline',
+                    isOndashboard: false,
                   ),
                   Expanded(
                     child: RefreshIndicator(
@@ -86,11 +85,11 @@ class TimelineView extends GetView<TimelineController> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(height: 10),
-                            _buildDateFilterSection(context),
-                            const SizedBox(height: 4),
-                            _buildViewAllButton(context),
-                            const SizedBox(height: 8),
-                            _buildTimelineContent(context),
+                            _buildDateFilterSection(context, controller),
+                            const SizedBox(height: 16),
+                            _buildAllContent(context, controller),
+                            const SizedBox(height: 16),
+                            _buildPagination(controller),
                             const SizedBox(height: 20),
                           ],
                         ),
@@ -104,12 +103,13 @@ class TimelineView extends GetView<TimelineController> {
     );
   }
 
-  Widget _buildDateFilterSection(BuildContext context) {
+  Widget _buildDateFilterSection(
+      BuildContext context, TimelineController controller) {
     return Obx(() => Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             subText5(
-              controller.isFilterChanged ? 'Filtered by date' : Lang.asOfToday,
+              controller.isFilterChanged ? 'Filtered by date' : 'As of Today',
               fontWeight: FontWeight.w600,
               color: AppColors.headingTextColor,
               fontSize: 13,
@@ -118,7 +118,7 @@ class TimelineView extends GetView<TimelineController> {
               children: [
                 // Date Picker Button — matches DatePickerButton design
                 InkWell(
-                  onTap: () => _showDatePicker(context),
+                  onTap: () => _showDatePicker(context, controller),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 5),
                     child: Container(
@@ -178,7 +178,8 @@ class TimelineView extends GetView<TimelineController> {
                       decoration: BoxDecoration(
                         color: Colors.red.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.red.withOpacity(0.3)),
+                        border:
+                            Border.all(color: Colors.red.withOpacity(0.3)),
                       ),
                       child: const Icon(
                         Icons.close,
@@ -194,41 +195,8 @@ class TimelineView extends GetView<TimelineController> {
         ));
   }
 
-  Widget _buildViewAllButton(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: GestureDetector(
-        onTap: () {
-          Get.to(() => const ViewAllTimelineView());
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-          decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.primary.withOpacity(0.2)),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.list_alt, size: 14, color: AppColors.primary),
-              const SizedBox(width: 6),
-              Text(
-                'View All',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTimelineContent(BuildContext context) {
+  Widget _buildAllContent(
+      BuildContext context, TimelineController controller) {
     return Obx(() {
       if (controller.scheduleList.isEmpty &&
           controller.visitsList.isEmpty &&
@@ -239,12 +207,13 @@ class TimelineView extends GetView<TimelineController> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Medicine Schedule Section (max 5)
+          // Medicine Schedule — ALL items
           if (controller.scheduleList.isNotEmpty) ...[
             _buildSectionHeader(
               icon: Icons.medication_outlined,
               title: 'Medicine Schedule',
-              subtitle: '${controller.scheduleList.length} medications today',
+              subtitle:
+                  '${controller.scheduleList.length} medications',
               color: AppColors.primary,
             ),
             const SizedBox(height: 12),
@@ -270,20 +239,18 @@ class TimelineView extends GetView<TimelineController> {
               ),
               child: Column(
                 children: controller.scheduleList
-                    .take(5)
-                    .toList()
                     .asMap()
                     .entries
                     .map((entry) {
                   final random = Random(entry.value.medicineId);
-                  final color = _cardColors[random.nextInt(_cardColors.length)];
-                  final icon = _cardIcons[random.nextInt(_cardIcons.length)];
+                  final color =
+                      _cardColors[random.nextInt(_cardColors.length)];
+                  final icon =
+                      _cardIcons[random.nextInt(_cardIcons.length)];
                   return Padding(
                     padding: EdgeInsets.only(
                       bottom: entry.key !=
-                              (controller.scheduleList.length > 5
-                                  ? 4
-                                  : controller.scheduleList.length - 1)
+                              controller.scheduleList.length - 1
                           ? 10
                           : 0,
                     ),
@@ -291,27 +258,24 @@ class TimelineView extends GetView<TimelineController> {
                       item: entry.value,
                       bgColor: color,
                       icon: icon,
-                      onTap: () =>
-                          TimelineDetailsDialogs.showScheduleDetailsDialog(
-                              entry.value),
+                      onTap: () => TimelineDetailsDialogs
+                          .showScheduleDetailsDialog(entry.value),
                     ),
                   );
                 }).toList(),
               ),
             ),
-            if (controller.scheduleList.length > 5)
-              _buildSeeMoreHint(controller.scheduleList.length - 5),
             const SizedBox(height: 24),
           ],
 
-          // 2. Visit Timeline Section (max 5)
+          // Visits — ALL items
           if (controller.visitsList.isNotEmpty) ...[
             _buildSectionHeaderWithSort(
               title: 'Visit Timeline',
               count: controller.visitsList.length,
             ),
             const SizedBox(height: 12),
-            ...controller.visitsList.take(5).map((visit) {
+            ...controller.visitsList.map((visit) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: VisitCard(
@@ -321,47 +285,38 @@ class TimelineView extends GetView<TimelineController> {
                 ),
               );
             }),
-            if (controller.visitsList.length > 5)
-              _buildSeeMoreHint(controller.visitsList.length - 5),
             const SizedBox(height: 24),
           ],
 
-          // 3. Medicine Updates Section (max 5)
+          // Medicine Updates — ALL items
           if (controller.medicineUpdatesList.isNotEmpty) ...[
             _buildSectionHeader(
               icon: Icons.history,
               title: 'Medicine Updates',
               subtitle:
-                  '${controller.medicineUpdatesList.length} recent updates',
+                  '${controller.medicineUpdatesList.length} updates',
               color: Colors.orange,
             ),
             const SizedBox(height: 12),
-            _buildMedicineUpdatesTimeline(context),
-            if (controller.medicineUpdatesList.length > 5)
-              _buildSeeMoreHint(controller.medicineUpdatesList.length - 5),
+            _buildMedicineUpdatesTimeline(controller),
           ],
         ],
       );
     });
   }
 
-  Widget _buildSeeMoreHint(int remaining) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8),
-      child: Center(
-        child: GestureDetector(
-          onTap: () => Get.to(() => const ViewAllTimelineView()),
-          child: Text(
-            '+$remaining more — View All',
-            style: TextStyle(
-              fontSize: 12,
-              color: AppColors.primary,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-      ),
-    );
+  Widget _buildPagination(TimelineController controller) {
+    return Obx(() {
+      if (!controller.shouldShowPagination || controller.totalPages.value <= 1) {
+        return const SizedBox.shrink();
+      }
+
+      return PaginationControls(
+        currentPage: controller.currentPage.value,
+        lastPage: controller.totalPages.value,
+        onPageChanged: (page) => controller.goToPage(page),
+      );
+    });
   }
 
   Widget _buildSectionHeader({
@@ -421,34 +376,34 @@ class TimelineView extends GetView<TimelineController> {
           ),
         ),
         Container(
-            // padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            // decoration: BoxDecoration(
-            //   color: AppColors.cardGray,
-            //   borderRadius: BorderRadius.circular(8),
-            //   border: Border.all(color: AppColors.dividerGray),
-            // ),
-            // child: Row(
-            //   mainAxisSize: MainAxisSize.min,
-            //   children: [
-            //     Text(
-            //       'Sort By',
-            //       style: TextStyle(
-            //         fontSize: 12,
-            //         color: AppColors.headingTextColor,
-            //         fontWeight: FontWeight.w500,
-            //       ),
-            //     ),
-            //     const SizedBox(width: 4),
-            //     Icon(Icons.filter_list, size: 14, color: AppColors.textColor),
-            //   ],
-            // ),
-            ),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: AppColors.cardGray,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppColors.dividerGray),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Sort By',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.headingTextColor,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Icon(Icons.filter_list, size: 14, color: AppColors.textColor),
+            ],
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildMedicineUpdatesTimeline(BuildContext context) {
-    final items = controller.medicineUpdatesList.take(5).toList();
+  Widget _buildMedicineUpdatesTimeline(TimelineController controller) {
+    final items = controller.medicineUpdatesList;
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -486,7 +441,6 @@ class TimelineView extends GetView<TimelineController> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Timeline connector
           Column(
             children: [
               Container(
@@ -517,7 +471,6 @@ class TimelineView extends GetView<TimelineController> {
             ],
           ),
           const SizedBox(width: 12),
-          // Event content
           Expanded(
             child: Container(
               margin: EdgeInsets.only(bottom: isLast ? 0 : 16),
@@ -649,7 +602,8 @@ class TimelineView extends GetView<TimelineController> {
   }
 
   String _formatTime12Hour(DateTime dt) {
-    final hour = dt.hour > 12 ? dt.hour - 12 : (dt.hour == 0 ? 12 : dt.hour);
+    final hour =
+        dt.hour > 12 ? dt.hour - 12 : (dt.hour == 0 ? 12 : dt.hour);
     final period = dt.hour >= 12 ? 'PM' : 'AM';
     return '$hour:${dt.minute.toString().padLeft(2, '0')} $period';
   }
@@ -678,7 +632,8 @@ class TimelineView extends GetView<TimelineController> {
     );
   }
 
-  Future<void> _showDatePicker(BuildContext context) async {
+  Future<void> _showDatePicker(
+      BuildContext context, TimelineController controller) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: controller.selectedDate.value ?? DateTime.now(),

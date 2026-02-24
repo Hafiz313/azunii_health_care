@@ -158,6 +158,26 @@ class HomeController_caregiver extends BaseController {
     }
   }
 
+  /// Get sorted visits in ascending order by date (earliest first)
+  List<UpcomingVisit> get sortedVisits {
+    final dashboard = dashboardData.value;
+    if (dashboard == null || dashboard.upcomingVisits.isEmpty) {
+      return [];
+    }
+    
+    final sorted = dashboard.upcomingVisits.toList()..sort((a, b) {
+      try {
+        final dateA = DateTime.parse(a.visitDate);
+        final dateB = DateTime.parse(b.visitDate);
+        return dateA.compareTo(dateB); // Ascending order
+      } catch (e) {
+        return 0;
+      }
+    });
+    
+    return sorted;
+  }
+
   void filterMedicinesByDate() {
     final dashboard = dashboardData.value;
     if (dashboard == null) {
@@ -166,37 +186,153 @@ class HomeController_caregiver extends BaseController {
     }
 
     if (selectedDateString.value.isEmpty) {
-      filteredMedicines.value = dashboard.medicineQueries;
+      // Show first 5 medicines as they come from API (no sorting)
+      filteredMedicines.value = dashboard.medicineQueries.take(5).toList();
       return;
     }
 
-    final selected = DateTime.parse(selectedDateString.value);
-    filteredMedicines.value = dashboard.medicineQueries.where((medicine) {
-      try {
-        // Parse start date
-        if (medicine.startDate == null || medicine.startDate!.isEmpty) {
-          return false; // Skip if no start date
-        }
+    try {
+      final selectedFilterDate = DateTime.parse(selectedDateString.value);
+      print('📅 Filtering caregiver medicines for date: ${selectedFilterDate.toString()}');
 
-        final startDate = DateTime.parse(medicine.startDate!);
+      final filtered = dashboard.medicineQueries.where((medicine) {
+        return _shouldIncludeMedicine(medicine, selectedFilterDate);
+      }).toList();
+      
+      // Show first 5 filtered medicines
+      filteredMedicines.value = filtered.take(5).toList();
 
-        // If medication has an end date
-        if (medicine.endDate != null && medicine.endDate!.isNotEmpty) {
-          final endDate = DateTime.parse(medicine.endDate!);
+      print('✅ Filtered medicines count: ${filteredMedicines.length}');
+    } catch (e) {
+      print('❌ Error in filterMedicinesByDate: $e');
+      filteredMedicines.value = dashboard.medicineQueries;
+    }
+  }
 
-          // Check if selected date is between start and end date (inclusive)
-          return (selected
-                  .isAfter(startDate.subtract(const Duration(days: 1))) &&
-              selected.isBefore(endDate.add(const Duration(days: 1))));
-        } else {
-          // If no end date, medication is ongoing - check if selected date is on or after start date
-          return selected.isAfter(startDate.subtract(const Duration(days: 1)));
-        }
-      } catch (e) {
-        print('Error filtering medication: $e');
+  /// Determines if a medicine should be included based on the selected filter date
+  bool _shouldIncludeMedicine(MedicineQuery medicine, DateTime selectedFilterDate) {
+    try {
+      print('\n🔍 Checking medicine: ${medicine.medicineName}');
+      
+      // Parse start_date (required field)
+      if (medicine.startDate == null || medicine.startDate!.isEmpty) {
+        print('  ❌ No start date, excluding');
         return false;
       }
-    }).toList();
+      
+      final startDate = DateTime.parse(medicine.startDate!);
+      print('  📅 Start date: ${startDate.toString()}');
+      
+      // Parse end_date (optional field, null means ongoing)
+      DateTime? endDate;
+      if (medicine.endDate != null && medicine.endDate!.isNotEmpty) {
+        endDate = DateTime.parse(medicine.endDate!);
+        print('  📅 End date: ${endDate.toString()}');
+      } else {
+        print('  📅 End date: null (ongoing)');
+      }
+
+      // Check if medicine has any frequencies
+      if (medicine.frequencies.isEmpty) {
+        print('  ❌ No frequencies, excluding');
+        return false;
+      }
+
+      // Check each frequency - if ANY matches, include the medicine
+      for (var freq in medicine.frequencies) {
+        final frequencyValue = freq.frequency.toLowerCase().trim();
+        print('  🔄 Checking frequency: $frequencyValue');
+
+        // 🔹 A) as_per_needed - ALWAYS include
+        if (frequencyValue == 'as_per_needed') {
+          print('    ✅ as_per_needed - ALWAYS INCLUDE');
+          return true;
+        }
+
+        // 1️⃣ Global Date Rule - Apply to all except as_per_needed
+        // Check if selectedFilterDate is before start_date
+        if (selectedFilterDate.isBefore(DateTime(startDate.year, startDate.month, startDate.day))) {
+          print('    ❌ Selected date is before start date, skip this frequency');
+          continue; // Try next frequency
+        }
+
+        // Check if selectedFilterDate is after end_date (if end_date exists)
+        if (endDate != null) {
+          if (selectedFilterDate.isAfter(DateTime(endDate.year, endDate.month, endDate.day))) {
+            print('    ❌ Selected date is after end date, skip this frequency');
+            continue; // Try next frequency
+          }
+        }
+
+        print('    ✅ Date is within valid range');
+
+        // 2️⃣ Frequency Rules
+        // 🔹 B) Daily
+        if (frequencyValue == 'daily') {
+          print('    ✅ Daily frequency - INCLUDE');
+          return true;
+        }
+
+        // 🔹 C) Every other day
+        if (frequencyValue == 'every other day') {
+          final differenceInDays = selectedFilterDate.difference(
+            DateTime(startDate.year, startDate.month, startDate.day)
+          ).inDays;
+          print('    📊 Every other day - Difference: $differenceInDays days');
+          
+          if (differenceInDays % 2 == 0) {
+            print('    ✅ Every other day matches (day $differenceInDays) - INCLUDE');
+            return true;
+          } else {
+            print('    ❌ Every other day does not match (day $differenceInDays)');
+            continue; // Try next frequency
+          }
+        }
+
+        // 🔹 D) Weekly
+        if (frequencyValue == 'weekly') {
+          final differenceInDays = selectedFilterDate.difference(
+            DateTime(startDate.year, startDate.month, startDate.day)
+          ).inDays;
+          print('    📊 Weekly - Difference: $differenceInDays days');
+          
+          if (differenceInDays % 7 == 0) {
+            print('    ✅ Weekly matches (day $differenceInDays) - INCLUDE');
+            return true;
+          } else {
+            print('    ❌ Weekly does not match (day $differenceInDays)');
+            continue; // Try next frequency
+          }
+        }
+
+        // 🔹 E) Monthly (30-day interval)
+        if (frequencyValue == 'monthly') {
+          final differenceInDays = selectedFilterDate.difference(
+            DateTime(startDate.year, startDate.month, startDate.day)
+          ).inDays;
+          print('    📊 Monthly - Difference: $differenceInDays days');
+          
+          if (differenceInDays % 30 == 0) {
+            print('    ✅ Monthly matches (day $differenceInDays) - INCLUDE');
+            return true;
+          } else {
+            print('    ❌ Monthly does not match (day $differenceInDays)');
+            continue; // Try next frequency
+          }
+        }
+
+        // Unknown frequency type
+        print('    ⚠️ Unknown frequency type: $frequencyValue');
+      }
+
+      // No frequency matched
+      print('  ❌ No frequency matched - EXCLUDE');
+      return false;
+      
+    } catch (e) {
+      print('  ❌ Error checking medicine: $e');
+      return false;
+    }
   }
 
   void loadUserData() {

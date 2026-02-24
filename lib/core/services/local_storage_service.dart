@@ -9,7 +9,9 @@ class LocalStorageService {
   static const String _userTypeKey = 'userType';
   static const String _tokenKey = 'authToken';
   
-  static const _secureStorage = FlutterSecureStorage();
+  static const _secureStorage = FlutterSecureStorage(
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+  );
 
   /// Initialize Hive
 
@@ -83,19 +85,21 @@ class LocalStorageService {
   }
 
   /// Complete logout - Clear all data and reset login status
+  /// NEVER throws — must always complete so navigation can proceed
   static Future<void> logout() async {
     try {
-      // Clear Hive data
-
       // Clear SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_isLoggedInKey);
       await prefs.remove(_userTypeKey);
-      
-      // Clear secure storage
+    } catch (e) {
+      // Ignore — we must not prevent navigation
+    }
+    try {
+      // Clear secure storage separately — can fail on some devices
       await _secureStorage.delete(key: _tokenKey);
     } catch (e) {
-      throw Exception('Failed to logout');
+      // Ignore — we must not prevent navigation
     }
   }
 }
