@@ -540,6 +540,14 @@ class AdvocacyController extends BaseController {
     }
   }
 
+  void clearForm() {
+    emailController.clear();
+    fullNameController.clear();
+    selectedRelationship.value = '';
+    viewPermission.value = true;
+    addNotesPermission.value = true;
+  }
+
   void setRelationship(String relationship) {
     selectedRelationship.value = relationship;
   }

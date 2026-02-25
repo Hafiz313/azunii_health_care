@@ -347,12 +347,13 @@ class MedicineController extends BaseController {
     // Determine frequency type and load frequencies
     if (medicine.frequencies.isNotEmpty && 
         medicine.frequencies[0].frequency == 'as_per_needed') {
-      // Unscheduled type
-      frequencyType.value = 'unscheduled';
+      // Unscheduled type — add the row BEFORE setting frequencyType
+      // to prevent the ever() listener from adding a duplicate row
       final row = MedicineFrequencyInput();
       row.frequency.value = 'as_per_needed';
       row.timeController.text = '00:00';
       frequencyRows.add(row);
+      frequencyType.value = 'unscheduled';
     } else {
       // Scheduled type
       frequencyType.value = 'scheduled';

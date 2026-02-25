@@ -44,59 +44,68 @@ class AdvocacyView extends GetView<AdvocacyController> {
   /// Caregiver Content
   Widget _buildCaregiverContent(AdvocacyController controller) {
     return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 20),
-                _buildAddCaregiverButton(),
-                const SizedBox(height: 24),
-                Obx(() => controller.caregivers.length > 0
-                    ? subText2(
-                        'Caregiver Access',
-                        color: AppColors.headingTextColor,
-                        align: TextAlign.start,
-                        fontWeight: FontWeight.w600,
-                      )
-                    : const SizedBox.shrink()),
-                const SizedBox(height: 16),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Obx(() => controller.caregivers.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.people_outline,
-                          size: 64,
-                          color: AppColors.textColor.withOpacity(0.5),
+      child: RefreshIndicator(
+        onRefresh: controller.fetchCaregivers,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+                    _buildAddCaregiverButton(),
+                    const SizedBox(height: 24),
+                    Obx(() => controller.caregivers.length > 0
+                        ? subText2(
+                            'Caregiver Access',
+                            color: AppColors.headingTextColor,
+                            align: TextAlign.start,
+                            fontWeight: FontWeight.w600,
+                          )
+                        : const SizedBox.shrink()),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+              Obx(() => controller.caregivers.isEmpty
+                  ? SizedBox(
+                      height: 400,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.people_outline,
+                              size: 64,
+                              color: AppColors.textColor.withOpacity(0.5),
+                            ),
+                            const SizedBox(height: 16),
+                            subText4(
+                              'No caregivers added yet',
+                              color: AppColors.textColor,
+                              align: TextAlign.center,
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 16),
-                        subText4(
-                          'No caregivers added yet',
-                          color: AppColors.textColor,
-                          align: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    itemCount: controller.caregivers.length,
-                    itemBuilder: (context, index) {
-                      final caregiver = controller.caregivers[index];
-                      return _buildCaregiverCard(controller, caregiver);
-                    },
-                  )),
+                      ),
+                    )
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      itemCount: controller.caregivers.length,
+                      itemBuilder: (context, index) {
+                        final caregiver = controller.caregivers[index];
+                        return _buildCaregiverCard(controller, caregiver);
+                      },
+                    )),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

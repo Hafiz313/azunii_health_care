@@ -9,6 +9,7 @@ import '../../widget/buttons.dart';
 import '../../widget/Common_widgets/customAppBar.dart';
 import '../../widget/Common_widgets/overlayloader.dart';
 import '../../widget/Common_widgets/date_picker_button.dart';
+import '../../widget/Common_widgets/pagination_controls.dart';
 import 'controller/medication_controller.dart';
 import '../../../core/models/caregiver_medicine_list_model.dart';
 
@@ -32,19 +33,19 @@ class _Medication_caretakerState extends State<Medication_caretaker> {
     // Get isOndashboard from widget parameter or arguments, default to true
     final args = Get.arguments as Map<String, dynamic>?;
     isOndashboard = args?['isOndashboard'] ?? widget.isOndashboard;
-    
+
     // Use existing controller or create new one
     if (Get.isRegistered<MedicationController>()) {
       controller = Get.find<MedicationController>();
     } else {
       controller = Get.put(MedicationController());
     }
-    
+
     // If not on dashboard (direct navigation), fetch data immediately
     if (!isOndashboard) {
       print('🚀 [Medication] Direct navigation detected - fetching data');
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        controller.getMedications();
+        controller.getMedications(page: 1);
       });
     }
   }
@@ -71,22 +72,35 @@ class _Medication_caretakerState extends State<Medication_caretaker> {
                   ),
                   Expanded(
                     child: RefreshIndicator(
-                      onRefresh: controller.getMedications,
-                      child: SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 5),
-                            _buildHeader(context, controller),
-                            const SizedBox(height: 20),
-                            _buildMedicationList(context, controller),
-                            const SizedBox(height: 20),
-                          ],
-                        ),
+                      onRefresh: () => controller.getMedications(
+                        page: controller.currentPage.value,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          //   const SizedBox(height: 5),
+                          _buildHeader(context, controller),
+                          const SizedBox(height: 20),
+                          Expanded(
+                            child: _buildMedicationList(context, controller),
+                          ),
+                        ],
                       ),
                     ),
                   ),
+                  // Pagination controls - hide when date filter is active
+                  Obx(() {
+                    if (controller.selectedDate.value != null) {
+                      return const SizedBox.shrink();
+                    }
+                    return PaginationControls(
+                      currentPage: controller.currentPage.value,
+                      lastPage: controller.lastPage.value,
+                      onPageChanged: (page) {
+                        controller.getMedicationsPage(page);
+                      },
+                    );
+                  }),
                 ],
               ),
             )),
@@ -140,7 +154,8 @@ class _Medication_caretakerState extends State<Medication_caretaker> {
                     onTap: () async {
                       final DateTime? picked = await showDatePicker(
                         context: context,
-                        initialDate: controller.selectedDate.value ?? DateTime.now(),
+                        initialDate:
+                            controller.selectedDate.value ?? DateTime.now(),
                         firstDate: DateTime(2020),
                         lastDate: DateTime(2030),
                       );
@@ -159,34 +174,31 @@ class _Medication_caretakerState extends State<Medication_caretaker> {
 
   Widget _buildMedicationList(
       BuildContext context, MedicationController controller) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Obx(() {
-        if (controller.filteredMedications.isEmpty) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(40),
-              child: subText4(
-                'No medicines are available',
-                color: AppColors.textColor,
-                fontWeight: FontWeight.w500,
-                align: TextAlign.center,
-              ),
+    return Obx(() {
+      if (controller.filteredMedications.isEmpty) {
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.all(40),
+            child: subText4(
+              'No medicines are available',
+              color: AppColors.textColor,
+              fontWeight: FontWeight.w500,
+              align: TextAlign.center,
             ),
-          );
-        }
-        return ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: controller.filteredMedications.length,
-          separatorBuilder: (context, index) => const SizedBox(height: 16),
-          itemBuilder: (context, index) {
-            final medication = controller.filteredMedications[index];
-            return _buildMedicationCard(context, medication, controller);
-          },
+          ),
         );
-      }),
-    );
+      }
+      return ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemCount: controller.filteredMedications.length,
+        separatorBuilder: (context, index) => const SizedBox(height: 16),
+        itemBuilder: (context, index) {
+          final medication = controller.filteredMedications[index];
+          return _buildMedicationCard(context, medication, controller);
+        },
+      );
+    });
   }
 
   Widget _buildMedicationCard(BuildContext context,
@@ -240,7 +252,8 @@ class _Medication_caretakerState extends State<Medication_caretaker> {
                   // Check if frequency is "as_per_needed"
                   if (f.frequency.toLowerCase() == 'as_per_needed') {
                     return Padding(
-                      padding: EdgeInsets.only(bottom: context.screenWidth * 0.01),
+                      padding:
+                          EdgeInsets.only(bottom: context.screenWidth * 0.01),
                       child: subText5(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
@@ -252,7 +265,8 @@ class _Medication_caretakerState extends State<Medication_caretaker> {
                   }
                   // Regular frequency with time
                   return Padding(
-                    padding: EdgeInsets.only(bottom: context.screenWidth * 0.01),
+                    padding:
+                        EdgeInsets.only(bottom: context.screenWidth * 0.01),
                     child: RichText(
                       text: TextSpan(
                         style: TextStyle(
@@ -262,12 +276,14 @@ class _Medication_caretakerState extends State<Medication_caretaker> {
                         ),
                         children: [
                           TextSpan(
-                            text: '${f.frequency[0].toUpperCase()}${f.frequency.substring(1)} at ',
+                            text:
+                                '${f.frequency[0].toUpperCase()}${f.frequency.substring(1)} at ',
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           TextSpan(
                             text: _formatTime(f.time),
-                            style: const TextStyle(fontWeight: FontWeight.normal),
+                            style:
+                                const TextStyle(fontWeight: FontWeight.normal),
                           ),
                         ],
                       ),
@@ -287,7 +303,8 @@ class _Medication_caretakerState extends State<Medication_caretaker> {
                 spacing: context.screenWidth * 0.03,
                 children: [
                   // Start Date
-                  if (medication.startDate != null && medication.startDate!.isNotEmpty)
+                  if (medication.startDate != null &&
+                      medication.startDate!.isNotEmpty)
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -308,7 +325,8 @@ class _Medication_caretakerState extends State<Medication_caretaker> {
                       ],
                     ),
                   // End Date - only show if available
-                  if (medication.endDate != null && medication.endDate!.isNotEmpty)
+                  if (medication.endDate != null &&
+                      medication.endDate!.isNotEmpty)
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -430,11 +448,11 @@ class _Medication_caretakerState extends State<Medication_caretaker> {
       final parts = time.split(':');
       int hour = int.parse(parts[0]);
       final minute = parts[1];
-      
+
       final period = hour >= 12 ? 'PM' : 'AM';
       if (hour > 12) hour -= 12;
       if (hour == 0) hour = 12;
-      
+
       return '$hour:$minute $period';
     } catch (e) {
       return time;

@@ -178,7 +178,7 @@ class Notesview extends StatelessWidget {
             return ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: controller.previousNotes.length,
+              itemCount: controller.previousNotes.length > 5 ? 5 : controller.previousNotes.length,
               separatorBuilder: (context, index) =>
                   SizedBox(height: context.screenWidth * 0.04),
               itemBuilder: (context, index) {

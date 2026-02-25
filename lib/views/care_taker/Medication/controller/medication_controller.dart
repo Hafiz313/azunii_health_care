@@ -13,6 +13,11 @@ class MedicationController extends BaseController {
   final CaregiverMedicineRepository _repository = CaregiverMedicineRepository();
   final CaregiverState _state = CaregiverState();
   
+  // Pagination state
+  final RxInt currentPage = 1.obs;
+  final RxInt lastPage = 1.obs;
+  final RxInt totalMedications = 0.obs;
+  
   // Track the current patient ID to detect changes
   final RxInt currentPatientId = RxInt(0);
   
@@ -54,10 +59,10 @@ class MedicationController extends BaseController {
   /// Always fetches fresh data to ensure the screen is up to date
   void refreshIfNeeded() {
     print('🔄 [Medication] Tab became visible - Fetching fresh data...');
-    getMedications();
+    getMedications(page: 1);
   }
 
-  Future<void> getMedications() async {
+  Future<void> getMedications({int page = 1}) async {
     // Prevent duplicate calls
     if (_isFetching) {
       print('⏳ [Medication] Already fetching, skipping duplicate call');
@@ -66,7 +71,7 @@ class MedicationController extends BaseController {
     
     final patientId = _state.activePatientId.value;
     
-    print('🔍 getMedications called - Patient ID: $patientId');
+    print('🔍 getMedications called - Patient ID: $patientId, Page: $page');
     
     if (patientId == null) {
       print('❌ No active patient selected');
@@ -84,20 +89,28 @@ class MedicationController extends BaseController {
     allMedications.value = [];
     filteredMedications.value = [];
     
-    print('📡 Fetching medications for patient ID: $patientId');
+    print('📡 Fetching medications for patient ID: $patientId (page: $page)');
 
     _isFetching = true;
-    final result = await safeApiCall(() => _repository.getMedicinesList());
+    final result = await safeApiCall(() => _repository.getMedicinesList(page: page));
     _isFetching = false;
     _needsRefresh = false; // Reset flag regardless of result
     
     if (result != null) {
-      print('✅ Received ${result.data.medicines.length} medications');
+      print('✅ Received ${result.data.medicines.length} medications (page: ${result.data.currentPage}/${result.data.lastPage}, total: ${result.data.total})');
       allMedications.value = result.data.medicines;
       filteredMedications.value = allMedications;
+      currentPage.value = result.data.currentPage;
+      lastPage.value = result.data.lastPage;
+      totalMedications.value = result.data.total;
     } else {
       print('❌ Failed to fetch medications');
     }
+  }
+
+  /// Fetch a specific page of medications (used by PaginationControls)
+  Future<void> getMedicationsPage(int page) async {
+    await getMedications(page: page);
   }
 
   void filterMedicationsByDate() {

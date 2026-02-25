@@ -11,35 +11,48 @@ import '../../widget/text.dart';
 import '../../widget/buttons.dart';
 import 'controller/advocacyController.dart';
 
-class AddCaregiverView extends StatelessWidget {
+class AddCaregiverView extends StatefulWidget {
   const AddCaregiverView({super.key});
 
   static const String routeName = '/add-caregiver';
 
   @override
+  State<AddCaregiverView> createState() => _AddCaregiverViewState();
+}
+
+class _AddCaregiverViewState extends State<AddCaregiverView> {
+  late final AdvocacyController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(AdvocacyController());
+    controller.clearForm();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final controller = Get.put(AdvocacyController());
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Obx(() => OverlayLoader(
-          isLoading: controller.isLoading.value,
-          child: Scaffold(
-            backgroundColor: AppColors.white,
-            body: SafeArea(
-              child: Column(
-                children: [
-                  CustomAppBar(
-                    isOndashboard: false,
-                    title: 'Add Caregiver',
-                  ),
-                  Expanded(
-                    child: _buildAddCaregiverContent(controller),
-                  ),
-                ],
+            isLoading: controller.isLoading.value,
+            child: Scaffold(
+              backgroundColor: AppColors.white,
+              body: SafeArea(
+                child: Column(
+                  children: [
+                    CustomAppBar(
+                      isOndashboard: false,
+                      title: 'Add Caregiver',
+                    ),
+                    Expanded(
+                      child: _buildAddCaregiverContent(controller),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        )),
+          )),
     );
   }
 
@@ -67,7 +80,7 @@ class AddCaregiverView extends StatelessWidget {
               CustomTxtField(
                 title: 'Email',
                 textEditingController: controller.emailController,
-                hintTxt: 'Enter Your Email',
+                hintTxt: 'Enter Caregiver Email',
                 prefixIcon: const Icon(
                   Icons.email_outlined,
                   color: AppColors.textColor,
@@ -81,7 +94,7 @@ class AddCaregiverView extends StatelessWidget {
               CustomTxtField(
                 title: 'Full Name',
                 textEditingController: controller.fullNameController,
-                hintTxt: 'Enter Your Full Name',
+                hintTxt: 'Enter Caregivers Name',
                 prefixIcon: const Icon(
                   Icons.person_outline,
                   color: AppColors.textColor,

@@ -109,6 +109,9 @@ class _AllMedicinesViewState extends State<AllMedicinesView> {
                         status: medicine.status == 'active'
                             ? 'Active'
                             : 'In Active',
+                        color: medicine.status == 'active'
+                            ? Colors.green
+                            : Colors.red,
                         onTap: () =>
                             controller.showAllMedicineDetails(medicine.id),
                       );

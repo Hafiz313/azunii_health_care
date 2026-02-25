@@ -356,7 +356,7 @@ class HomeView extends StatelessWidget {
                 onTap: controller.onViewAllMedicinesTap,
                 child: subText5(
                   Lang.viewAll,
-                  color: Colors.blue,
+                  color: Colors.black,
                   align: TextAlign.start,
                   context: context,
                 ),

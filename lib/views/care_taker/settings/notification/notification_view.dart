@@ -39,7 +39,7 @@ class _NotificationViewState extends State<NotificationView> {
     return Obx(() => OverlayLoader(
           isLoading: controller.isLoading.value,
           child: Scaffold(
-            backgroundColor: const Color(0xFFF0F4F8),
+            backgroundColor: const Color.fromARGB(255, 255, 255, 255),
             appBar: AppBar(
               backgroundColor: Colors.white,
               elevation: 0,
@@ -64,7 +64,7 @@ class _NotificationViewState extends State<NotificationView> {
                 children: [
                   Padding(
                     padding: EdgeInsets.symmetric(
-                        horizontal: context.percentWidth * 0.04,
+                        horizontal: context.percentWidth * 4,
                         vertical: context.percentHeight * 0.01),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,

@@ -19,21 +19,22 @@ class CaregiverMedicineRepository {
   }
 
   // Get Caregiver Medicines List (New API Response)
-  Future<CaregiverMedicineListApiResponse> getMedicinesList() async {
+  Future<CaregiverMedicineListApiResponse> getMedicinesList({int page = 1}) async {
     try {
-      print('\n💊 GET CAREGIVER MEDICINES LIST Request 💊');
+      print('\n💊 GET CAREGIVER MEDICINES LIST Request (page: $page) 💊');
       
       final patientId = CaregiverState().activePatientId.value;
       if (patientId == null) {
         throw Exception('No active patient selected');
       }
       
+      final endpoint = '${Apis.getMedicineCaregiver}?page=$page';
       final response = await ApiClient.postWithAuth(
-        Apis.getMedicineCaregiver,
+        endpoint,
         body: {'patient_id': patientId},
       );
       
-      print('📄 Medicines List Response: Retrieved caregiver medicines\n');
+      print('📄 Medicines List Response: Retrieved caregiver medicines (page: $page)\n');
       return CaregiverMedicineListApiResponse.fromJson(response);
     } catch (e) {
       print('❌ Get Caregiver Medicines List Error: $e');
