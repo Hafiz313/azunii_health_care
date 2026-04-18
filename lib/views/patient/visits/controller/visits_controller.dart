@@ -6,10 +6,14 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:intl/intl.dart';
+import 'package:file_picker/file_picker.dart';
 import '../../../../core/controllers/base_controller.dart';
 import '../../../../core/models/visit_model.dart';
 import '../../../../core/repositories/visits_repo.dart';
+import 'dart:convert';
 import 'package:intl/intl.dart';
+import '../../../../core/models/specialty_model.dart';
+import '../../../../core/services/local_storage_service.dart';
 
 class VisitsController extends BaseController {
   final VisitsRepository _VisitsRepository = VisitsRepository();
@@ -18,11 +22,73 @@ class VisitsController extends BaseController {
   final TextEditingController notesController = TextEditingController();
 
   final RxString selectedSpecialty = RxString('');
+  final RxString selectedCategory = RxString('');
+  final RxString selectedSpecialtyName = RxString('');
   final Rx<DateTime?> selectedDate = Rx<DateTime?>(null);
-  final Rx<File?> selectedImage = Rx<File?>(null);
+  final Rx<File?> selectedFile = Rx<File?>(null);
   final RxString existingImageUrl = RxString('');
   final RxInt editingVisitId = RxInt(0);
   final RxBool isEditMode = RxBool(false);
+  
+  final RxList<SpecialtyModel> specialities = <SpecialtyModel>[].obs;
+  final RxList<String> categories = <String>[].obs;
+  final RxList<String> namesForCategory = <String>[].obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchSpecialties();
+  }
+
+  Future<void> fetchSpecialties() async {
+    try {
+      final cachedStr = await LocalStorageService.getCachedDoctorSpecialties();
+      if (cachedStr != null) {
+        final List<dynamic> jsonList = jsonDecode(cachedStr);
+        specialities.value = jsonList.map((e) => SpecialtyModel.fromJson(e)).toList();
+      } else {
+        final data = await _VisitsRepository.getSpecialties();
+        if (data.isNotEmpty) {
+          await LocalStorageService.saveDoctorSpecialties(jsonEncode(data));
+          specialities.value = data.map((e) => SpecialtyModel.fromJson(e)).toList();
+        }
+      }
+      
+      // Update categories list
+      final Set<String> cats = {};
+      for (var s in specialities) {
+        if (s.category.isNotEmpty) cats.add(s.category);
+      }
+      categories.value = cats.toList();
+    } catch (e) {
+      debugPrint('Error fetching specialties: $e');
+    }
+  }
+
+  void setCategory(String? category) {
+    selectedCategory.value = category ?? '';
+    selectedSpecialtyName.value = '';
+    selectedSpecialty.value = '';
+    
+    if (selectedCategory.value.isNotEmpty) {
+      namesForCategory.value = specialities
+          .where((s) => s.category == selectedCategory.value)
+          .map((s) => s.name)
+          .toList();
+    } else {
+      namesForCategory.clear();
+    }
+  }
+
+  void setSpecialtyName(String? name) {
+    selectedSpecialtyName.value = name ?? '';
+    final spec = specialities.firstWhereOrNull((s) => s.name == name);
+    if (spec != null) {
+      selectedSpecialty.value = spec.description; // We pass the description "as is going right now" (e.g., Cardiologist)
+    } else {
+      selectedSpecialty.value = name ?? ''; // Fallback
+    }
+  }
 
   final ImagePicker _picker = ImagePicker();
 
@@ -34,10 +100,10 @@ class VisitsController extends BaseController {
     selectedDate.value = date;
   }
 
-  Future<void> showImagePickerDialog() async {
+  Future<void> showFilePickerOptions() async {
     Get.dialog(
       AlertDialog(
-        title: const Text('Select Image'),
+        title: const Text('Select Photo or Document'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -57,10 +123,34 @@ class VisitsController extends BaseController {
                 _pickImage(ImageSource.gallery);
               },
             ),
+            ListTile(
+              leading: const Icon(Icons.description),
+              title: const Text('Document (PDF, Word, etc.)'),
+              onTap: () {
+                Get.back();
+                _pickDocument();
+              },
+            ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _pickDocument() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf', 'doc', 'docx', 'txt'],
+      );
+
+      if (result != null && result.files.single.path != null) {
+        selectedFile.value = File(result.files.single.path!);
+        existingImageUrl.value = '';
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to pick document: $e');
+    }
   }
 
   Future<void> _pickImage(ImageSource source) async {
@@ -108,7 +198,7 @@ class VisitsController extends BaseController {
 
       final XFile? image = await _picker.pickImage(source: source);
       if (image != null) {
-        selectedImage.value = File(image.path);
+        selectedFile.value = File(image.path);
         existingImageUrl.value = ''; // Clear existing URL when new image is selected
       }
     } catch (e) {
@@ -117,7 +207,7 @@ class VisitsController extends BaseController {
   }
 
   void clearImage() {
-    selectedImage.value = null;
+    selectedFile.value = null;
     existingImageUrl.value = '';
   }
 
@@ -133,6 +223,25 @@ class VisitsController extends BaseController {
     providerNameController.text = visit.providerName;
     selectedSpecialty.value = visit.specialty;
     notesController.text = visit.notes;
+    
+    // Find name and category from description (if loaded)
+    if (specialities.isNotEmpty) {
+      final spec = specialities.firstWhereOrNull((s) => s.description == visit.specialty);
+      if (spec != null) {
+        selectedCategory.value = spec.category;
+        namesForCategory.value = specialities
+          .where((s) => s.category == spec.category)
+          .map((self) => self.name)
+          .toList();
+        selectedSpecialtyName.value = spec.name;
+      } else {
+        selectedCategory.value = '';
+        selectedSpecialtyName.value = visit.specialty;
+      }
+    } else {
+        selectedCategory.value = '';
+        selectedSpecialtyName.value = visit.specialty;
+    }
 
     // Parse visit date
     try {
@@ -144,8 +253,8 @@ class VisitsController extends BaseController {
     // Load existing image URL if available
     if (visit.attachment != null && visit.attachment!.isNotEmpty) {
       existingImageUrl.value = visit.attachment!;
-      selectedImage.value = null; // Clear local file since we have network image
-      print('✅ Existing image URL set: ${existingImageUrl.value}');
+      selectedFile.value = null; // Clear local file since we have network image
+      print('✅ Existing attachment URL set: ${existingImageUrl.value}');
     } else {
       print('⚠️ No attachment found');
     }
@@ -179,7 +288,7 @@ class VisitsController extends BaseController {
       specialty: selectedSpecialty.value,
       visitDate: formattedDate,
       notes: notesController.text.trim(),
-      attachment: selectedImage.value,
+      attachment: selectedFile.value,
     );
 
     // Call API using safeApiCall
@@ -226,7 +335,7 @@ class VisitsController extends BaseController {
       specialty: selectedSpecialty.value,
       visitDate: formattedDate,
       notes: notesController.text.trim(),
-      attachment: selectedImage.value,
+      attachment: selectedFile.value,
     );
 
     // Call API using safeApiCall
@@ -255,8 +364,11 @@ class VisitsController extends BaseController {
       // TextEditingControllers may already be disposed
     }
     selectedSpecialty.value = '';
+    selectedCategory.value = '';
+    selectedSpecialtyName.value = '';
+    namesForCategory.clear();
     selectedDate.value = null;
-    selectedImage.value = null;
+    selectedFile.value = null;
     existingImageUrl.value = '';
     isEditMode.value = false;
     editingVisitId.value = 0;

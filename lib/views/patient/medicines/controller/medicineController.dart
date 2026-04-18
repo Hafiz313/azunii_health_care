@@ -8,6 +8,7 @@ import '../../../../core/controllers/base_controller.dart';
 import '../../../../core/models/Medicine_model.dart';
 import '../../../../core/repositories/Medicine_repo.dart';
 import '../../../widget/Common_widgets/custom_snackbar.dart';
+import 'package:file_picker/file_picker.dart';
 
 class MedicineFrequencyInput {
   final RxString frequency = RxString('');
@@ -19,7 +20,7 @@ class MedicineFrequencyInput {
 
 class MedicineController extends BaseController {
   final MedicineRepository _medicineRepository = MedicineRepository();
-  
+
   // Text Controllers
   final TextEditingController medNameController = TextEditingController();
   final TextEditingController dosageController = TextEditingController();
@@ -29,11 +30,11 @@ class MedicineController extends BaseController {
   // Observable variables
   final RxString selectedDosage = RxString('');
   final RxString selectedStatus = RxString('active');
-  final Rx<File?> selectedImage = Rx<File?>(null);
+  final Rx<File?> selectedFile = Rx<File?>(null);
   final RxString existingImageUrl = RxString('');
   final RxInt editingMedicineId = RxInt(0);
   final RxBool isEditMode = RxBool(false);
-  
+
   // Frequency type: 'scheduled' or 'unscheduled'
   final RxString frequencyType = RxString('scheduled');
 
@@ -59,15 +60,15 @@ class MedicineController extends BaseController {
     // 0-1 days: Only Daily
     if (days < 2) {
       return ['Daily'];
-    } 
+    }
     // 2-6 days: Daily + Every other day
     else if (days < 7) {
       return ['Daily', 'Every other day'];
-    } 
+    }
     // 7-29 days: Daily + Every other day + Weekly
     else if (days < 30) {
       return ['Daily', 'Every other day', 'Weekly'];
-    } 
+    }
     // 30+ days: All options
     else {
       return ['Daily', 'Every other day', 'Weekly', 'Monthly'];
@@ -88,7 +89,7 @@ class MedicineController extends BaseController {
     if (frequencyRows.isEmpty) {
       addFrequencyRow();
     }
-    
+
     // Listen to frequency type changes to ensure proper setup
     ever(frequencyType, (type) {
       if (type == 'unscheduled' && frequencyRows.isEmpty) {
@@ -185,7 +186,8 @@ class MedicineController extends BaseController {
   bool _hasDuplicateFrequency() {
     for (int i = 0; i < frequencyRows.length; i++) {
       for (int j = i + 1; j < frequencyRows.length; j++) {
-        if (frequencyRows[i].frequency.value == frequencyRows[j].frequency.value &&
+        if (frequencyRows[i].frequency.value ==
+                frequencyRows[j].frequency.value &&
             frequencyRows[i].timeController.text.trim() ==
                 frequencyRows[j].timeController.text.trim() &&
             frequencyRows[i].frequency.value.isNotEmpty &&
@@ -201,7 +203,8 @@ class MedicineController extends BaseController {
   void recalculateFrequencies() {
     final available = availableFrequencies;
     for (var row in frequencyRows) {
-      if (row.frequency.value.isNotEmpty && !available.contains(row.frequency.value)) {
+      if (row.frequency.value.isNotEmpty &&
+          !available.contains(row.frequency.value)) {
         row.frequency.value = '';
       }
     }
@@ -217,10 +220,10 @@ class MedicineController extends BaseController {
     }
   }
 
-  Future<void> showImagePickerDialog() async {
+  Future<void> showFilePickerOptions() async {
     Get.dialog(
       AlertDialog(
-        title: const Text('Select Image'),
+        title: const Text('Select Photo or Document'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -240,10 +243,34 @@ class MedicineController extends BaseController {
                 _pickImage(ImageSource.gallery);
               },
             ),
+            ListTile(
+              leading: const Icon(Icons.description),
+              title: const Text('Document (PDF, Word, etc.)'),
+              onTap: () {
+                Get.back();
+                _pickDocument();
+              },
+            ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _pickDocument() async {
+    try {
+      FilePickerResult? result = await FilePicker.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf', 'doc', 'docx', 'txt'],
+      );
+
+      if (result != null && result.files.single.path != null) {
+        selectedFile.value = File(result.files.single.path!);
+        existingImageUrl.value = ''; // Clear existing URL
+      }
+    } catch (e) {
+      CustomSnackbar.show('Failed to pick document: $e', isSuccess: false);
+    }
   }
 
   Future<void> _pickImage(ImageSource source) async {
@@ -294,7 +321,7 @@ class MedicineController extends BaseController {
 
       final XFile? image = await _picker.pickImage(source: source);
       if (image != null) {
-        selectedImage.value = File(image.path);
+        selectedFile.value = File(image.path);
         existingImageUrl.value =
             ''; // Clear existing URL when new image is selected
       }
@@ -304,7 +331,7 @@ class MedicineController extends BaseController {
   }
 
   void clearImage() {
-    selectedImage.value = null;
+    selectedFile.value = null;
     existingImageUrl.value = '';
   }
 
@@ -320,7 +347,7 @@ class MedicineController extends BaseController {
     medNameController.text = medicine.medicineName;
     selectedDosage.value = medicine.dosage;
     selectedStatus.value = medicine.status;
-    
+
     // Load dates
     if (medicine.startDate != null && medicine.startDate!.isNotEmpty) {
       startDateController.text = medicine.startDate!;
@@ -332,8 +359,8 @@ class MedicineController extends BaseController {
     // Load existing image URL if available
     if (medicine.attachment != null && medicine.attachment!.isNotEmpty) {
       existingImageUrl.value = medicine.attachment!;
-      selectedImage.value = null;
-      debugPrint('✅ Existing image URL set: ${existingImageUrl.value}');
+      selectedFile.value = null;
+      debugPrint('✅ Existing attachment URL set: ${existingImageUrl.value}');
     } else {
       debugPrint('⚠️ No attachment found');
     }
@@ -345,7 +372,7 @@ class MedicineController extends BaseController {
     frequencyRows.clear();
 
     // Determine frequency type and load frequencies
-    if (medicine.frequencies.isNotEmpty && 
+    if (medicine.frequencies.isNotEmpty &&
         medicine.frequencies[0].frequency == 'as_per_needed') {
       // Unscheduled type — add the row BEFORE setting frequencyType
       // to prevent the ever() listener from adding a duplicate row
@@ -414,7 +441,8 @@ class MedicineController extends BaseController {
 
       // Block duplicate frequency + time combinations
       if (_hasDuplicateFrequency()) {
-        _showBottomSnackBar('Duplicate frequency and time combination is not allowed');
+        _showBottomSnackBar(
+            'Duplicate frequency and time combination is not allowed');
         return;
       }
 
@@ -422,7 +450,9 @@ class MedicineController extends BaseController {
       if (endDateController.text.trim().isNotEmpty) {
         final startDate = _parseDate(startDateController.text.trim());
         final endDate = _parseDate(endDateController.text.trim());
-        if (startDate != null && endDate != null && endDate.isBefore(startDate)) {
+        if (startDate != null &&
+            endDate != null &&
+            endDate.isBefore(startDate)) {
           _showBottomSnackBar('End date cannot be before start date');
           return;
         }
@@ -443,29 +473,30 @@ class MedicineController extends BaseController {
     print('🔍 Frequency Type: ${frequencyType.value}');
     print('🔍 Frequency Rows Count: ${frequencyRows.length}');
     for (int i = 0; i < frequencyRows.length; i++) {
-      print('🔍 Row $i - Frequency Value: "${frequencyRows[i].frequency.value}"');
+      print(
+          '🔍 Row $i - Frequency Value: "${frequencyRows[i].frequency.value}"');
       print('🔍 Row $i - Time: "${frequencyRows[i].timeController.text}"');
     }
 
     // Build frequencies list
-    final frequencies = frequencyRows
-        .map((row) {
-          // For unscheduled, ensure frequency is 'as_per_needed'
-          String freqValue = row.frequency.value;
-          if (frequencyType.value == 'unscheduled' && freqValue.isEmpty) {
-            freqValue = 'as_per_needed';
-          }
-          return MedicineFrequency(
-            frequency: freqValue,
-            time: row.timeController.text.trim(),
-          );
-        })
-        .toList();
+    final frequencies = frequencyRows.map((row) {
+      // For unscheduled, ensure frequency is 'as_per_needed'
+      String freqValue = row.frequency.value;
+      if (frequencyType.value == 'unscheduled' && freqValue.isEmpty) {
+        freqValue = 'as_per_needed';
+      }
+      return MedicineFrequency(
+        frequency: freqValue,
+        time: row.timeController.text.trim(),
+      );
+    }).toList();
 
     // Force clear end date for unscheduled — never send it to API
     final String? endDateValue = frequencyType.value == 'unscheduled'
         ? null
-        : (endDateController.text.trim().isEmpty ? null : endDateController.text.trim());
+        : (endDateController.text.trim().isEmpty
+            ? null
+            : endDateController.text.trim());
 
     // Create request with dates
     final medicineRequest = StoreMedicineRequest(
@@ -474,7 +505,7 @@ class MedicineController extends BaseController {
       status: selectedStatus.value,
       startDate: startDateController.text.trim(),
       endDate: endDateValue,
-      attachment: selectedImage.value,
+      attachment: selectedFile.value,
       frequencies: frequencies,
     );
 
@@ -566,7 +597,8 @@ class MedicineController extends BaseController {
 
       // Block duplicate frequency + time combinations
       if (_hasDuplicateFrequency()) {
-        _showBottomSnackBar('Duplicate frequency and time combination is not allowed');
+        _showBottomSnackBar(
+            'Duplicate frequency and time combination is not allowed');
         return;
       }
 
@@ -574,7 +606,9 @@ class MedicineController extends BaseController {
       if (endDateController.text.trim().isNotEmpty) {
         final startDate = _parseDate(startDateController.text.trim());
         final endDate = _parseDate(endDateController.text.trim());
-        if (startDate != null && endDate != null && endDate.isBefore(startDate)) {
+        if (startDate != null &&
+            endDate != null &&
+            endDate.isBefore(startDate)) {
           _showBottomSnackBar('End date cannot be before start date');
           return;
         }
@@ -595,29 +629,30 @@ class MedicineController extends BaseController {
     print('🔍 Frequency Type: ${frequencyType.value}');
     print('🔍 Frequency Rows Count: ${frequencyRows.length}');
     for (int i = 0; i < frequencyRows.length; i++) {
-      print('🔍 Row $i - Frequency Value: "${frequencyRows[i].frequency.value}"');
+      print(
+          '🔍 Row $i - Frequency Value: "${frequencyRows[i].frequency.value}"');
       print('🔍 Row $i - Time: "${frequencyRows[i].timeController.text}"');
     }
 
     // Build frequencies list
-    final frequencies = frequencyRows
-        .map((row) {
-          // For unscheduled, ensure frequency is 'as_per_needed'
-          String freqValue = row.frequency.value;
-          if (frequencyType.value == 'unscheduled' && freqValue.isEmpty) {
-            freqValue = 'as_per_needed';
-          }
-          return MedicineFrequency(
-            frequency: freqValue,
-            time: row.timeController.text.trim(),
-          );
-        })
-        .toList();
+    final frequencies = frequencyRows.map((row) {
+      // For unscheduled, ensure frequency is 'as_per_needed'
+      String freqValue = row.frequency.value;
+      if (frequencyType.value == 'unscheduled' && freqValue.isEmpty) {
+        freqValue = 'as_per_needed';
+      }
+      return MedicineFrequency(
+        frequency: freqValue,
+        time: row.timeController.text.trim(),
+      );
+    }).toList();
 
     // Force clear end date for unscheduled — never send it to API
     final String? updateEndDateValue = frequencyType.value == 'unscheduled'
         ? null
-        : (endDateController.text.trim().isEmpty ? null : endDateController.text.trim());
+        : (endDateController.text.trim().isEmpty
+            ? null
+            : endDateController.text.trim());
 
     // Create request with dates
     final updateRequest = UpdateMedicineRequest(
@@ -627,7 +662,7 @@ class MedicineController extends BaseController {
       status: selectedStatus.value,
       startDate: startDateController.text.trim(),
       endDate: updateEndDateValue,
-      attachment: selectedImage.value,
+      attachment: selectedFile.value,
       frequencies: frequencies,
     );
     debugPrint('update request is ${updateRequest.toJson()}');
@@ -726,7 +761,7 @@ class MedicineController extends BaseController {
     }
     frequencyRows.clear();
     addFrequencyRow(); // Add one empty row
-    selectedImage.value = null;
+    selectedFile.value = null;
     existingImageUrl.value = '';
   }
 

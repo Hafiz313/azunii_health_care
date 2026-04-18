@@ -102,4 +102,36 @@ class LocalStorageService {
       // Ignore — we must not prevent navigation
     }
   }
+  
+  /// Save doctor specialties to cache with timestamp
+  static Future<void> saveDoctorSpecialties(String jsonString) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('doctor_specialties_cache', jsonString);
+      await prefs.setString('doctor_specialties_date', DateTime.now().toIso8601String());
+    } catch (e) {
+      // Ignore
+    }
+  }
+
+  /// Get cached doctor specialties if valid (less than 2 days old)
+  static Future<String?> getCachedDoctorSpecialties() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final dateStr = prefs.getString('doctor_specialties_date');
+      final dataStr = prefs.getString('doctor_specialties_cache');
+      
+      if (dateStr != null && dataStr != null) {
+        final date = DateTime.parse(dateStr);
+        final now = DateTime.now();
+        // Check if cache is older than 2 days
+        if (now.difference(date).inDays < 2) {
+          return dataStr;
+        }
+      }
+    } catch (e) {
+      // Ignore
+    }
+    return null;
+  }
 }

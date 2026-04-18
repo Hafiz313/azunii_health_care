@@ -21,6 +21,7 @@ class Apis {
   static const String getPatientVisits = '/patient/visits/index';
   static const String getVisitDetails = '/patient/visits/show';
   static const String updatePatientVisit = '/patient/visits/update';
+  static const String getDoctorSpecialties = '/patient/visits/specialties';
 
   // Patient summaries endpoints
   static const String getPatientSummary = '/patient/summary/index';

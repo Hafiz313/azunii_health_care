@@ -140,11 +140,12 @@ class _EditMedicineViewState extends State<EditMedicineView> {
     return Obx(() => CustomDropdown(
           label: Lang.status,
           hintText: 'Select status',
-          items: const ['active', 'inactive'],
+          items: const ['active', 'inactive', 'paused'],
           selectedValue: controller.selectedStatus.value.isEmpty
               ? null
               : controller.selectedStatus.value.toLowerCase(),
           onChanged: controller.setStatus,
+          allowCustomValue: false,
           prefixIcon: Icon(
             Icons.medical_services_outlined,
             color: AppColors.textColor,
@@ -615,8 +616,8 @@ class _EditMedicineViewState extends State<EditMedicineView> {
       headerIcon: Icons.upload,
       title: Lang.photoDocumentUpload,
       subtitle: Lang.selectAndUploadPhoto,
-      onTap: controller.showImagePickerDialog,
-      selectedImage: controller.selectedImage,
+      onTap: controller.showFilePickerOptions,
+      selectedFile: controller.selectedFile,
       existingImageUrl: controller.existingImageUrl,
     );
   }

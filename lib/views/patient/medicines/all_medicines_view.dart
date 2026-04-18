@@ -108,10 +108,14 @@ class _AllMedicinesViewState extends State<AllMedicinesView> {
                         isCompleted: medicine.status != 'active',
                         status: medicine.status == 'active'
                             ? 'Active'
-                            : 'In Active',
+                            : medicine.status == 'paused'
+                                ? 'Paused'
+                                : 'In Active',
                         color: medicine.status == 'active'
                             ? Colors.green
-                            : Colors.red,
+                            : medicine.status == 'paused'
+                                ? Colors.orange
+                                : Colors.red,
                         onTap: () =>
                             controller.showAllMedicineDetails(medicine.id),
                       );

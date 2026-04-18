@@ -12,7 +12,7 @@ class UploadSectionWidget extends StatelessWidget {
   final String title;
   final String subtitle;
   final VoidCallback onTap;
-  final Rx<File?> selectedImage;
+  final Rx<File?> selectedFile;
   final RxString? existingImageUrl;
 
   const UploadSectionWidget({
@@ -21,7 +21,7 @@ class UploadSectionWidget extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.onTap,
-    required this.selectedImage,
+    required this.selectedFile,
     this.existingImageUrl,
   });
 
@@ -90,62 +90,53 @@ class UploadSectionWidget extends StatelessWidget {
               ),
               child: Obx(() {
                 // Show local file if selected
-                if (selectedImage.value != null) {
+                if (selectedFile.value != null) {
+                  final path = selectedFile.value!.path;
+                  final isImg = _isImage(path);
+
                   return Container(
                     padding: const EdgeInsets.all(16),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.file(
-                        selectedImage.value!,
-                        height: 200,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                    child: isImg
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.file(
+                              selectedFile.value!,
+                              height: 200,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : _buildDocumentPlaceholder(path.split('/').last),
                   );
                 }
-                // Show network image if available
-                else if (existingImageUrl != null && existingImageUrl!.value.isNotEmpty) {
+                // Show network image/file if available
+                else if (existingImageUrl != null &&
+                    existingImageUrl!.value.isNotEmpty) {
+                  final url = existingImageUrl!.value;
+                  final isImg = _isImage(url);
+
                   return Container(
                     padding: const EdgeInsets.all(16),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        existingImageUrl!.value,
-                        height: 200,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            height: 200,
-                            decoration: BoxDecoration(
-                              color: AppColors.cardGray,
-                              borderRadius: BorderRadius.circular(8),
+                    child: isImg
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              url,
+                              height: 200,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return _buildErrorPlaceholder();
+                              },
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return _buildLoadingPlaceholder();
+                              },
                             ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.broken_image,
-                                size: 50,
-                                color: AppColors.textColor,
-                              ),
-                            ),
-                          );
-                        },
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Container(
-                            height: 200,
-                            decoration: BoxDecoration(
-                              color: AppColors.cardGray,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
+                          )
+                        : _buildDocumentPlaceholder(
+                            url.split('/').last.split('?').first),
                   );
                 }
                 // Show upload placeholder
@@ -168,7 +159,7 @@ class UploadSectionWidget extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         subText5(
-                          Lang.fileFormats,
+                          'PNG, JPG, PDF, DOC (max. 10MB)',
                           fontWeight: FontWeight.normal,
                           fontSize: 13,
                           color: AppColors.textColor,
@@ -181,6 +172,79 @@ class UploadSectionWidget extends StatelessWidget {
             ),
           )
         ],
+      ),
+    );
+  }
+
+  bool _isImage(String path) {
+    final lowerPath = path.toLowerCase();
+    return lowerPath.endsWith('.jpg') ||
+        lowerPath.endsWith('.jpeg') ||
+        lowerPath.endsWith('.png') ||
+        lowerPath.endsWith('.gif') ||
+        lowerPath.endsWith('.webp') ||
+        lowerPath.endsWith('.heic') ||
+        lowerPath.endsWith('.heif');
+  }
+
+  Widget _buildDocumentPlaceholder(String fileName) {
+    return Container(
+      height: 200,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppColors.cardGray,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.description,
+            size: 50,
+            color: AppColors.primary,
+          ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: subText5(
+              fileName,
+              color: AppColors.headingTextColor,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              align: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorPlaceholder() {
+    return Container(
+      height: 200,
+      decoration: BoxDecoration(
+        color: AppColors.cardGray,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: const Center(
+        child: Icon(
+          Icons.broken_image,
+          size: 50,
+          color: AppColors.textColor,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingPlaceholder() {
+    return Container(
+      height: 200,
+      decoration: BoxDecoration(
+        color: AppColors.cardGray,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: const Center(
+        child: CircularProgressIndicator(),
       ),
     );
   }

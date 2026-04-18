@@ -65,6 +65,22 @@ class VisitsRepository {
     }
   }
 
+  // Get Doctor Specialties
+  Future<List<dynamic>> getSpecialties() async {
+    try {
+      debugPrint('\n📋 GET DOCTOR SPECIALTIES Request 📋');
+      final response = await ApiClient.getWithAuth(Apis.getDoctorSpecialties);
+      if (response != null && response['status'] == true) {
+        debugPrint('📄 Specialties Response: Retrieved successfully\n');
+        return response['data'] as List<dynamic>;
+      }
+      return [];
+    } catch (e) {
+      debugPrint('❌ Get Specialties Error: $e');
+      rethrow;
+    }
+  }
+
   // Get Visit Details
   Future<VisitDetailResponse> getVisitDetails(int visitId) async {
     try {

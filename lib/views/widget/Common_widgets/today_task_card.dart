@@ -54,7 +54,12 @@ class TodayTaskCard extends StatelessWidget {
               fontWeight: FontWeight.w500,
               status ?? (isCompleted ? 'Active' : 'In Active'),
               fontSize: 12,
-              color: isCompleted ? color ?? Colors.green : color ?? Colors.red,
+              color: color ??
+                  (status?.toLowerCase() == 'paused'
+                      ? Colors.orange
+                      : isCompleted
+                          ? Colors.green
+                          : Colors.red),
               align: TextAlign.start,
             ),
           ],

@@ -92,20 +92,30 @@ class _EditVisitsViewState extends State<EditVisitsView> {
                               ),
                               const SizedBox(height: 20),
                               Obx(() => CustomDropdown(
+                                    label: 'Category',
+                                    hintText: 'Select Category',
+                                    items: controller.categories.toList(),
+                                    selectedValue:
+                                        controller.selectedCategory.value.isEmpty
+                                            ? null
+                                            : controller.selectedCategory.value,
+                                    onChanged: controller.setCategory,
+                                    prefixIcon: const Icon(
+                                      Icons.category_outlined,
+                                      size: 18,
+                                      color: AppColors.textColor,
+                                    ),
+                                  )),
+                              const SizedBox(height: 20),
+                              Obx(() => CustomDropdown(
                                     label: Lang.specialty,
                                     hintText: Lang.selectSpecialty,
-                                    items: const [
-                                      'Cardiologist',
-                                      'Neurologist',
-                                      'Dermatologist',
-                                      'Pediatrician',
-                                      'Orthopedic',
-                                    ],
+                                    items: controller.namesForCategory.toList(),
                                     selectedValue: controller
-                                            .selectedSpecialty.value.isEmpty
+                                            .selectedSpecialtyName.value.isEmpty
                                         ? null
-                                        : controller.selectedSpecialty.value,
-                                    onChanged: controller.setSpecialty,
+                                        : controller.selectedSpecialtyName.value,
+                                    onChanged: controller.setSpecialtyName,
                                     prefixIcon: const Icon(
                                       Icons.settings_outlined,
                                       size: 18,
@@ -133,8 +143,8 @@ class _EditVisitsViewState extends State<EditVisitsView> {
                                 headerIcon: Icons.upload,
                                 title: Lang.photoDocumentUpload,
                                 subtitle: Lang.selectAndUploadPhoto,
-                                onTap: controller.showImagePickerDialog,
-                                selectedImage: controller.selectedImage,
+                                onTap: controller.showFilePickerOptions,
+                                selectedFile: controller.selectedFile,
                                 existingImageUrl: controller.existingImageUrl,
                               ),
                               const SizedBox(height: 24),

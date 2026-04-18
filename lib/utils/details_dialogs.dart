@@ -4,6 +4,10 @@ import 'package:Azunii_Health/core/models/visit_model.dart';
 import 'package:Azunii_Health/utils/DateForm.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:io';
 
 class DetailsDialogs {
   static void showVisitDetailsDialog(
@@ -66,42 +70,9 @@ class DetailsDialogs {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  GestureDetector(
-                    onTap: () => onImagePreview(visit.attachment!),
-                    child: Container(
-                      height: 120,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppColors.dividerGray),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          visit.attachment!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              color: AppColors.cardGray,
-                              child: Icon(
-                                Icons.image_not_supported,
-                                color: AppColors.textColor,
-                                size: 40,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Tap to preview',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textColor,
-                      fontStyle: FontStyle.italic,
-                    ),
+                  _buildAttachmentPreview(
+                    visit.attachment!,
+                    onImagePreview: onImagePreview,
                   ),
                 ],
                 const SizedBox(height: 20),
@@ -238,42 +209,9 @@ class DetailsDialogs {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  GestureDetector(
-                    onTap: () => onImagePreview(medicine.attachment!),
-                    child: Container(
-                      height: 120,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppColors.dividerGray),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          medicine.attachment!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              color: AppColors.cardGray,
-                              child: Icon(
-                                Icons.image_not_supported,
-                                color: AppColors.textColor,
-                                size: 40,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Tap to preview',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppColors.textColor,
-                      fontStyle: FontStyle.italic,
-                    ),
+                  _buildAttachmentPreview(
+                    medicine.attachment!,
+                    onImagePreview: onImagePreview,
                   ),
                 ],
                 const SizedBox(height: 20),
@@ -487,7 +425,7 @@ class DetailsDialogs {
   /// Example: "daily" -> "Daily", "as_per_needed" -> "As Per Needed", "monthly" -> "Monthly"
   static String _formatFrequencyLabel(String frequency) {
     final lowerFreq = frequency.toLowerCase().trim();
-    
+
     if (lowerFreq == 'as_per_needed') {
       return 'As Per Needed';
     } else if (lowerFreq == 'daily') {
@@ -501,6 +439,118 @@ class DetailsDialogs {
     } else {
       // Capitalize first letter for any other frequency
       return frequency[0].toUpperCase() + frequency.substring(1);
+    }
+  }
+
+  static Widget _buildAttachmentPreview(String url,
+      {required Function(String) onImagePreview}) {
+    final isImg = _isImage(url);
+    final fileName = url.split('/').last.split('?').first;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          onTap: () {
+            if (isImg) {
+              onImagePreview(url);
+            } else {
+              _openRemoteFile(url);
+            }
+          },
+          child: Container(
+            height: 120,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: AppColors.cardGray,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.dividerGray),
+            ),
+            child: isImg
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      url,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Center(
+                            child: Icon(Icons.broken_image,
+                                color: AppColors.textColor, size: 40));
+                      },
+                    ),
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.description,
+                          color: AppColors.primary, size: 40),
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Text(
+                          fileName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.headingTextColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          isImg ? 'Tap to preview image' : 'Tap to open document',
+          style: TextStyle(
+            fontSize: 12,
+            color: AppColors.textColor,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      ],
+    );
+  }
+
+  static bool _isImage(String path) {
+    final lowerPath = path.toLowerCase();
+    return lowerPath.endsWith('.jpg') ||
+        lowerPath.endsWith('.jpeg') ||
+        lowerPath.endsWith('.png') ||
+        lowerPath.endsWith('.gif') ||
+        lowerPath.endsWith('.webp') ||
+        lowerPath.endsWith('.heic') ||
+        lowerPath.endsWith('.heif');
+  }
+
+  static Future<void> _openRemoteFile(String url) async {
+    try {
+      Get.dialog(
+        const Center(child: CircularProgressIndicator()),
+        barrierDismissible: false,
+      );
+
+      final response = await http.get(Uri.parse(url));
+      final bytes = response.bodyBytes;
+
+      final dir = await getTemporaryDirectory();
+      final fileName = url.split('/').last.split('?').first;
+      final file = File('${dir.path}/$fileName');
+
+      await file.writeAsBytes(bytes);
+
+      Get.back(); // Close loading
+      final result = await OpenFile.open(file.path);
+      if (result.type != ResultType.done) {
+        Get.snackbar('Error', 'Could not open file: ${result.message}',
+            snackPosition: SnackPosition.BOTTOM);
+      }
+    } catch (e) {
+      if (Get.isOverlaysOpen) Get.back();
+      Get.snackbar('Error', 'Failed to download file: $e',
+          snackPosition: SnackPosition.BOTTOM);
     }
   }
 }
