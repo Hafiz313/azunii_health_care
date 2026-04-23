@@ -2,6 +2,7 @@ import 'package:Azunii_Health/utils/percentage_size_ext.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/customAppBar.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/custom_dropdown.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/overlayloader.dart';
+import 'package:Azunii_Health/views/widget/Common_widgets/custom_snackbar.dart';
 import 'package:Azunii_Health/views/widget/text_fields.dart';
 import 'package:Azunii_Health/views/widget/loading_overlay.dart';
 import 'package:flutter/material.dart';
@@ -139,6 +140,7 @@ class _AddVisitViewState extends State<AddVisitView> {
                                     label: 'Category',
                                     hintText: 'Select Category',
                                     items: controller.categories.toList(),
+                                    allowCustomValue: false,
                                     selectedValue:
                                         controller.selectedCategory.value.isEmpty
                                             ? null
@@ -155,11 +157,17 @@ class _AddVisitViewState extends State<AddVisitView> {
                                     label: Lang.specialty,
                                     hintText: Lang.selectSpecialty,
                                     items: controller.namesForCategory.toList(),
+                                    allowCustomValue: false,
                                     selectedValue:
                                         controller.selectedSpecialtyName.value.isEmpty
                                             ? null
                                             : controller.selectedSpecialtyName.value,
                                     onChanged: controller.setSpecialtyName,
+                                    onTapOverride: controller.selectedCategory.value.isEmpty
+                                        ? () {
+                                            CustomSnackbar.show('Please pick a category first');
+                                          }
+                                        : null,
                                     prefixIcon: const Icon(
                                       Icons.settings_outlined,
                                       size: 18,

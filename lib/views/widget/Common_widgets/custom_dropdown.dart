@@ -10,6 +10,7 @@ class CustomDropdown extends StatelessWidget {
   final Function(String?) onChanged;
   final String? label;
   final bool allowCustomValue;
+  final VoidCallback? onTapOverride;
 
   const CustomDropdown({
     super.key,
@@ -20,6 +21,7 @@ class CustomDropdown extends StatelessWidget {
     required this.onChanged,
     this.label,
     this.allowCustomValue = true,
+    this.onTapOverride,
   });
 
   @override
@@ -40,7 +42,7 @@ class CustomDropdown extends StatelessWidget {
           const SizedBox(height: 8),
         ],
         InkWell(
-          onTap: () {
+          onTap: onTapOverride ?? () {
             // Unfocus any active text fields before showing picker
             FocusManager.instance.primaryFocus?.unfocus();
             _showPicker(context).then((_) {

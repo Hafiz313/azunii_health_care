@@ -29,7 +29,7 @@ class VisitsController extends BaseController {
   final RxString existingImageUrl = RxString('');
   final RxInt editingVisitId = RxInt(0);
   final RxBool isEditMode = RxBool(false);
-  
+
   final RxList<SpecialtyModel> specialities = <SpecialtyModel>[].obs;
   final RxList<String> categories = <String>[].obs;
   final RxList<String> namesForCategory = <String>[].obs;
@@ -45,15 +45,17 @@ class VisitsController extends BaseController {
       final cachedStr = await LocalStorageService.getCachedDoctorSpecialties();
       if (cachedStr != null) {
         final List<dynamic> jsonList = jsonDecode(cachedStr);
-        specialities.value = jsonList.map((e) => SpecialtyModel.fromJson(e)).toList();
+        specialities.value =
+            jsonList.map((e) => SpecialtyModel.fromJson(e)).toList();
       } else {
         final data = await _VisitsRepository.getSpecialties();
         if (data.isNotEmpty) {
           await LocalStorageService.saveDoctorSpecialties(jsonEncode(data));
-          specialities.value = data.map((e) => SpecialtyModel.fromJson(e)).toList();
+          specialities.value =
+              data.map((e) => SpecialtyModel.fromJson(e)).toList();
         }
       }
-      
+
       // Update categories list
       final Set<String> cats = {};
       for (var s in specialities) {
@@ -69,7 +71,7 @@ class VisitsController extends BaseController {
     selectedCategory.value = category ?? '';
     selectedSpecialtyName.value = '';
     selectedSpecialty.value = '';
-    
+
     if (selectedCategory.value.isNotEmpty) {
       namesForCategory.value = specialities
           .where((s) => s.category == selectedCategory.value)
@@ -84,7 +86,8 @@ class VisitsController extends BaseController {
     selectedSpecialtyName.value = name ?? '';
     final spec = specialities.firstWhereOrNull((s) => s.name == name);
     if (spec != null) {
-      selectedSpecialty.value = spec.description; // We pass the description "as is going right now" (e.g., Cardiologist)
+      selectedSpecialty.value = spec
+          .description; // We pass the description "as is going right now" (e.g., Cardiologist)
     } else {
       selectedSpecialty.value = name ?? ''; // Fallback
     }
@@ -139,7 +142,7 @@ class VisitsController extends BaseController {
 
   Future<void> _pickDocument() async {
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
+      FilePickerResult? result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf', 'doc', 'docx', 'txt'],
       );
@@ -189,8 +192,7 @@ class VisitsController extends BaseController {
                 'Gallery permission permanently denied. Please enable it in app settings.');
             await openAppSettings();
           } else {
-            Get.snackbar(
-                'Permission Denied', 'Gallery permission is required');
+            Get.snackbar('Permission Denied', 'Gallery permission is required');
           }
           return;
         }
@@ -199,7 +201,8 @@ class VisitsController extends BaseController {
       final XFile? image = await _picker.pickImage(source: source);
       if (image != null) {
         selectedFile.value = File(image.path);
-        existingImageUrl.value = ''; // Clear existing URL when new image is selected
+        existingImageUrl.value =
+            ''; // Clear existing URL when new image is selected
       }
     } catch (e) {
       Get.snackbar('Error', 'Failed to pick image: $e');
@@ -215,7 +218,7 @@ class VisitsController extends BaseController {
   void loadVisitData(VisitModel visit) {
     print('📊 Loading visit data for editing');
     print('📸 Visit attachment: ${visit.attachment}');
-    
+
     isEditMode.value = true;
     editingVisitId.value = visit.id;
 
@@ -223,24 +226,25 @@ class VisitsController extends BaseController {
     providerNameController.text = visit.providerName;
     selectedSpecialty.value = visit.specialty;
     notesController.text = visit.notes;
-    
+
     // Find name and category from description (if loaded)
     if (specialities.isNotEmpty) {
-      final spec = specialities.firstWhereOrNull((s) => s.description == visit.specialty);
+      final spec = specialities
+          .firstWhereOrNull((s) => s.description == visit.specialty);
       if (spec != null) {
         selectedCategory.value = spec.category;
         namesForCategory.value = specialities
-          .where((s) => s.category == spec.category)
-          .map((self) => self.name)
-          .toList();
+            .where((s) => s.category == spec.category)
+            .map((self) => self.name)
+            .toList();
         selectedSpecialtyName.value = spec.name;
       } else {
         selectedCategory.value = '';
         selectedSpecialtyName.value = visit.specialty;
       }
     } else {
-        selectedCategory.value = '';
-        selectedSpecialtyName.value = visit.specialty;
+      selectedCategory.value = '';
+      selectedSpecialtyName.value = visit.specialty;
     }
 
     // Parse visit date
@@ -249,7 +253,7 @@ class VisitsController extends BaseController {
     } catch (e) {
       selectedDate.value = null;
     }
-    
+
     // Load existing image URL if available
     if (visit.attachment != null && visit.attachment!.isNotEmpty) {
       existingImageUrl.value = visit.attachment!;
@@ -302,7 +306,7 @@ class VisitsController extends BaseController {
         clearAllFields();
         Get.back();
       }
-      
+
       // Show success snackbar after navigation
       _showBottomSnackBar('Visit updated successfully!', isSuccess: true);
     }
