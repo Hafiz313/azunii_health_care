@@ -16,6 +16,8 @@ class VisitsRepository {
         'specialty': visitRequest.specialty,
         'visit_date': visitRequest.visitDate,
         'notes': visitRequest.notes,
+        if (visitRequest.specialityId != null)
+          'speciality_id': visitRequest.specialityId.toString(),
       };
 
       final response = await ApiClient.postMultipartWithAuth(
@@ -111,6 +113,9 @@ class VisitsRepository {
       fields['specialty'] = request.specialty;
       fields['visit_date'] = request.visitDate;
       fields['notes'] = request.notes;
+      if (request.specialityId != null) {
+        fields['speciality_id'] = request.specialityId.toString();
+      }
 
       final response = await ApiClient.postMultipartWithAuth(
         '${Apis.updatePatientVisit}',

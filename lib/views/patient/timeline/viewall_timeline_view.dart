@@ -109,7 +109,7 @@ class ViewAllTimelineView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             subText5(
-              controller.isFilterChanged ? 'Filtered by date' : 'As of Today',
+              controller.isFilterChanged ? 'Filtered by date' : 'Full Timeline',
               fontWeight: FontWeight.w600,
               color: AppColors.headingTextColor,
               fontSize: 13,

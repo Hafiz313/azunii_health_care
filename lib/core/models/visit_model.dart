@@ -7,6 +7,7 @@ class StoreVisitRequest {
   final String visitDate;
   final String notes;
   final File? attachment;
+  final int? specialityId;
 
   StoreVisitRequest({
     required this.providerName,
@@ -14,6 +15,7 @@ class StoreVisitRequest {
     required this.visitDate,
     required this.notes,
     this.attachment,
+    this.specialityId,
   });
 
   Map<String, dynamic> toJson() {
@@ -22,6 +24,7 @@ class StoreVisitRequest {
       'specialty': specialty,
       'visit_date': visitDate,
       'notes': notes,
+      if (specialityId != null) 'speciality_id': specialityId,
       if (attachment != null) 'attachment': attachment,
     };
   }
@@ -34,6 +37,7 @@ class UpdateVisitRequest {
   final String visitDate;
   final String notes;
   final File? attachment;
+  final int? specialityId;
 
   UpdateVisitRequest({
     required this.id,
@@ -42,6 +46,7 @@ class UpdateVisitRequest {
     required this.visitDate,
     required this.notes,
     this.attachment,
+    this.specialityId,
   });
 
   Map<String, dynamic> toJson() {
@@ -51,6 +56,7 @@ class UpdateVisitRequest {
       'specialty': specialty,
       'visit_date': visitDate,
       'notes': notes,
+      if (specialityId != null) 'speciality_id': specialityId,
       if (attachment != null) 'attachment': attachment,
     };
   }

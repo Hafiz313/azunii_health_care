@@ -29,6 +29,7 @@ class VisitsController extends BaseController {
   final RxString existingImageUrl = RxString('');
   final RxInt editingVisitId = RxInt(0);
   final RxBool isEditMode = RxBool(false);
+  final RxnInt selectedSpecialityId = RxnInt(null);
 
   final RxList<SpecialtyModel> specialities = <SpecialtyModel>[].obs;
   final RxList<String> categories = <String>[].obs;
@@ -88,8 +89,10 @@ class VisitsController extends BaseController {
     if (spec != null) {
       selectedSpecialty.value = spec
           .description; // We pass the description "as is going right now" (e.g., Cardiologist)
+      selectedSpecialityId.value = spec.id;
     } else {
       selectedSpecialty.value = name ?? ''; // Fallback
+      selectedSpecialityId.value = null;
     }
   }
 
@@ -238,13 +241,16 @@ class VisitsController extends BaseController {
             .map((self) => self.name)
             .toList();
         selectedSpecialtyName.value = spec.name;
+        selectedSpecialityId.value = spec.id;
       } else {
         selectedCategory.value = '';
         selectedSpecialtyName.value = visit.specialty;
+        selectedSpecialityId.value = null;
       }
     } else {
       selectedCategory.value = '';
       selectedSpecialtyName.value = visit.specialty;
+      selectedSpecialityId.value = null;
     }
 
     // Parse visit date
@@ -293,6 +299,7 @@ class VisitsController extends BaseController {
       visitDate: formattedDate,
       notes: notesController.text.trim(),
       attachment: selectedFile.value,
+      specialityId: selectedSpecialityId.value,
     );
 
     // Call API using safeApiCall
@@ -340,6 +347,7 @@ class VisitsController extends BaseController {
       visitDate: formattedDate,
       notes: notesController.text.trim(),
       attachment: selectedFile.value,
+      specialityId: selectedSpecialityId.value,
     );
 
     // Call API using safeApiCall
@@ -376,6 +384,7 @@ class VisitsController extends BaseController {
     existingImageUrl.value = '';
     isEditMode.value = false;
     editingVisitId.value = 0;
+    selectedSpecialityId.value = null;
   }
 
   @override

@@ -109,7 +109,7 @@ class TimelineView extends GetView<TimelineController> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             subText5(
-              controller.isFilterChanged ? 'Filtered by date' : Lang.asOfToday,
+              controller.isFilterChanged ? 'Filtered by date' : 'Full Timeline',
               fontWeight: FontWeight.w600,
               color: AppColors.headingTextColor,
               fontSize: 13,
@@ -244,7 +244,9 @@ class TimelineView extends GetView<TimelineController> {
             _buildSectionHeader(
               icon: Icons.medication_outlined,
               title: 'Medicine Schedule',
-              subtitle: '${controller.scheduleList.length} medications today',
+              subtitle: controller.isFilterChanged
+                  ? '${controller.scheduleList.length} medications scheduled'
+                  : '${controller.scheduleList.length} medications found',
               color: AppColors.primary,
             ),
             const SizedBox(height: 12),

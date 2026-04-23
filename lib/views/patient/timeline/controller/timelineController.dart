@@ -15,11 +15,11 @@ class TimelineController extends BaseController {
   final RxList<TimelineEvent> visitsList = <TimelineEvent>[].obs;
   final RxList<TimelineEvent> medicineUpdatesList = <TimelineEvent>[].obs;
 
-  final Rx<DateTime?> selectedDate = Rx<DateTime?>(DateTime.now());
+  final Rxn<DateTime> selectedDate = Rxn<DateTime>(null);
   final RxInt currentPage = RxInt(1);
   final RxInt totalPages = RxInt(1);
   final RxInt totalItems = RxInt(0);
-  final RxBool showAllDates = RxBool(false);
+  final RxBool showAllDates = RxBool(true);
 
   @override
   void onInit() {
@@ -58,8 +58,8 @@ class TimelineController extends BaseController {
   }
 
   void resetFilter() {
-    selectedDate.value = DateTime.now();
-    showAllDates.value = false;
+    selectedDate.value = null;
+    showAllDates.value = true;
     fetchTimeline(1);
   }
 
@@ -92,10 +92,6 @@ class TimelineController extends BaseController {
   bool get shouldShowPagination => totalItems.value >= 10;
 
   bool get isFilterChanged {
-    if (selectedDate.value == null) return false;
-    final now = DateTime.now();
-    return selectedDate.value!.year != now.year ||
-        selectedDate.value!.month != now.month ||
-        selectedDate.value!.day != now.day;
+    return selectedDate.value != null;
   }
 }
