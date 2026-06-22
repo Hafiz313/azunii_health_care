@@ -101,7 +101,7 @@ class SignUpView extends StatelessWidget {
                     title: Lang.password,
                     hintTxt: Lang.enterYourPassword,
                     textEditingController: controller.passwordTxtField,
-                    isHiddenPassword: controller.isPasswordVisible.value,
+                    isHiddenPassword: !controller.isPasswordVisible.value,
                     prefixIcon: Icon(
                       Icons.lock_outline,
                       color: AppColors.borderColor,
@@ -135,7 +135,7 @@ class SignUpView extends StatelessWidget {
                     title: Lang.verifyPassword,
                     hintTxt: Lang.verifyPassword,
                     textEditingController: controller.confirmPasswordTxtField,
-                    isHiddenPassword: controller.isConformPasswordVisible.value,
+                    isHiddenPassword: !controller.isConformPasswordVisible.value,
                     prefixIcon: Icon(
                       Icons.lock_outline,
                       color: AppColors.borderColor,

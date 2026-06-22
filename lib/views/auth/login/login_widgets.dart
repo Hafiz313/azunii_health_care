@@ -49,7 +49,7 @@ class LoginWidgets {
           // enabled: !mainLoading.value,
           textEditingController: controller.passwordController,
           keyboardType: TextInputType.visiblePassword,
-          isHiddenPassword: controller.isPasswordVisible.value,
+          isHiddenPassword: !controller.isPasswordVisible.value,
           prefixIcon: Icon(
             Icons.lock_outline,
             color: AppColors.borderColor,
