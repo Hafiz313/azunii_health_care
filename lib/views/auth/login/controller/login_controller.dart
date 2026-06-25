@@ -28,6 +28,22 @@ class LoginController extends BaseController {
     isChecked.value = value ?? false;
   }
 
+  @override
+  void onInit() {
+    super.onInit();
+    _loadSavedCredentials();
+  }
+
+  Future<void> _loadSavedCredentials() async {
+    final rememberMe = await LocalStorageService.getRememberMeStatus();
+    isChecked.value = rememberMe;
+    if (rememberMe) {
+      final credentials = await LocalStorageService.getRememberedCredentials();
+      emailController.text = credentials['email'] ?? '';
+      passwordController.text = credentials['password'] ?? '';
+    }
+  }
+
   /// STEP 1: Standard login flow
   /// - Validates form
   /// - Gets FCM token (REQUIRED)
@@ -101,6 +117,20 @@ class LoginController extends BaseController {
 
       await LocalStorageService.setLoginStatus(true,
           userType: userType, token: result.token);
+
+      if (isChecked.value) {
+        await LocalStorageService.saveRememberMeCredentials(
+          true,
+          emailController.text.trim(),
+          passwordController.text,
+        );
+      } else {
+        await LocalStorageService.saveRememberMeCredentials(
+          false,
+          '',
+          '',
+        );
+      }
 
       // Store user data from login response
       Staticdata.userModel = result.user;

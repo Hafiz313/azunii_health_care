@@ -36,7 +36,7 @@ class VisitResponse {
     return VisitResponse(
       status: json['status'] ?? false,
       message: json['message'] ?? '',
-      data: VisitPaginationData.fromJson(json['data']),
+      data: VisitPaginationData.fromJson(json),
     );
   }
 
@@ -76,26 +76,28 @@ class VisitPaginationData {
   });
 
   factory VisitPaginationData.fromJson(Map<String, dynamic> json) {
+    final meta = json['meta'] as Map<String, dynamic>?;
+    final links = json['links'] as Map<String, dynamic>?;
     return VisitPaginationData(
-      currentPage: json['current_page'] ?? 1,
+      currentPage: meta?['current_page'] ?? 1,
       visits: (json['data'] as List<dynamic>?)
               ?.map((visit) => VisitModel.fromJson(visit))
               .toList() ??
           [],
-      firstPageUrl: json['first_page_url'],
-      from: json['from'],
-      lastPage: json['last_page'] ?? 1,
-      lastPageUrl: json['last_page_url'],
-      links: (json['links'] as List<dynamic>?)
+      firstPageUrl: links?['first'],
+      from: meta?['from'],
+      lastPage: meta?['last_page'] ?? 1,
+      lastPageUrl: links?['last'],
+      links: (meta?['links'] as List<dynamic>?)
               ?.map((link) => VisitLink.fromJson(link))
               .toList() ??
           [],
-      nextPageUrl: json['next_page_url'],
-      path: json['path'] ?? '',
-      perPage: json['per_page'] ?? 10,
-      prevPageUrl: json['prev_page_url'],
-      to: json['to'],
-      total: json['total'] ?? 0,
+      nextPageUrl: links?['next'],
+      path: meta?['path'] ?? '',
+      perPage: meta?['per_page'] ?? 10,
+      prevPageUrl: links?['prev'],
+      to: meta?['to'],
+      total: meta?['total'] ?? 0,
     );
   }
 }

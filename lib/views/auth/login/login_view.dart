@@ -75,24 +75,24 @@ class _LoginViewState extends State<LoginView> {
       child: Form(
         key: controller.formKey,
         child: Column(children: [
-          Text(
-            Lang.appName,
-            style: GoogleFonts.michroma(
-              fontSize: context.percentWidth * 6.25,
-              fontWeight: FontWeight.w500,
-              color: AppColors.blackColor,
-            ),
-          ),
-          Text(
-            Lang.appSlang,
-            style: GoogleFonts.michroma(
-              fontSize: context.percentWidth * 3.00,
-              fontWeight: FontWeight.w500,
-              color: AppColors.blackColor,
-            ),
-          ),
-
-          SizedBox(height: context.percentHeight * 1.0),
+          // Text(
+          //   Lang.appName,
+          //   style: GoogleFonts.michroma(
+          //     fontSize: context.percentWidth * 6.25,
+          //     fontWeight: FontWeight.w500,
+          //     color: AppColors.blackColor,
+          //   ),
+          // ),
+          // Text(
+          //   Lang.appSlang,
+          //   style: GoogleFonts.michroma(
+          //     fontSize: context.percentWidth * 3.00,
+          //     fontWeight: FontWeight.w500,
+          //     color: AppColors.blackColor,
+          //   ),
+          // ),
+          //
+          // SizedBox(height: context.percentHeight * 1.0),
           Text(
             Lang.welcomeBack,
             style: GoogleFonts.michroma(

@@ -1,9 +1,11 @@
+
 import 'package:Azunii_Health/core/models/static_user_model.dart';
 import 'package:Azunii_Health/utils/percentage_size_ext.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/customAppBar.dart';
 import 'package:Azunii_Health/views/widget/Common_widgets/overlayloader.dart';
 import 'package:Azunii_Health/views/widget/buttons.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 import '../../../consts/colors.dart';
@@ -26,6 +28,8 @@ class _ProfileViewState extends State<ProfileView>
   late Animation<Offset> _slideAnimation;
   final HomeController controller = Get.find<HomeController>();
   final RxBool isEditMode = false.obs;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void initState() {
@@ -184,11 +188,25 @@ class _ProfileViewState extends State<ProfileView>
                   enabled: isEditMode.value),
               const SizedBox(height: 12),
               _buildTextField('Password', controller.passwordController,
-                  isPassword: true, enabled: isEditMode.value),
+                  isPassword: true,
+                  obscureText: _obscurePassword,
+                  onToggleVisibility: () {
+                    setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    });
+                  },
+                  enabled: isEditMode.value),
               const SizedBox(height: 12),
               _buildTextField(
                   'Confirm Password', controller.confirmPasswordController,
-                  isPassword: true, enabled: isEditMode.value),
+                  isPassword: true,
+                  obscureText: _obscureConfirmPassword,
+                  onToggleVisibility: () {
+                    setState(() {
+                      _obscureConfirmPassword = !_obscureConfirmPassword;
+                    });
+                  },
+                  enabled: isEditMode.value),
               const SizedBox(height: 20),
               // Edit/Update Profile Button
               SizedBox(
@@ -294,7 +312,8 @@ class _ProfileViewState extends State<ProfileView>
     }
   }
 
-  void _showLogoutConfirmation() {
+  void
+  _showLogoutConfirmation() {
     _showConfirmationDialog(
       title: 'Logout',
       message: 'Are you sure you want to logout from your account?',
@@ -385,7 +404,10 @@ class _ProfileViewState extends State<ProfileView>
 
 
   Widget _buildTextField(String label, TextEditingController textController,
-      {bool isPassword = false, bool enabled = true}) {
+      {bool isPassword = false,
+      bool obscureText = false,
+      VoidCallback? onToggleVisibility,
+      bool enabled = true}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -400,9 +422,19 @@ class _ProfileViewState extends State<ProfileView>
         const SizedBox(height: 6),
         TextField(
           controller: textController,
-          obscureText: isPassword,
+          obscureText: isPassword ? obscureText : false,
           enabled: enabled,
           decoration: InputDecoration(
+            suffixIcon: isPassword
+                ? InkWell(
+                    onTap: onToggleVisibility,
+                    child: Icon(
+                      obscureText ? FontAwesomeIcons.eye : FontAwesomeIcons.eyeSlash,
+                      color: AppColors.borderColor,
+                      size: context.percentHeight * 2.0,
+                    ),
+                  )
+                : null,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(color: AppColors.primary.withOpacity(0.3)),

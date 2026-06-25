@@ -120,27 +120,28 @@ class MedicineListResponse {
   });
 
   factory MedicineListResponse.fromJson(Map<String, dynamic> json) {
-    final data = json['data'] as Map<String, dynamic>;
+    final meta = json['meta'] as Map<String, dynamic>?;
+    final links = json['links'] as Map<String, dynamic>?;
     return MedicineListResponse(
       status: json['status'] ?? false,
       message: json['message'] ?? '',
-      currentPage: data['current_page'] ?? 1,
-      medicines: (data['data'] as List<dynamic>? ?? [])
+      currentPage: meta?['current_page'] ?? 1,
+      medicines: (json['data'] as List<dynamic>? ?? [])
           .map((medicine) => Medicine.fromJson(medicine))
           .toList(),
-      firstPageUrl: data['first_page_url'],
-      from: data['from'],
-      lastPage: data['last_page'] ?? 1,
-      lastPageUrl: data['last_page_url'],
-      links: (data['links'] as List<dynamic>? ?? [])
+      firstPageUrl: links?['first'],
+      from: meta?['from'],
+      lastPage: meta?['last_page'] ?? 1,
+      lastPageUrl: links?['last'],
+      links: (meta?['links'] as List<dynamic>? ?? [])
           .map((link) => PaginationLink.fromJson(link))
           .toList(),
-      nextPageUrl: data['next_page_url'],
-      path: data['path'] ?? '',
-      perPage: data['per_page'] ?? 10,
-      prevPageUrl: data['prev_page_url'],
-      to: data['to'],
-      total: data['total'] ?? 0,
+      nextPageUrl: links?['next'],
+      path: meta?['path'] ?? '',
+      perPage: meta?['per_page'] ?? 10,
+      prevPageUrl: links?['prev'],
+      to: meta?['to'],
+      total: meta?['total'] ?? 0,
     );
   }
 }

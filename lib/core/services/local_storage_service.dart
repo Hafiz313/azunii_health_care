@@ -8,6 +8,9 @@ class LocalStorageService {
   static const String _userIdKey = 'userId';
   static const String _userTypeKey = 'userType';
   static const String _tokenKey = 'authToken';
+  static const String _rememberMeKey = 'rememberMe';
+  static const String _rememberedEmailKey = 'rememberedEmail';
+  static const String _rememberedPasswordKey = 'rememberedPassword';
   
   static const _secureStorage = FlutterSecureStorage(
     aOptions: AndroidOptions(encryptedSharedPreferences: true),
@@ -133,5 +136,60 @@ class LocalStorageService {
       // Ignore
     }
     return null;
+  }
+
+  /// Save remember me credentials
+  static Future<void> saveRememberMeCredentials(
+      bool rememberMe, String email, String password) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_rememberMeKey, rememberMe);
+
+      if (rememberMe) {
+        await _secureStorage.write(key: _rememberedEmailKey, value: email);
+        await _secureStorage.write(key: _rememberedPasswordKey, value: password);
+      } else {
+        await _secureStorage.delete(key: _rememberedEmailKey);
+        await _secureStorage.delete(key: _rememberedPasswordKey);
+      }
+    } catch (e) {
+      // Ignore or log error
+    }
+  }
+
+  /// Get remember me status
+  static Future<bool> getRememberMeStatus() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getBool(_rememberMeKey) ?? false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /// Get remembered credentials
+  static Future<Map<String, String?>> getRememberedCredentials() async {
+    try {
+      final email = await _secureStorage.read(key: _rememberedEmailKey);
+      final password = await _secureStorage.read(key: _rememberedPasswordKey);
+      return {
+        'email': email,
+        'password': password,
+      };
+    } catch (e) {
+      return {'email': null, 'password': null};
+    }
+  }
+
+  /// Clear remembered credentials
+  static Future<void> clearRememberedCredentials() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_rememberMeKey);
+      await _secureStorage.delete(key: _rememberedEmailKey);
+      await _secureStorage.delete(key: _rememberedPasswordKey);
+    } catch (e) {
+      // Ignore
+    }
   }
 }

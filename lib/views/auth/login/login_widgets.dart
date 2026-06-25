@@ -1,3 +1,4 @@
+
 import 'package:Azunii_Health/consts/appconsts.dart';
 import 'package:Azunii_Health/utils/percentage_size_ext.dart';
 import 'package:Azunii_Health/views/auth/forget/froget_view.dart';
@@ -79,56 +80,64 @@ class LoginWidgets {
       () => Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Container(
-                height: context.percentHeight * 2.5,
-                width: context.percentHeight * 2.5,
-                padding: const EdgeInsets.all(0),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: controller.isChecked.value
-                        ? AppColors.secondary
-                        : AppColors.borderColor,
-                    width: 0.5,
-                  ),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Transform.scale(
-                  scale: 0.7,
-                  child: Checkbox(
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    visualDensity: VisualDensity.compact,
-                    value: controller.isChecked.value,
-                    onChanged: controller.toggleRememberMe,
-                    side: BorderSide(
+          GestureDetector(
+            onTap: () {
+              controller.toggleRememberMe(!controller.isChecked.value);
+            },
+            behavior: HitTestBehavior.opaque,
+            child: Row(
+              children: [
+                IgnorePointer(
+                  child: Container(
+                    height: context.percentHeight * 2.5,
+                    width: context.percentHeight * 2.5,
+                    padding: const EdgeInsets.all(0),
+                    decoration: BoxDecoration(
+                      border: Border.all(
                         color: controller.isChecked.value
                             ? AppColors.secondary
                             : AppColors.borderColor,
-                        width: 0.8),
-                    fillColor: MaterialStateProperty.resolveWith<Color?>(
-                      (Set<MaterialState> states) {
-                        if (states.contains(MaterialState.selected)) {
-                          return AppColors.secondary;
-                        }
-                        return Colors.transparent;
-                      },
+                        width: 0.5,
+                      ),
+                      borderRadius: BorderRadius.circular(4),
                     ),
-                    checkColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(3),
+                    child: Transform.scale(
+                      scale: 0.7,
+                      child: Checkbox(
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        visualDensity: VisualDensity.compact,
+                        value: controller.isChecked.value,
+                        onChanged: (_) {},
+                        side: BorderSide(
+                            color: controller.isChecked.value
+                                ? AppColors.secondary
+                                : AppColors.borderColor,
+                            width: 0.8),
+                        fillColor: MaterialStateProperty.resolveWith<Color?>(
+                          (Set<MaterialState> states) {
+                            if (states.contains(MaterialState.selected)) {
+                              return AppColors.secondary;
+                            }
+                            return Colors.transparent;
+                          },
+                        ),
+                        checkColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(
-                width: context.percentWidth * 2,
-              ),
-              Text(
-                Lang.rememberMe,
-                style: TextStyle(color: AppColors.headingTextColor),
-              ),
-            ],
+                SizedBox(
+                  width: context.percentWidth * 2,
+                ),
+                Text(
+                  Lang.rememberMe,
+                  style: TextStyle(color: AppColors.headingTextColor),
+                ),
+              ],
+            ),
           ),
           GestureDetector(
             onTap: () {
