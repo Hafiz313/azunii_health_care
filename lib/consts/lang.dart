@@ -233,7 +233,7 @@ class Lang {
   static const String selectDate = 'Select Date';
   static const String notes = 'Notes';
   static const String writeDescription = 'Write your Description';
-  static const String photoDocumentUpload = 'Photo/Document Upload';
+  static const String photoDocumentUpload = 'Photo Upload';
   static const String selectAndUploadPhoto =
       'Select and upload the Photo of your choice';
   static const String chooseFileOrDrag = 'Choose a file or drag & drop it here';

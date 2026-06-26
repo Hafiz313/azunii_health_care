@@ -15,6 +15,8 @@ class TimelineController extends BaseController {
   final RxList<TimelineEvent> visitsList = <TimelineEvent>[].obs;
   final RxList<TimelineEvent> medicineUpdatesList = <TimelineEvent>[].obs;
 
+  final RxString sortOrder = 'latest'.obs; // 'latest' or 'oldest'
+
   final Rxn<DateTime> selectedDate = Rxn<DateTime>(null);
   final RxInt currentPage = RxInt(1);
   final RxInt totalPages = RxInt(1);
@@ -63,11 +65,30 @@ class TimelineController extends BaseController {
     fetchTimeline(1);
   }
 
-  void _separateAndReverse() {
-    // Reverse schedules for latest-first
-    scheduleList.value = _allSchedules.reversed.toList();
+  void changeSortOrder(String order) {
+    sortOrder.value = order;
+    _separateAndReverse();
+  }
 
-    // Separate events into visits and medicine updates, reverse both
+  void _separateAndReverse() {
+    // Sort schedules by startDate
+    final sortedSchedules = List<MedicineSchedule>.from(_allSchedules);
+    if (sortOrder.value == 'latest') {
+      sortedSchedules.sort((a, b) {
+        final dtA = DateTime.tryParse(a.startDate) ?? DateTime(1970);
+        final dtB = DateTime.tryParse(b.startDate) ?? DateTime(1970);
+        return dtB.compareTo(dtA);
+      });
+    } else {
+      sortedSchedules.sort((a, b) {
+        final dtA = DateTime.tryParse(a.startDate) ?? DateTime(1970);
+        final dtB = DateTime.tryParse(b.startDate) ?? DateTime(1970);
+        return dtA.compareTo(dtB);
+      });
+    }
+    scheduleList.value = sortedSchedules;
+
+    // Separate events into visits and medicine updates
     final visits = <TimelineEvent>[];
     final medUpdates = <TimelineEvent>[];
 
@@ -79,8 +100,33 @@ class TimelineController extends BaseController {
       }
     }
 
-    visitsList.value = visits.reversed.toList();
-    medicineUpdatesList.value = medUpdates.reversed.toList();
+    // Sort visits and medicine updates by timestamp
+    if (sortOrder.value == 'latest') {
+      visits.sort((a, b) {
+        final dtA = DateTime.tryParse(a.timestamp) ?? DateTime(1970);
+        final dtB = DateTime.tryParse(b.timestamp) ?? DateTime(1970);
+        return dtB.compareTo(dtA);
+      });
+      medUpdates.sort((a, b) {
+        final dtA = DateTime.tryParse(a.timestamp) ?? DateTime(1970);
+        final dtB = DateTime.tryParse(b.timestamp) ?? DateTime(1970);
+        return dtB.compareTo(dtA);
+      });
+    } else {
+      visits.sort((a, b) {
+        final dtA = DateTime.tryParse(a.timestamp) ?? DateTime(1970);
+        final dtB = DateTime.tryParse(b.timestamp) ?? DateTime(1970);
+        return dtA.compareTo(dtB);
+      });
+      medUpdates.sort((a, b) {
+        final dtA = DateTime.tryParse(a.timestamp) ?? DateTime(1970);
+        final dtB = DateTime.tryParse(b.timestamp) ?? DateTime(1970);
+        return dtA.compareTo(dtB);
+      });
+    }
+
+    visitsList.value = visits;
+    medicineUpdatesList.value = medUpdates;
   }
 
   void goToPage(int page) {

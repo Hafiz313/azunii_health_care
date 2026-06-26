@@ -33,6 +33,7 @@ class Apis {
   static const String storePatientMedicine = '/patient/medicine/store';
   static const String getMedicineDetails = '/patient/medicine/show';
   static const String updatePatientMedicine = '/patient/medicine/update';
+  static const String searchPatientMedicine = '/patient/medicine/search';
   //feedback
   static const String storeFeedback = '/patient/feedback/store';
   //caregivers
@@ -45,6 +46,9 @@ class Apis {
   //notes caregivers
   static const String notesCaregiver = '/caregiver/notes/store';
   static const String listCaregiver = '/caregiver/notes/index';
+  // patient caregiver notes
+  static const String getPatientCaregiverNotes = '/patient/caregiver/notes';
+  static const String showPatientCaregiverNote = '/patient/caregiver/notes';
   //timeline
   static const String getTimeline = '/patient/timeline/index';
 

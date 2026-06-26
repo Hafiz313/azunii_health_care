@@ -34,7 +34,10 @@ class _EditVisitsViewState extends State<EditVisitsView> {
     visitId = widget.visitId;
     final arguments = Get.arguments as Map<String, dynamic>?;
     if (arguments != null && arguments['visit'] != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (controller.specialities.isEmpty) {
+          await controller.fetchSpecialties();
+        }
         controller.loadVisitData(arguments['visit']);
         final visit = arguments['visit'];
         visitId =

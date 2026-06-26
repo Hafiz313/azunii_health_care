@@ -159,7 +159,7 @@ class UploadSectionWidget extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         subText5(
-                          'PNG, JPG, PDF, DOC (max. 10MB)',
+                          'PNG, JPG (max. 10MB)',
                           fontWeight: FontWeight.normal,
                           fontSize: 13,
                           color: AppColors.textColor,

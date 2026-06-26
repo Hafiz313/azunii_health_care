@@ -13,6 +13,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'widgets/searchable_medicine_field.dart';
 
 class EditMedicineView extends StatefulWidget {
   final bool? isOndashboard;
@@ -106,15 +107,15 @@ class _EditMedicineViewState extends State<EditMedicineView> {
   }
 
   Widget _buildMedicineNameField() {
-    return CustomTxtField(
+    return SearchableMedicineField(
       title: Lang.medName,
-      textEditingController: controller.medNameController,
       hintTxt: Lang.enterMedName,
-      prefixIcon: Icon(
+      prefixIcon: const Icon(
         Icons.medication_outlined,
         color: AppColors.textColor,
         size: 20,
       ),
+      controller: controller,
     );
   }
 

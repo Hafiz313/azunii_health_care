@@ -9,6 +9,7 @@ import '../advocacy/controller/advocacyController.dart';
 
 import '../medicines/medicines_view.dart';
 import '../summary/summary_view.dart';
+import '../notes/patient_notes_view.dart';
 import '../timeline/timeline_view.dart';
 import '../timeline/controller/timelineController.dart';
 import '../visits/visits_view.dart';
@@ -47,7 +48,7 @@ class _PatientDashboardState extends State<PatientDashboard> {
       const HomeView(),
       const AddMedicineView(),
       AddVisitView(),
-      const SummaryView(),
+      const PatientNotesView(),
       const TimelineView(
         isOndashboard: true,
       ),

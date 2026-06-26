@@ -109,7 +109,7 @@ class VisitsController extends BaseController {
   Future<void> showFilePickerOptions() async {
     Get.dialog(
       AlertDialog(
-        title: const Text('Select Photo or Document'),
+        title: const Text('Select Photo'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -129,34 +129,10 @@ class VisitsController extends BaseController {
                 _pickImage(ImageSource.gallery);
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.description),
-              title: const Text('Document (PDF, Word, etc.)'),
-              onTap: () {
-                Get.back();
-                _pickDocument();
-              },
-            ),
           ],
         ),
       ),
     );
-  }
-
-  Future<void> _pickDocument() async {
-    try {
-      FilePickerResult? result = await FilePicker.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pdf', 'doc', 'docx', 'txt'],
-      );
-
-      if (result != null && result.files.single.path != null) {
-        selectedFile.value = File(result.files.single.path!);
-        existingImageUrl.value = '';
-      }
-    } catch (e) {
-      Get.snackbar('Error', 'Failed to pick document: $e');
-    }
   }
 
   Future<void> _pickImage(ImageSource source) async {
@@ -232,8 +208,8 @@ class VisitsController extends BaseController {
 
     // Find name and category from description (if loaded)
     if (specialities.isNotEmpty) {
-      final spec = specialities
-          .firstWhereOrNull((s) => s.description == visit.specialty);
+      final spec = specialities.firstWhereOrNull((s) =>
+          s.description == visit.specialty || s.name == visit.specialty);
       if (spec != null) {
         selectedCategory.value = spec.category;
         namesForCategory.value = specialities

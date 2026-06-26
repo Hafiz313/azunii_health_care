@@ -582,7 +582,8 @@ class HomeController_caregiver extends BaseController {
                 if (visit.updatedBy.name.isNotEmpty)
                   _buildDetailRow('Updated By', visit.updatedBy.name),
                 _buildDetailRow('Created At', _formatDate(visit.createdAt)),
-                _buildDetailRow('Updated At', _formatDate(visit.updatedAt)),
+                if (visit.updatedAt.isNotEmpty && visit.updatedAt.toLowerCase() != 'null')
+                  _buildDetailRow('Updated At', _formatDate(visit.updatedAt)),
                 if (visit.attachment != null &&
                     visit.attachment!.isNotEmpty) ...[
                   const SizedBox(height: 16),

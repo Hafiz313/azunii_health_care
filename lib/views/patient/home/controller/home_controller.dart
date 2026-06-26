@@ -410,17 +410,13 @@ class HomeController extends BaseController {
     }
   }
 
-  Future<void> editVisit(int visitId) async {
-    print('print visit id is $visitId');
-    final visit = visitsList.firstWhereOrNull((v) => v.id == visitId);
-    if (visit != null) {
-      Get.to(
-          () => EditVisitsView(
-                isOndashboard: false,
-                visitId: visitId,
-              ),
-          arguments: {'visit': visit});
-    }
+  Future<void> editVisit(VisitModel visit) async {
+    Get.to(
+        () => EditVisitsView(
+              isOndashboard: false,
+              visitId: visit.id,
+            ),
+        arguments: {'visit': visit});
   }
 
   Future<void> refreshData() async {
@@ -735,16 +731,13 @@ class HomeController extends BaseController {
   }
 
   /// Edit visit from All Visits screen
-  Future<void> editAllVisit(int visitId) async {
-    final visit = allVisitsPageList.firstWhereOrNull((v) => v.id == visitId);
-    if (visit != null) {
-      Get.to(
-          () => EditVisitsView(
-                isOndashboard: false,
-                visitId: visitId,
-              ),
-          arguments: {'visit': visit});
-    }
+  Future<void> editAllVisit(VisitModel visit) async {
+    Get.to(
+        () => EditVisitsView(
+              isOndashboard: false,
+              visitId: visit.id,
+            ),
+        arguments: {'visit': visit});
   }
 
   @override

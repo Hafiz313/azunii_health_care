@@ -12,7 +12,7 @@ import 'dart:io';
 class DetailsDialogs {
   static void showVisitDetailsDialog(
     VisitModel visit, {
-    required Function(int) onEdit,
+    required Function(VisitModel) onEdit,
     required Function(String) onImagePreview,
   }) {
     Get.dialog(
@@ -58,7 +58,8 @@ class DetailsDialogs {
                 if (visit.updatedBy != null)
                   _buildDetailRow('Updated By', visit.updatedBy!.name),
                 _buildDetailRow('Created At', formatDate(visit.createdAt)),
-                _buildDetailRow('Updated At', formatDate(visit.updatedAt)),
+                if (visit.updatedAt.isNotEmpty && visit.updatedAt.toLowerCase() != 'null')
+                  _buildDetailRow('Updated At', formatDate(visit.updatedAt)),
                 if (visit.attachment != null &&
                     visit.attachment!.isNotEmpty) ...[
                   const SizedBox(height: 16),
@@ -98,7 +99,7 @@ class DetailsDialogs {
                       child: ElevatedButton(
                         onPressed: () {
                           Get.back();
-                          onEdit(visit.id.toInt());
+                          onEdit(visit);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,

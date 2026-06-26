@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,6 +21,11 @@ class MedicineFrequencyInput {
 
 class MedicineController extends BaseController {
   final MedicineRepository _medicineRepository = MedicineRepository();
+
+  // Search autocomplete state
+  final RxList<String> medicineSearchResults = <String>[].obs;
+  final RxBool isSearchingMedicine = false.obs;
+  Timer? _searchDebounceTimer;
 
   // Text Controllers
   final TextEditingController medNameController = TextEditingController();
@@ -223,7 +229,7 @@ class MedicineController extends BaseController {
   Future<void> showFilePickerOptions() async {
     Get.dialog(
       AlertDialog(
-        title: const Text('Select Photo or Document'),
+        title: const Text('Select Photo'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -243,34 +249,10 @@ class MedicineController extends BaseController {
                 _pickImage(ImageSource.gallery);
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.description),
-              title: const Text('Document (PDF, Word, etc.)'),
-              onTap: () {
-                Get.back();
-                _pickDocument();
-              },
-            ),
           ],
         ),
       ),
     );
-  }
-
-  Future<void> _pickDocument() async {
-    try {
-      FilePickerResult? result = await FilePicker.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pdf', 'doc', 'docx', 'txt'],
-      );
-
-      if (result != null && result.files.single.path != null) {
-        selectedFile.value = File(result.files.single.path!);
-        existingImageUrl.value = ''; // Clear existing URL
-      }
-    } catch (e) {
-      CustomSnackbar.show('Failed to pick document: $e', isSuccess: false);
-    }
   }
 
   Future<void> _pickImage(ImageSource source) async {
@@ -765,9 +747,33 @@ class MedicineController extends BaseController {
     existingImageUrl.value = '';
   }
 
+  void searchMedicine(String query) {
+    if (_searchDebounceTimer?.isActive ?? false) _searchDebounceTimer!.cancel();
+
+    if (query.trim().length < 2) {
+      medicineSearchResults.clear();
+      return;
+    }
+
+    _searchDebounceTimer = Timer(const Duration(milliseconds: 300), () async {
+      isSearchingMedicine.value = true;
+      try {
+        final results = await _medicineRepository.searchMedicineNames(query.trim());
+        medicineSearchResults.value = results;
+      } catch (e) {
+        debugPrint('Error searching medicine: $e');
+      } finally {
+        isSearchingMedicine.value = false;
+      }
+    });
+  }
+
   @override
   void onClose() {
     _clearAllFields();
+    if (_searchDebounceTimer?.isActive ?? false) {
+      _searchDebounceTimer!.cancel();
+    }
     medNameController.dispose();
     dosageController.dispose();
     startDateController.dispose();

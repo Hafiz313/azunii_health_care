@@ -16,6 +16,7 @@ import '../../../consts/lang.dart';
 import '../../widget/text.dart';
 import '../../widget/buttons.dart';
 import 'controller/medicineController.dart';
+import 'widgets/searchable_medicine_field.dart';
 
 class AddMedicineView extends StatefulWidget {
   final bool? isOndashboard;
@@ -95,15 +96,15 @@ class _AddMedicineViewState extends State<AddMedicineView> {
   }
 
   Widget _buildMedicineNameField() {
-    return CustomTxtField(
+    return SearchableMedicineField(
       title: Lang.medName,
-      textEditingController: controller.medNameController,
       hintTxt: Lang.enterMedName,
       prefixIcon: const Icon(
         Icons.medication_outlined,
         color: AppColors.textColor,
         size: 20,
       ),
+      controller: controller,
     );
   }
 

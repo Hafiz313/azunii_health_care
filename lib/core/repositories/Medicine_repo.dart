@@ -143,4 +143,18 @@ class MedicineRepository {
       rethrow;
     }
   }
+
+  // Search medicine names
+  Future<List<String>> searchMedicineNames(String query) async {
+    try {
+      print('\n🔍 SEARCH MEDICINES Request 🔍 (query: $query)');
+      final endpoint = '${Apis.searchPatientMedicine}?q=${Uri.encodeComponent(query)}';
+      final response = await ApiClient.getWithAuth(endpoint);
+      print('📄 Search Medicines Response retrieved successfully\n');
+      return List<String>.from(response['data'] ?? []);
+    } catch (e) {
+      print('❌ Search Medicines Error: $e');
+      return [];
+    }
+  }
 }

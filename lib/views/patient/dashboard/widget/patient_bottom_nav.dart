@@ -52,7 +52,7 @@ class PatientBottomNav extends StatelessWidget {
                   )),
               Obx(() => BottomNavItem(
                     svgIcon: AppAssets.note2,
-                    label: Lang.summary,
+                    label: Lang.notes,
                     isSelected: controller.currentIndex.value == 3,
                     onTap: () => controller.changePage(3),
                   )),

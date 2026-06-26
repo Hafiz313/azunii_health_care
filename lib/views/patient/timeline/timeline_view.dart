@@ -309,6 +309,7 @@ class TimelineView extends GetView<TimelineController> {
           // 2. Visit Timeline Section (max 5)
           if (controller.visitsList.isNotEmpty) ...[
             _buildSectionHeaderWithSort(
+              controller,
               title: 'Visit Timeline',
               count: controller.visitsList.length,
             ),
@@ -407,7 +408,8 @@ class TimelineView extends GetView<TimelineController> {
     );
   }
 
-  Widget _buildSectionHeaderWithSort({
+  Widget _buildSectionHeaderWithSort(
+    TimelineController controller, {
     required String title,
     required int count,
   }) {
@@ -416,35 +418,52 @@ class TimelineView extends GetView<TimelineController> {
       children: [
         Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
             color: AppColors.headingTextColor,
             fontWeight: FontWeight.w600,
             fontSize: 15,
           ),
         ),
-        Container(
-            // padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            // decoration: BoxDecoration(
-            //   color: AppColors.cardGray,
-            //   borderRadius: BorderRadius.circular(8),
-            //   border: Border.all(color: AppColors.dividerGray),
-            // ),
-            // child: Row(
-            //   mainAxisSize: MainAxisSize.min,
-            //   children: [
-            //     Text(
-            //       'Sort By',
-            //       style: TextStyle(
-            //         fontSize: 12,
-            //         color: AppColors.headingTextColor,
-            //         fontWeight: FontWeight.w500,
-            //       ),
-            //     ),
-            //     const SizedBox(width: 4),
-            //     Icon(Icons.filter_list, size: 14, color: AppColors.textColor),
-            //   ],
-            // ),
+        PopupMenuButton<String>(
+          initialValue: controller.sortOrder.value,
+          onSelected: (String value) {
+            controller.changeSortOrder(value);
+          },
+          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+            const PopupMenuItem<String>(
+              value: 'latest',
+              child: Text('Latest First', style: TextStyle(fontFamily: 'Satoshi')),
             ),
+            const PopupMenuItem<String>(
+              value: 'oldest',
+              child: Text('Oldest First', style: TextStyle(fontFamily: 'Satoshi')),
+            ),
+          ],
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.cardGray,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.dividerGray),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Obx(() => Text(
+                  controller.sortOrder.value == 'latest' ? 'Latest First' : 'Oldest First',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.headingTextColor,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'Satoshi',
+                  ),
+                )),
+                const SizedBox(width: 4),
+                const Icon(Icons.swap_vert, size: 14, color: AppColors.textColor),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }
