@@ -86,7 +86,10 @@ class HomeView extends StatelessWidget {
               ),
               SizedBox(width: context.screenWidth * 0.03),
               // Logo/Icon (R or ribbon icon)
-
+              Image.asset(
+                AppAssets.logoMain,
+                height: context.screenHeight * 0.035,
+              ),
               SizedBox(width: context.screenWidth * 0.03),
               // Welcome text
               Expanded(
