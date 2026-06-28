@@ -3,10 +3,10 @@ import 'package:get/get.dart';
 import '../../../../consts/colors.dart';
 import '../../../../core/models/notes_model.dart';
 import '../../../../utils/percentage_size_ext.dart';
-import '../../../widget/Common_widgets/customAppBar.dart';
-import '../../../widget/Common_widgets/overlayloader.dart';
-import '../../../widget/Common_widgets/pagination_controls.dart';
-import '../../../widget/text.dart';
+import '../../widget/Common_widgets/customAppBar.dart';
+import '../../widget/Common_widgets/overlayloader.dart';
+import '../../widget/Common_widgets/pagination_controls.dart';
+import '../../widget/text.dart';
 import 'controller/patient_notes_controller.dart';
 
 class PatientNotesView extends StatelessWidget {
@@ -21,7 +21,8 @@ class PatientNotesView extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const CustomAppBar(
+            const
+            CustomAppBar(
               title: 'Notes',
               isOndashboard: true,
             ),
@@ -140,6 +141,7 @@ class PatientNotesView extends StatelessWidget {
                     ),
                   ),
                   SizedBox(width: context.screenWidth * 0.03),
+
                   subText4(
                     note.category,
                     color: AppColors.headingTextColor,

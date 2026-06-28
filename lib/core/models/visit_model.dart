@@ -100,13 +100,16 @@ class VisitModel {
       visitDate: json['visit_date'] ?? '',
       notes: json['notes'] ?? '',
       attachment: json['attachment'],
-      createdBy: json['created_by'] != null
-          ? UserModel.fromJson(json['created_by'])
-          : null,
-      updatedBy: json['updated_by'] != null &&
-              json['updated_by'] is Map<String, dynamic>
-          ? UserModel.fromJson(json['updated_by'])
-          : null,
+      createdBy: (json['createdBy'] != null && json['createdBy'] is Map<String, dynamic>)
+          ? UserModel.fromJson(json['createdBy'])
+          : (json['created_by'] != null && json['created_by'] is Map<String, dynamic>)
+              ? UserModel.fromJson(json['created_by'])
+              : null,
+      updatedBy: (json['updatedBy'] != null && json['updatedBy'] is Map<String, dynamic>)
+          ? UserModel.fromJson(json['updatedBy'])
+          : (json['updated_by'] != null && json['updated_by'] is Map<String, dynamic>)
+              ? UserModel.fromJson(json['updated_by'])
+              : null,
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',
       user: json['user'] != null ? UserModel.fromJson(json['user']) : null,

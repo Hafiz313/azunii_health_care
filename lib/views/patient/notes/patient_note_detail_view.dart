@@ -4,9 +4,9 @@ import '../../../../consts/colors.dart';
 import '../../../../core/controllers/base_controller.dart';
 import '../../../../core/models/notes_model.dart';
 import '../../../../utils/percentage_size_ext.dart';
-import '../../../widget/Common_widgets/customAppBar.dart';
-import '../../../widget/Common_widgets/overlayloader.dart';
-import '../../../widget/text.dart';
+import '../../widget/Common_widgets/customAppBar.dart';
+import '../../widget/Common_widgets/overlayloader.dart';
+import '../../widget/text.dart';
 import 'repository/patient_notes_repository.dart';
 
 class PatientNoteDetailController extends BaseController {
@@ -47,7 +47,7 @@ class PatientNoteDetailView extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const CustomAppBar(
+             CustomAppBar(
               title: 'Note Details',
               isOndashboard: false,
             ),

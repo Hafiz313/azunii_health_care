@@ -165,8 +165,8 @@ class SearchableMedicineField extends StatelessWidget {
                           ),
                         );
                       },
-                    );
-                  }),
+                    ),
+                  ),
                 ),
               );
             },
