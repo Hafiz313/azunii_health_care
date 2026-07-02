@@ -48,3 +48,6 @@ linux/flutter/generated_plugins.cmake
 linux/flutter/generated_plugins.cmake
 macos/Flutter/GeneratedPluginRegistrant.swift
 pubspec.lock
+ios/Podfile.lock
+android/.kotlin/sessions/kotlin-compiler-3309708687181747319.salive
+ios/Runner.xcodeproj/project.pbxproj
